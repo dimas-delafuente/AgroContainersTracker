@@ -1,0 +1,52 @@
+﻿@page "/containers"
+
+@using AgroContainerTracker.Domain
+@using AgroContainerTracker.Services
+
+@inject IContainerService containerService
+@inject NavigationManager navigationManager
+
+<h1>Contenedores</h1>
+
+<a href="/containers/create" class="btn btn-primary">Crear cámara</a>
+
+@if (containers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Contenedor</th>
+                <th>Tamaño</th>
+                <th>#Palots</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var container in containers)
+            {
+                <tr @onclick="() => OpenContainerDetails(container.ContainerId)">
+                    <td>@container.ContainerId</td>
+                    <td>@container.Size</td>
+                    <td>@container.Palots.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Container> containers = new List<Container>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        containers = await containerService.GetContainersAsync();
+    }
+
+    private void OpenContainerDetails(int containerId)
+    {
+        navigationManager.NavigateTo($"/containers/details/{containerId}");
+    }
+}

@@ -9,15 +9,24 @@ namespace AgroContainerTracker
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHost CreateHostBuilder(string[] args)
+        //public static IWebHost CreateHostBuilder(string[] args)
+        //{
+        //    return WebHost.CreateDefaultBuilder(args)
+        //        .UseStartup<Startup>()
+        //        .UseElectron(args)
+        //        .Build();
+        //}
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseElectron(args)
-                .Build();
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(
+                    webBuilder => webBuilder.UseStartup<Startup>());
         }
+
+
     }
 }

@@ -1,0 +1,49 @@
+﻿@page "/palots/create"
+
+@using AgroContainerTracker.Domain
+@using AgroContainerTracker.Services
+@inject IPalotService palotService
+
+<h1>Crear contenedor</h1>
+
+<EditForm Model="@palot" OnValidSubmit="AddPalot">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+
+    <label for="name">Cámara</label>
+    <InputText id="name" @bind-Value="palot.PalotId" class="form-control" />
+
+    <label for="size">Número de entrada</label>
+    <InputText id="size" @bind-Value="palot.ArrivalNumber" class="form-control" />
+
+    <label for="size">Fecha de entrada</label>
+    <InputDate id="size" @bind-Value="palot.Arrival" class="form-control" />
+
+    <label for="size">Peso</label>
+    <InputNumber id="size" @bind-Value="palot.Weight" class="form-control" />
+
+    <label for="size">Cámara</label>
+    <InputSelect id="size" @bind-Value="palot.ContainerId" class="form-control">
+        @foreach (var container in containers)
+        {
+            <option value="@container.ContainerId">Cámara @container.ContainerId</option>
+
+        }
+    </InputSelect>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+
+@code {
+
+
+    private AddPalotRequest palot = new AddPalotRequest();
+    private readonly List<Container> containers = new List<Container>();
+
+    public void AddPalot()
+    {
+        palotService.AddPalotAsync(palot);
+    }
+}

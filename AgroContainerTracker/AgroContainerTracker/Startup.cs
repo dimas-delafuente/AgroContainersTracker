@@ -1,18 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using AgroContainerTracker.Data;
 using ElectronNET.API;
 using AgroContainerTracker.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using AgroContainerTracker.Services;
+using AgroContainerTracker.Infrastructure;
+using System;
 
 namespace AgroContainerTracker
 {
@@ -31,8 +29,14 @@ namespace AgroContainerTracker
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddDbContext<ApplicationContext>(opt =>
-                opt.UseSqlServer(Configuration.GetConnectionString("sqlConnection")));
+            services.AddScoped<IContainerService, ContainerService>();
+            services.AddScoped<IPalotService, PalotService>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddDbContext<ApplicationContext>(options => options
+                .UseMySql(Configuration.GetConnectionString("sqlConnection")
+            ));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +63,7 @@ namespace AgroContainerTracker
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
 
             ConfigureElectronDesktop();
         }
