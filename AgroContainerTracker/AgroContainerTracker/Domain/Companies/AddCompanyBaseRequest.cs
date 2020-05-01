@@ -5,9 +5,6 @@ namespace AgroContainerTracker.Domain.Companies
     public class AddCompanyBaseRequest
     {
         [Required]
-        public int CompanyNumber { get; set; }
-
-        [Required]
         [MaxLength(9)]
         public string CompanyCode { get; set; }
 

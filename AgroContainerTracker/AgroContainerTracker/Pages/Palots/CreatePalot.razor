@@ -37,7 +37,7 @@
     <InputSelect id="buyer" name="buyer" @bind-Value="palot.BuyerId" class="form-control">
         @foreach (var customer in customers)
         {
-            <option value="@customer.CompanyId">@customer.Name</option>
+            <option value="@customer.CustomerId">@customer.Name</option>
 
         }
     </InputSelect>
@@ -46,7 +46,7 @@
     <InputSelect id="grower" @bind-Value="palot.SellerId" class="form-control">
         @foreach (var customer in customers)
         {
-            <option value="@customer.CompanyId">@customer.Name</option>
+            <option value="@customer.CustomerId">@customer.Name</option>
 
         }
     </InputSelect>

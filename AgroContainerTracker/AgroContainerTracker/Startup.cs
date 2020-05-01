@@ -11,6 +11,7 @@ using AutoMapper;
 using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Infrastructure.Services;
 using System;
+using Radzen;
 
 namespace AgroContainerTracker
 {
@@ -35,8 +36,8 @@ namespace AgroContainerTracker
             services.AddScoped<ISupplierService, SupplierService>();
             services.AddScoped<ICreditorService, CreditorService>();
             services.AddScoped<ICarrierService, CarrierService>();
-
-
+            services.AddScoped<DialogService>();
+            services.AddScoped<NotificationService>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

@@ -32,12 +32,12 @@ namespace AgroContainerTracker.Mocks
                                 },
                                 Buyer = new Customer
                                 {
-                                    CompanyId = 0,
+                                    CustomerId = 0,
                                     Name = "Haciendas Bio"
                                 },
                                 Seller = new Customer
                                 {
-                                    CompanyId = 1,
+                                    CustomerId = 1,
                                     Name = "Frutas Nene"
                                 },
                                 IsActive = true
@@ -66,12 +66,12 @@ namespace AgroContainerTracker.Mocks
                                 },
                                 Buyer = new Customer
                                 {
-                                    CompanyId = 0,
+                                    CustomerId = 0,
                                     Name = "Haciendas Bio"
                                 },
                                 Seller = new Customer
                                 {
-                                    CompanyId = 1,
+                                    CustomerId = 1,
                                     Name = "Frutas Nene"
                                 },
                                 IsActive = true
@@ -102,12 +102,12 @@ namespace AgroContainerTracker.Mocks
                             },
                             Buyer = new Customer
                             {
-                                CompanyId = 0,
+                                CustomerId = 0,
                                 Name = "Haciendas Bio"
                             },
                             Seller = new Customer
                             {
-                                CompanyId = 1,
+                                CustomerId = 1,
                                 Name = "Frutas Nene"
                             },
                             IsActive = true
@@ -128,12 +128,12 @@ namespace AgroContainerTracker.Mocks
                                 },
                                 Buyer = new Customer
                                 {
-                                    CompanyId = 0,
+                                    CustomerId = 0,
                                     Name = "Haciendas Bio"
                                 },
                                 Seller = new Customer
                                 {
-                                    CompanyId = 1,
+                                    CustomerId = 1,
                                     Name = "Frutas Nene"
                                 },
                                 IsActive = true

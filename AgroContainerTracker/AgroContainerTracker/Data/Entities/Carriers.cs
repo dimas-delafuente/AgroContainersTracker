@@ -11,8 +11,8 @@ namespace AgroContainerTracker.Data.Entities
             Vehicles = new HashSet<VehicleEntity>();
         }
 
-        public int CompanyId { get; set; }
-        public int CompanyNumber { get; set; }
+        public int CarrierId { get; set; }
+        public int CarrierNumber { get; set; }
         public string CompanyCode { get; set; }
         public string Name { get; set; }
         public string ContactName { get; set; }

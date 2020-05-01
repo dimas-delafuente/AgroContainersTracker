@@ -3,6 +3,8 @@
 
 @inject ICustomerService customerService
 @inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
 
 <div class="row mt-3">
     <div class="col-lg-4">
@@ -19,20 +21,20 @@ else
     <div class="row mt-5">
         <div class="col-lg-12">
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-                        AllowSorting="true" Data="@customers" TItem="Customer" ColumnWidth="200px">
+                        AllowSorting="true" Data="@customers" TItem="Customer" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="Customer" Property="CompanyNumber" Title="Número" Width="50px"/>
+                    <RadzenGridColumn TItem="Customer" Property="CustomerNumber" Title="Número" Width="50px" />
                     <RadzenGridColumn TItem="Customer" Property="Name" Title="Nombre" />
                     <RadzenGridColumn TItem="Customer" Property="Email" Title="Email" />
                     <RadzenGridColumn TItem="Customer" Property="Phone" Title="Teléfono" />
                     <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-pencil" @onclick="() => OpenCustomerDetails(data.CompanyId)"></span>
+                            <span class="oi oi-pencil" @onclick="() => OpenCustomerDetails(data.CustomerId)"></span>
                         </Template>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-trash" @onclick="() => OpenCustomerDetails(data.CompanyId)"></span>
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveCustomerDialog(data)"></span>
                         </Template>
                     </RadzenGridColumn>
                 </Columns>
@@ -43,7 +45,7 @@ else
 }
 
 @code {
-    private IEnumerable<Customer> customers = new List<Customer>();
+    private List<Customer> customers = new List<Customer>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +55,55 @@ else
     private void OpenCustomerDetails(int customerId)
     {
         navigationManager.NavigateTo($"/customers/details/{customerId}");
+    }
+
+    private async Task RemoveCustomer(Customer customer)
+    {
+        bool deleted = await customerService.DeleteAsync(customer.CustomerId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+        if (deleted)
+        {
+            customers.Remove(customer);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            var message = new NotificationMessage() {
+                Severity = NotificationSeverity.Success,
+                Summary = "Cliente eliminado",
+                Detail = "El cliente se ha eliminado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar el cliente.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private async Task ShowRemoveCustomerDialog(Customer customer) {
+        await dialogService.OpenAsync("Eliminar cliente", ds =>
+            @<RadzenCard Style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este cliente?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveCustomer(customer)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </RadzenCard>);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
     }
 
 }

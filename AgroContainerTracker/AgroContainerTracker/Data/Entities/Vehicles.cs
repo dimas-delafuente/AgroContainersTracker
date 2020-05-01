@@ -8,8 +8,7 @@ namespace AgroContainerTracker.Data.Entities
         public int VehicleId { get; set; }
         public string RegistrationNumber { get; set; }
         public string CarriageRegistrationNumber { get; set; }
-        public int CompanyId { get; set; }
-        public int? CarrierCompanyId { get; set; }
+        public int CarrierId { get; set; }
 
         public virtual CarrierEntity CarrierCompany { get; set; }
     }

@@ -6,10 +6,13 @@ namespace AgroContainerTracker.Core.Services
 {
     public interface ICarrierService
     {
-        Task<IEnumerable<Carrier>> GetAllAsync();
+        Task<List<Carrier>> GetAllAsync();
         
-        Task<Carrier> GetByIdAsync(int id);
+        Task<Carrier> GetByIdAsync(int carrierId);
 
-        Task AddAsync(AddCarrierRequest company);
+        Task AddAsync(AddCarrierRequest carrier);
+
+        Task<bool> DeleteAsync(int carrierId);
+
     }
 }

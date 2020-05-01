@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Data.Contexts;
@@ -36,32 +35,55 @@ namespace AgroContainerTracker.Infrastructure.Services
                 if (addResponse.State.Equals(EntityState.Added))
                     await _context.SaveChangesAsync().ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
+                throw;
             }
         }
 
-        public async Task<IEnumerable<Creditor>> GetAllAsync()
+        public async Task<List<Creditor>> GetAllAsync()
         {
             IEnumerable<CreditorEntity> entities = await _context.Creditors.AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
 
-            return _mapper.Map<IEnumerable<Creditor>>(entities);
+            return _mapper.Map<List<Creditor>>(entities);
         }
 
-        public async Task<Creditor> GetByIdAsync(int id)
+        public async Task<Creditor> GetByIdAsync(int creditorId)
         {
-            if (id < 0)
+            if (creditorId < 0)
                 throw new ArgumentOutOfRangeException();
 
             CreditorEntity entity = await _context.Creditors
-                .Where(x => x.CompanyId.Equals(id))
                 .Include(x => x.Country)
-                .FirstOrDefaultAsync()
+                .FirstOrDefaultAsync(x => x.CreditorId.Equals(creditorId))
                 .ConfigureAwait(false);
 
             return _mapper.Map<Creditor>(entity);
+        }
+
+        public async Task<bool> DeleteAsync(int creditorId)
+        {
+            try
+            {
+                CreditorEntity creditor = await _context.Creditors.FindAsync(creditorId).ConfigureAwait(false);
+
+                if (creditor != null)
+                {
+                    var removedEntity = _context.Creditors.Remove(creditor);
+                    if (removedEntity?.Entity != null && removedEntity.State.Equals(EntityState.Deleted))
+                    {
+                        int deleted = await _context.SaveChangesAsync().ConfigureAwait(false);
+                        return deleted > 0;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return false;
         }
     }
 }

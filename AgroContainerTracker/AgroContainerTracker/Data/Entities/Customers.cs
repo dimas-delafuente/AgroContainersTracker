@@ -11,8 +11,8 @@ namespace AgroContainerTracker.Data.Entities
             PalotsSeller = new HashSet<PalotEntity>();
         }
 
-        public int CompanyId { get; set; }
-        public int CompanyNumber { get; set; }
+        public int CustomerId { get; set; }
+        public int CustomerNumber { get; set; }
         public string CompanyCode { get; set; }
         public string Name { get; set; }
         public string ContactName { get; set; }

@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace AgroContainerTracker.Domain.Companies
 {
     public class Carrier : CompanyBase
     {
+        public int CarrierId { get; set; }
+
+        public int CarrierNumber { get; set; }
+
         public string SanitaryRegistrationNumber { get; set; }
 
         public IEnumerable<Vehicle> Vehicles { get; set; }
@@ -13,7 +19,7 @@ namespace AgroContainerTracker.Domain.Companies
 
     public class Vehicle
     {
-        public int CompanyId { get; set; }
+        public int CarrierId { get; set; }
 
         public string RegistrationNumber { get; set; }
 
@@ -23,7 +29,7 @@ namespace AgroContainerTracker.Domain.Companies
     public class Driver
     {
 
-        public int CompanyId { get; set; }
+        public int CarrierId { get; set; }
 
         public string Name { get; set; }
 
@@ -38,6 +44,10 @@ namespace AgroContainerTracker.Domain.Companies
             Vehicles = new List<Vehicle>();
             Drivers = new List<Driver>();
         }
+
+        [Required]
+        [Range(0, Int32.MaxValue)]
+        public int CarrierNumber { get; set; }
 
         public string SanitaryRegistrationNumber { get; set; }
 

@@ -38,33 +38,55 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch(Exception e)
             {
-
+                throw;
             }
             
 
         }
 
-        public async Task<IEnumerable<Customer>> GetAllAsync()
+        public async Task<List<Customer>> GetAllAsync()
         {
             IEnumerable<CustomerEntity> entities = await _context.Customers.AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
-
-            return _mapper.Map<IEnumerable<Customer>>(entities);
+            return _mapper.Map<List<Customer>>(entities);
         }
 
-        public async Task<Customer> GetByIdAsync(int id)
+        public async Task<Customer> GetByIdAsync(int customerId)
         {
-            if (id < 0)
+            if (customerId < 0)
                 throw new ArgumentOutOfRangeException();
 
             CustomerEntity entity = await _context.Customers
-                .Where(x => x.CompanyId.Equals(id))
                 .Include(x => x.Country)
-                .FirstOrDefaultAsync()
+                .FirstOrDefaultAsync(x => x.CustomerId.Equals(customerId))
                 .ConfigureAwait(false);
 
             return _mapper.Map<Customer>(entity);
 
+        }
+
+        public async Task<bool> DeleteAsync(int customerId)
+        {
+            try
+            {
+                CustomerEntity customer = await _context.Customers.FindAsync(customerId).ConfigureAwait(false);
+
+                if (customer != null)
+                {
+                    var removedEntity = _context.Customers.Remove(customer);
+                    if (removedEntity?.Entity != null && removedEntity.State.Equals(EntityState.Deleted))
+                    {
+                        int deleted = await _context.SaveChangesAsync().ConfigureAwait(false);
+                        return deleted > 0;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return false;
         }
     }
 }

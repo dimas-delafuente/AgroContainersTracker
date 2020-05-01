@@ -6,10 +6,12 @@ namespace AgroContainerTracker.Core.Services
 {
     public interface ICustomerService
     {
-        Task<IEnumerable<Customer>> GetAllAsync();
+        Task<List<Customer>> GetAllAsync();
 
-        Task<Customer> GetByIdAsync(int id);
+        Task<Customer> GetByIdAsync(int customerId);
 
-        Task AddAsync(AddCustomerRequest company);
+        Task AddAsync(AddCustomerRequest customer);
+
+        Task<bool> DeleteAsync(int customerId);
     }
 }

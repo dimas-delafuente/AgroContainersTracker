@@ -5,8 +5,8 @@ namespace AgroContainerTracker.Data.Entities
 {
     public partial class CreditorEntity
     {
-        public int CompanyId { get; set; }
-        public int CompanyNumber { get; set; }
+        public int CreditorId { get; set; }
+        public int CreditorNumber { get; set; }
         public string CompanyCode { get; set; }
         public string Name { get; set; }
         public string ContactName { get; set; }

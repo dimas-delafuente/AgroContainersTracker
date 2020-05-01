@@ -3,9 +3,6 @@ namespace AgroContainerTracker.Domain.Companies
 {
     public class CompanyBase
     {
-        public int CompanyId { get; set; }
-
-        public int CompanyNumber { get; set; }
 
         public string CompanyCode { get; set; }
 

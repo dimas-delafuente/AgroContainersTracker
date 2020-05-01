@@ -3,6 +3,8 @@
 
 @inject ICreditorService creditorService
 @inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
 
 <div class="row mt-3">
     <div class="col-lg-4">
@@ -19,20 +21,20 @@ else
     <div class="row mt-5">
         <div class="col-lg-12">
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-                        AllowSorting="true" Data="@creditors" TItem="Creditor" ColumnWidth="200px">
+                        AllowSorting="true" Data="@creditors" TItem="Creditor" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="Creditor" Property="CompanyNumber" Title="Número" Width="50px"/>
+                    <RadzenGridColumn TItem="Creditor" Property="CreditorNumber" Title="Número" Width="50px" />
                     <RadzenGridColumn TItem="Creditor" Property="Name" Title="Nombre" />
                     <RadzenGridColumn TItem="Creditor" Property="Email" Title="Email" />
                     <RadzenGridColumn TItem="Creditor" Property="Phone" Title="Teléfono" />
                     <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-pencil" @onclick="() => OpenCreditorDetails(data.CompanyId)"></span>
+                            <span class="oi oi-pencil" @onclick="() => OpenCreditorDetails(data.CreditorId)"></span>
                         </Template>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-trash" @onclick="() => OpenCreditorDetails(data.CompanyId)"></span>
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveCreditorDialog(data)"></span>
                         </Template>
                     </RadzenGridColumn>
                 </Columns>
@@ -43,7 +45,7 @@ else
 }
 
 @code {
-    private IEnumerable<Creditor> creditors = new List<Creditor>();
+    private List<Creditor> creditors = new List<Creditor>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +55,57 @@ else
     private void OpenCreditorDetails(int creditorId)
     {
         navigationManager.NavigateTo($"/creditors/details/{creditorId}");
+    }
+
+    private async Task RemoveCreditor(Creditor customer)
+    {
+        bool deleted = await creditorService.DeleteAsync(customer.CreditorId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+        if (deleted)
+        {
+            creditors.Remove(customer);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Acreedor eliminado",
+                Detail = "El acreedor se ha eliminado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar el acreedor.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private async Task ShowRemoveCreditorDialog(Creditor creditor)
+    {
+        await dialogService.OpenAsync("Eliminar acreedor", ds =>
+            @<RadzenCard Style="padding: 20px;">
+                 <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este acreedor?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveCreditor(creditor)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </RadzenCard>);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
     }
 
 }
