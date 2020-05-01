@@ -6,7 +6,7 @@ namespace AgroContainerTracker.Domain
     public class AddPalotRequest
     {
         [Required]
-        public string PalotId { get; set; }
+        public string PalotCode { get; set; }
 
         [Required]
         public string ArrivalNumber { get; set; }
@@ -21,14 +21,13 @@ namespace AgroContainerTracker.Domain
         public int ContainerId { get; set; }
 
         [Required]
-        public Guid FruitGrowerId { get; set; }
+        public int SellerId { get; set; }
 
         [Required]
-        public Guid FruitBuyerId { get; set; }
-
+        public int BuyerId { get; set; }
 
         [Required]
-        public Guid FruitId { get; set; }
+        public int FruitId { get; set; }
 
     }
 }

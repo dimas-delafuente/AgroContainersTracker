@@ -1,10 +1,11 @@
 ﻿@page "/containers/create"
 
 @using AgroContainerTracker.Domain
-@using AgroContainerTracker.Services
+@using AgroContainerTracker.Core.Services
 @inject IContainerService containerService
+@inject NavigationManager NavigationManager
 
-<h1>Crear contenedor</h1>
+<h1>Añadir Cámara</h1>
 
 <EditForm Model="@container" OnValidSubmit="AddContainer">
     <DataAnnotationsValidator />
@@ -12,7 +13,7 @@
 
 
     <label for="name">Cámara</label>
-    <InputNumber id="name" @bind-Value="container.ContainerId" class="form-control"/>
+    <InputNumber id="name" @bind-Value="container.ContainerId" class="form-control" />
 
     <label for="size">Tamaño</label>
     <InputNumber id="size" @bind-Value="container.Size" class="form-control" />
@@ -26,11 +27,12 @@
 
     private AddContainerRequest container = new AddContainerRequest();
 
-    public void AddContainer()
+    public async Task AddContainer()
     {
         try
         {
-            containerService.AddContainerAsync(container);
+            await containerService.AddContainerAsync(container).ConfigureAwait(false);
+            NavigationManager.NavigateTo("containers");
         }
         catch (Exception e)
         {

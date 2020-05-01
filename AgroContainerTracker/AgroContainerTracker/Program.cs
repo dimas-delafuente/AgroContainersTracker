@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace AgroContainerTracker
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

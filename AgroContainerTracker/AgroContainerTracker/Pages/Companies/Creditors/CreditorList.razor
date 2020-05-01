@@ -1,0 +1,58 @@
+﻿@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+
+@inject ICreditorService creditorService
+@inject NavigationManager navigationManager
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/creditors/create" class="btn btn-primary">Agregar acreedor</a>
+    </div>
+</div>
+
+@if (creditors == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@creditors" TItem="Creditor" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn TItem="Creditor" Property="CompanyNumber" Title="Número" Width="50px"/>
+                    <RadzenGridColumn TItem="Creditor" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Creditor" Property="Email" Title="Email" />
+                    <RadzenGridColumn TItem="Creditor" Property="Phone" Title="Teléfono" />
+                    <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenCreditorDetails(data.CompanyId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => OpenCreditorDetails(data.CompanyId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code {
+    private IEnumerable<Creditor> creditors = new List<Creditor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        creditors = await creditorService.GetAllAsync().ConfigureAwait(false);
+    }
+
+    private void OpenCreditorDetails(int creditorId)
+    {
+        navigationManager.NavigateTo($"/creditors/details/{creditorId}");
+    }
+
+}

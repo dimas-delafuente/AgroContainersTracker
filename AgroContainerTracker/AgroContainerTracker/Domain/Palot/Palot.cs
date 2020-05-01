@@ -1,4 +1,5 @@
 ﻿using System;
+using AgroContainerTracker.Domain.Companies;
 
 namespace AgroContainerTracker.Domain
 {
@@ -9,8 +10,9 @@ namespace AgroContainerTracker.Domain
             Box,
             Palot
         }
+        public int PalotId { get; set; }
 
-        public string PalotId { get; set; }
+        public string PalotCode { get; set; }
 
         public string ArrivalNumber { get; set; }
 
@@ -24,9 +26,9 @@ namespace AgroContainerTracker.Domain
 
         public int ContainerId { get; set; }
 
-        public FruitVendor FruitGrower { get; set; }
+        public Customer Seller { get; set; }
 
-        public FruitVendor FruitBuyer { get; set; }
+        public Customer Buyer { get; set; }
 
         public Fruit Fruit { get; set; }
 

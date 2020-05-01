@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AgroContainerTracker.Services
+namespace AgroContainerTracker.Core.Services
 {
     public interface IContainerService
     {

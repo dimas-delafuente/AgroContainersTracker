@@ -8,8 +8,8 @@ using ElectronNET.API;
 using AgroContainerTracker.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using AgroContainerTracker.Services;
-using AgroContainerTracker.Infrastructure;
+using AgroContainerTracker.Core.Services;
+using AgroContainerTracker.Infrastructure.Services;
 using System;
 
 namespace AgroContainerTracker
@@ -23,14 +23,21 @@ namespace AgroContainerTracker
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddScoped<ICountryService, CountryService>();
+
             services.AddScoped<IContainerService, ContainerService>();
             services.AddScoped<IPalotService, PalotService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ISupplierService, SupplierService>();
+            services.AddScoped<ICreditorService, CreditorService>();
+            services.AddScoped<ICarrierService, CarrierService>();
+
+
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddDbContext<ApplicationContext>(options => options
@@ -39,8 +46,7 @@ namespace AgroContainerTracker
 
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -65,12 +71,13 @@ namespace AgroContainerTracker
             });
 
 
-            ConfigureElectronDesktop();
+
+            // ConfigureElectronDesktop();
         }
 
-        private async void ConfigureElectronDesktop()
-        {
-            await Electron.WindowManager.CreateWindowAsync();
-        }
+        //private async void ConfigureElectronDesktop()
+        //{
+        //    await Electron.WindowManager.CreateWindowAsync();
+        //}
     }
 }

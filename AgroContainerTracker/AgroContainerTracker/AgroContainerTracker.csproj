@@ -20,10 +20,28 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
+    <PackageReference Include="Radzen.Blazor" Version="2.6.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Pages\Companies\Customers\CreateSupplier.razor" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="electron.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mocks\" />
+    <Folder Include="Pages\Companies\" />
+    <Folder Include="Infrastructure\Services\" />
+    <Folder Include="Infrastructure\Profiles\" />
+    <Folder Include="Domain\Address\" />
+    <Folder Include="Domain\Packaging\" />
+    <Folder Include="Pages\PackagingManagement\" />
+    <Folder Include="Domain\Rates\" />
+    <Folder Include="Pages\Companies\Customers\" />
+    <Folder Include="Pages\Companies\Suppliers\" />
+    <Folder Include="Pages\Companies\Creditors\" />
+    <Folder Include="Pages\Companies\Carriers\" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,125 @@
+﻿@page "/creditors/details/{Id:int}"
+
+@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+@inject ICreditorService creditorService
+
+<div class="row">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (creditor == null)
+{
+    <p><em>No se ha encontrado el acreedor @Id</em></p>
+}
+else
+{
+<RadzenPanel AllowCollapse="true">
+    <HeaderTemplate>
+        <span style="float:left;">
+            <RadzenIcon Icon="account_box" /><b style="font-size:30px">DETALLES</b>
+        </span>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
+                <div class="row">
+                    <div class="form-group col-lg-2">
+                        <label for="number">Nº Cliente:</label>
+                        <RadzenTextBox Value="@creditor.CompanyNumber.ToString()" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <label for="name">Nombre:</label>
+                        <RadzenTextBox Value="@creditor.Name" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <label for="cif">CIF:</label>
+                        <RadzenTextBox Value="@creditor.CompanyCode" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="name">Contacto:</label>
+                        <RadzenTextBox Value="@creditor.ContactName" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="email">Email:</label>
+                        <RadzenTextBox Value="@creditor.Email" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="phone">Teléfono:</label>
+                        <RadzenTextBox Value="@creditor.Phone" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="mobile">Móvil:</label>
+                        <RadzenTextBox Value="@creditor.Mobile" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <label for="description">Observaciones:</label>
+                        <RadzenTextArea Value="@creditor.Description" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+            </RadzenFieldset>
+
+
+
+            <RadzenFieldset Text="DIRECCIÓN" class="mt-2">
+                <div class="row">
+                    <div class="form-group col-lg-8">
+                        <label for="address">Dirección:</label>
+                        <RadzenTextBox Value="@creditor.Address" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label for="locality">Localidad:</label>
+                        <RadzenTextBox Value="@creditor.Locality" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label for="postal_code">Código Postal:</label>
+                        <RadzenTextBox Value="@creditor.PostalCode" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label for="state">Provincia:</label>
+                        <RadzenTextBox Value="@creditor.State" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label for="country">País:</label>
+                        <RadzenTextBox Value="@creditor.Country.Name" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+            </RadzenFieldset>
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
+}
+
+<div class="row">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Creditor creditor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        creditor = await creditorService.GetByIdAsync(Id).ConfigureAwait(false);
+    }
+}

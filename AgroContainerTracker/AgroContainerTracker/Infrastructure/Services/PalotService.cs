@@ -1,7 +1,7 @@
 ﻿using AgroContainerTracker.Data.Contexts;
 using AgroContainerTracker.Data.Entities;
 using AgroContainerTracker.Domain;
-using AgroContainerTracker.Services;
+using AgroContainerTracker.Core.Services;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AgroContainerTracker.Infrastructure
+namespace AgroContainerTracker.Infrastructure.Services
 {
     public class PalotService : IPalotService
     {
@@ -51,6 +51,8 @@ namespace AgroContainerTracker.Infrastructure
             {
                 var palots = await _context.Palots.ToListAsync().ConfigureAwait(false);
                 return _mapper.Map<IEnumerable<Palot>>(palots);
+
+                //return Mocks.Mocks.Palots;
             }
             catch(Exception e)
             {

@@ -1,14 +1,18 @@
 ﻿@page "/containers"
 
 @using AgroContainerTracker.Domain
-@using AgroContainerTracker.Services
+@using AgroContainerTracker.Core.Services
 
 @inject IContainerService containerService
 @inject NavigationManager navigationManager
 
 <h1>Contenedores</h1>
 
-<a href="/containers/create" class="btn btn-primary">Crear cámara</a>
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/containers/create" class="btn btn-primary">Crear cámara</a>
+    </div>
+</div>
 
 @if (containers == null)
 {
@@ -16,25 +20,31 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Contenedor</th>
-                <th>Tamaño</th>
-                <th>#Palots</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var container in containers)
-            {
-                <tr @onclick="() => OpenContainerDetails(container.ContainerId)">
-                    <td>@container.ContainerId</td>
-                    <td>@container.Size</td>
-                    <td>@container.Palots.Count</td>
+
+<div class="row mt-5">
+    <div class="col-lg-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Contenedor</th>
+                    <th>Tamaño</th>
+                    <th>#Palots</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var container in containers)
+                {
+                    <tr @onclick="() => OpenContainerDetails(container.ContainerId)">
+                        <td>@container.ContainerId</td>
+                        <td>@container.Size</td>
+                        <td>@container.Palots.Count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+    
 }
 
 @code {

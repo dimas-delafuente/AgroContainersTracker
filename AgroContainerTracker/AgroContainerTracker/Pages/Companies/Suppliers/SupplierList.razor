@@ -1,0 +1,58 @@
+﻿@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+
+@inject ISupplierService supplierService
+@inject NavigationManager navigationManager
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/suppliers/create" class="btn btn-primary">Agregar proveedor</a>
+    </div>
+</div>
+
+@if (suppliers == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@suppliers" TItem="Supplier" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn TItem="Supplier" Property="CompanyNumber" Title="Número" Width="50px"/>
+                    <RadzenGridColumn TItem="Supplier" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Supplier" Property="Email" Title="Email" />
+                    <RadzenGridColumn TItem="Supplier" Property="Phone" Title="Teléfono" />
+                    <RadzenGridColumn TItem="Supplier" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenSupplierDetails(data.CompanyId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Supplier" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => OpenSupplierDetails(data.CompanyId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code {
+    private IEnumerable<Supplier> suppliers = new List<Supplier>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        suppliers = await supplierService.GetAllAsync().ConfigureAwait(false);
+    }
+
+    private void OpenSupplierDetails(int supplierId)
+    {
+        navigationManager.NavigateTo($"/suppliers/details/{supplierId}");
+    }
+
+}

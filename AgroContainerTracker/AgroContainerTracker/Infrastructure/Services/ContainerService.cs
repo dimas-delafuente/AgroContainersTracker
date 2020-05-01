@@ -1,7 +1,7 @@
 ﻿using AgroContainerTracker.Data.Contexts;
 using AgroContainerTracker.Data.Entities;
 using AgroContainerTracker.Domain;
-using AgroContainerTracker.Services;
+using AgroContainerTracker.Core.Services;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AgroContainerTracker.Infrastructure
+namespace AgroContainerTracker.Infrastructure.Services
 {
     public class ContainerService : IContainerService
     {
@@ -34,8 +34,10 @@ namespace AgroContainerTracker.Infrastructure
             {
                 ContainerEntity container = await _context.Containers.FindAsync(id).ConfigureAwait(false);
                 return _mapper.Map<Container>(container);
+                //return Mocks.Mocks.Containers.Find(x => x.ContainerId == id);
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw;
             }
@@ -48,8 +50,10 @@ namespace AgroContainerTracker.Infrastructure
             {
                 var containers = await _context.Containers.ToListAsync().ConfigureAwait(false);
                 return _mapper.Map<IEnumerable<Container>>(containers);
+                //return Mocks.Mocks.Containers;
 
-            }catch (Exception e) 
+            }
+            catch (Exception e) 
             {
                 throw;
             }

@@ -1,11 +1,9 @@
 ﻿using System;
-
 namespace AgroContainerTracker.Domain
 {
-    public class FruitVendor
+    public class Country
     {
-        public Guid FruitVendorId { get; set; }
-
+        public int CountryId { get; set; }
         public string Name { get; set; }
     }
 }
