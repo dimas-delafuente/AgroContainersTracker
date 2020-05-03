@@ -1,13 +1,16 @@
 ﻿@page "/customers/create"
 
 @using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Domain
 
 @using AgroContainerTracker.Core.Services
 
 @inject ICustomerService customerService
 @inject ICountryService countryService
+@inject  IRateService rateService
 @inject NavigationManager NavigationManager
+@inject NotificationService notificationService
 
 <h1>Añadir Cliente</h1>
 
@@ -109,8 +112,9 @@
             </div>
             <div class="form-group col-lg-4">
                 <label for="country">País:</label>
-                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@countries" @bind-Value="customer.CountryId"
-                                TextProperty="Name" ValueProperty="CountryId" Style="display: block;" Required/>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@countries" @bind-Value="customer.CountryId"
+                                TextProperty="Name" ValueProperty="CountryId" Style="display: block;" Required />
             </div>
         </div>
     </RadzenFieldset>
@@ -119,12 +123,9 @@
         <div class="row">
             <div class="form-group col-lg-4">
                 <label for="rate">Tarifa:</label>
-                <InputSelect id="rate" name="rate" @bind-Value="customer.RateId" class="form-control">
-                    @foreach (var rate in rates)
-                    {
-                        <option value="@rate.RateId">@rate.Name</option>
-                    }
-                </InputSelect>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@rates" @bind-Value="customer.RateId"
+                                TextProperty="Name" ValueProperty="RateId" Style="display: block;" Required />
             </div>
             <div class="form-group col-lg-8">
                 <label for="bankAccount">Cuenta bancaria:</label>
@@ -136,9 +137,9 @@
     <hr />
     <div class="row mt-4 mb-4">
         <div class="col-lg-12">
-            <div>
+            <div class="float-right">
                 <button type="button" class="btn btn-outline-dark" @onclick="OnCancel">Cancelar</button>
-                <button type="submit" class="btn btn-success">Guardar cambios</button>
+                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
             </div>
         </div>
     </div>
@@ -148,9 +149,11 @@
 @code {
     private const int SPAIN_COUNTRY_ID = 28;
 
-    private AddCustomerRequest customer = new AddCustomerRequest {
+    private AddCustomerRequest customer = new AddCustomerRequest
+    {
         CountryId = SPAIN_COUNTRY_ID
     };
+
     private List<Rate> rates = new List<Rate>();
     public string errorMessage;
 
@@ -159,6 +162,7 @@
     protected override async Task OnInitializedAsync()
     {
         countries = await countryService.GetAll().ConfigureAwait(false);
+        rates = await rateService.GetAllAsync().ConfigureAwait(false);
     }
 
     public async Task AddCustomer()
@@ -166,16 +170,37 @@
         try
         {
             await customerService.AddAsync(customer).ConfigureAwait(false);
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Cliente añadido",
+                Detail = "El cliente se ha añadido correctamente",
+                Duration = 4000
+            };
+            Notify(message);
             NavigationManager.NavigateTo("companies");
         }
         catch (Exception)
         {
             errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al añadir el cliente.",
+                Duration = 4000
+            };
+            Notify(message);
         }
     }
 
     public void OnCancel()
     {
         NavigationManager.NavigateTo("companies");
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
     }
 }

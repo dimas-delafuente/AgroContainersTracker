@@ -16,8 +16,6 @@ namespace AgroContainerTracker.Data.Configurations
 
             entityBuilder.Property(e => e.CarrierId).HasColumnType("int(11)");
 
-            entityBuilder.HasAlternateKey(e => e.CarrierNumber);
-
             entityBuilder.Property(e => e.Address)
                 .HasColumnType("longtext")
                 .HasCharSet("utf8mb4")

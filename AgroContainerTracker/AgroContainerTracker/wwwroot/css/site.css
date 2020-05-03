@@ -14,7 +14,9 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
-.input:disabled {
+.textbox:disabled,
+.textarea:disabled,
+input:disabled {
     color: rgba(58, 58, 58, 0.7) !important;
 }
 
@@ -184,4 +186,18 @@ app {
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
+}
+
+.ui-cell-data > .oi {
+    cursor: pointer;
+}
+
+.oi.oi-trash {
+    color: red;
+}
+
+.form-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

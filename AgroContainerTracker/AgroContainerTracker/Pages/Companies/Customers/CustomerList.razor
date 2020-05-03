@@ -8,7 +8,7 @@
 
 <div class="row mt-3">
     <div class="col-lg-4">
-        <a href="/customers/create" class="btn btn-primary">Agregar cliente</a>
+        <a href="/customers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cliente</a>
     </div>
 </div>
 
@@ -29,7 +29,12 @@ else
                     <RadzenGridColumn TItem="Customer" Property="Phone" Title="Teléfono" />
                     <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-pencil" @onclick="() => OpenCustomerDetails(data.CustomerId)"></span>
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenCustomerDetails(data.CustomerId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenCustomerEdit(data.CustomerId)"></span>
                         </Template>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
@@ -55,6 +60,11 @@ else
     private void OpenCustomerDetails(int customerId)
     {
         navigationManager.NavigateTo($"/customers/details/{customerId}");
+    }
+
+    private void OpenCustomerEdit(int customerId)
+    {
+        navigationManager.NavigateTo($"/customers/edit/{customerId}");
     }
 
     private async Task RemoveCustomer(Customer customer)

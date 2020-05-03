@@ -11,9 +11,11 @@ namespace AgroContainerTracker.Domain.Companies
         [Required]
         public string Name { get; set; }
 
+        [Required]
         public string ContactName { get; set; }
 
         [EmailAddress]
+        [Required]
         public string Email { get; set; }
 
         [MaxLength(9)]
@@ -21,15 +23,24 @@ namespace AgroContainerTracker.Domain.Companies
 
         [MaxLength(9)]
         public string Mobile { get; set; }
+
+        [Required]
         public string Address { get; set; }
+
+        [Required]
         public string Locality { get; set; }
 
+        [Required]
         public string State { get; set; }
 
         [MaxLength(5)]
+        [Required]
         public string PostalCode { get; set; }
-        public int CountryId { get; set; }
 
+        [Required]
+        public int? CountryId { get; set; }
+
+        [MaxLength(300)]
         public string Description { get; set; }
 
     }

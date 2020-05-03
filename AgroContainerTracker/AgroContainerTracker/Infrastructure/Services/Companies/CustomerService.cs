@@ -23,14 +23,13 @@ namespace AgroContainerTracker.Infrastructure.Services
         }
 
         public async Task AddAsync(AddCustomerRequest customer)
-        {
+        {  
             try
             {
                 if (customer == null)
                     throw new ArgumentNullException();
 
                 CustomerEntity entity = _mapper.Map<CustomerEntity>(customer);
-
                 var addResponse = await _context.Customers.AddAsync(entity).ConfigureAwait(false);
 
                 if (addResponse.State.Equals(EntityState.Added))
@@ -38,10 +37,9 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch(Exception e)
             {
+                _context.DetachAll();
                 throw;
             }
-            
-
         }
 
         public async Task<List<Customer>> GetAllAsync()
@@ -57,12 +55,13 @@ namespace AgroContainerTracker.Infrastructure.Services
                 throw new ArgumentOutOfRangeException();
 
             CustomerEntity entity = await _context.Customers
+                .AsNoTracking()
                 .Include(x => x.Country)
+                .Include(x => x.Rate)
                 .FirstOrDefaultAsync(x => x.CustomerId.Equals(customerId))
                 .ConfigureAwait(false);
 
             return _mapper.Map<Customer>(entity);
-
         }
 
         public async Task<bool> DeleteAsync(int customerId)
@@ -81,12 +80,41 @@ namespace AgroContainerTracker.Infrastructure.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _context.DetachAll();
                 return false;
             }
 
             return false;
+        }
+
+        public async Task<bool> UpdateAsync(Customer customer)
+        {
+            CustomerEntity entity = null;
+            try
+            {
+                if (customer == null)
+                    throw new ArgumentNullException();
+
+                entity = await _context.Customers
+                    .FindAsync(customer.CustomerId)
+                    .ConfigureAwait(false);
+
+                if (entity != null)
+                {
+                    _mapper.Map(customer, entity);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                throw;
+            }
         }
     }
 }

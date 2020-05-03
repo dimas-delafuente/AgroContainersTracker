@@ -11,8 +11,6 @@ namespace AgroContainerTracker.Data.Configurations
             entityBuilder.HasKey(e => e.CustomerId)
                 .HasName("PRIMARY");
 
-            entityBuilder.HasAlternateKey(e => e.CustomerNumber);
-
             entityBuilder.HasIndex(e => e.CountryId);
 
             entityBuilder.HasIndex(e => e.RateId);

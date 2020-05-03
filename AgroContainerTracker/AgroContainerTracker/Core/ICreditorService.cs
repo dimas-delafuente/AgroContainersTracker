@@ -15,5 +15,7 @@ namespace AgroContainerTracker.Core.Services
 
         Task<bool> DeleteAsync(int creditorId);
 
+        Task<bool> UpdateAsync(Creditor creditor);
+
     }
 }

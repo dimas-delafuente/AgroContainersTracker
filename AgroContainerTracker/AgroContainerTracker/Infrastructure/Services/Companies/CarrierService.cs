@@ -38,6 +38,7 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch (Exception)
             {
+                _context.DetachAll();
                 throw;
             }
         }
@@ -52,17 +53,27 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         public async Task<Carrier> GetByIdAsync(int carrierId)
         {
-            if (carrierId < 0)
-                throw new ArgumentOutOfRangeException();
+            try
+            {
+                if (carrierId < 0)
+                    throw new ArgumentOutOfRangeException();
 
-            CarrierEntity entity = await _context.Carriers
-                .Include(x => x.Country)
-                .Include(x => x.Vehicles)
-                .Include(x => x.Drivers)
-                .FirstOrDefaultAsync(x => x.CarrierId.Equals(carrierId))
-                .ConfigureAwait(false);
+                CarrierEntity entity = await _context.Carriers
+                    .AsNoTracking()
+                    .Include(x => x.Country)
+                    .Include(x => x.Vehicles)
+                    .Include(x => x.Drivers)
+                    .FirstOrDefaultAsync(x => x.CarrierId.Equals(carrierId))
+                    .ConfigureAwait(false);
 
-            return _mapper.Map<Carrier>(entity);
+                return _mapper.Map<Carrier>(entity);
+            }
+            catch (Exception)
+            {
+                _context.DetachAll();
+                throw;
+            }
+
         }
 
         public async Task<bool> DeleteAsync(int carrierId)
@@ -81,12 +92,42 @@ namespace AgroContainerTracker.Infrastructure.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _context.DetachAll();
                 return false;
             }
 
             return false;
+        }
+
+        public async Task<bool> UpdateAsync(Carrier carrier)
+        {
+            try
+            {
+                if (carrier == null)
+                    throw new ArgumentNullException();
+
+                CarrierEntity entity = await _context.Carriers
+                    .Include(x => x.Vehicles)
+                    .Include(x => x.Drivers)
+                    .FirstOrDefaultAsync(x => x.CarrierId.Equals(carrier.CarrierId))
+                    .ConfigureAwait(false);
+
+                if (entity != null)
+                {
+                    _mapper.Map(carrier, entity);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                throw;
+            }
         }
     }
 }

@@ -6,15 +6,22 @@ namespace AgroContainerTracker.Domain.Companies
 {
     public class Carrier : CompanyBase
     {
+        public Carrier()
+        {
+            Country = new Country();
+            Vehicles = new List<Vehicle>();
+            Drivers = new List<Driver>();
+        }
+
         public int CarrierId { get; set; }
 
         public int CarrierNumber { get; set; }
 
         public string SanitaryRegistrationNumber { get; set; }
 
-        public IEnumerable<Vehicle> Vehicles { get; set; }
+        public List<Vehicle> Vehicles { get; set; }
 
-        public IEnumerable<Driver> Drivers { get; set; }
+        public List<Driver> Drivers { get; set; }
     }
 
     public class Vehicle

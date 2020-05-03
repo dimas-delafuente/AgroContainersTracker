@@ -15,8 +15,6 @@ namespace AgroContainerTracker.Data.Configurations
 
             entityBuilder.Property(e => e.CreditorId).HasColumnType("int(11)");
 
-            entityBuilder.HasAlternateKey(e => e.CreditorNumber);
-
             entityBuilder.Property(e => e.Address)
                 .HasColumnType("longtext")
                 .HasCharSet("utf8mb4")

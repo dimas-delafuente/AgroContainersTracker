@@ -14,5 +14,7 @@ namespace AgroContainerTracker.Core.Services
 
         Task<bool> DeleteAsync(int carrierId);
 
+        Task<bool> UpdateAsync(Carrier carrier);
+
     }
 }

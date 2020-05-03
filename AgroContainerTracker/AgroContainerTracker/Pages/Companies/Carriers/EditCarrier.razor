@@ -1,4 +1,4 @@
-﻿@page "/carriers/create"
+﻿@page "/carriers/edit/{Id:int}"
 
 @using AgroContainerTracker.Domain.Companies
 @using AgroContainerTracker.Domain
@@ -10,7 +10,7 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
-<h1>Añadir Transportista</h1>
+<h1>Editar Transportista</h1>
 
 <div class="row mt-4">
     <div class="col-sm-4">
@@ -27,8 +27,14 @@
     </div>
 }
 
+@if (carrier == null)
+{
+    <p><em>No se ha encontrado el transportista @Id</em></p>
+}
+else
+{
 
-<EditForm Model="@carrier" OnValidSubmit="AddSupplier">
+<EditForm Model="@carrier" OnValidSubmit="UpdateCarrier">
     <DataAnnotationsValidator />
 
     <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
@@ -110,8 +116,8 @@
             </div>
             <div class="form-group col-lg-4">
                 <label for="country">País:</label>
-                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@countries" @bind-Value="carrier.CountryId"
-                                TextProperty="Name" ValueProperty="CountryId" Style="display: block;" />
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@countries" @bind-Value="carrier.Country.CountryId"
+                                TextProperty="Name" ValueProperty="CountryId" Style="display: block;" Required />
             </div>
         </div>
     </RadzenFieldset>
@@ -161,6 +167,7 @@
             <button type="button" class="btn btn-outline-primary" @onclick="AddDriver">Añadir conductor</button>
         </div>
     </RadzenFieldset>
+
     <hr />
     <div class="row mt-4 mb-4">
         <div class="col-lg-12">
@@ -171,46 +178,51 @@
         </div>
     </div>
 </EditForm>
-
+}
 
 @code {
 
-    private AddCarrierRequest carrier = new AddCarrierRequest();
+    [Parameter]
+    public int Id { get; set; }
     public string errorMessage;
+
+    private Carrier carrier = new Carrier();
 
     private IEnumerable<Country> countries;
 
     protected override async Task OnInitializedAsync()
     {
+        carrier = await carrierService.GetByIdAsync(Id).ConfigureAwait(false);
         countries = await countryService.GetAll().ConfigureAwait(false);
+
     }
 
-    public async Task AddSupplier()
+    public async Task UpdateCarrier()
     {
         try
         {
-            await carrierService.AddAsync(carrier).ConfigureAwait(false);
-            var message = new NotificationMessage()
+            bool updated = await carrierService.UpdateAsync(carrier).ConfigureAwait(false);
+
+            if (updated)
             {
-                Severity = NotificationSeverity.Success,
-                Summary = "Transportista añadido",
-                Detail = "El transportista se ha añadido correctamente",
-                Duration = 4000
-            };
-            Notify(message);
-            NavigationManager.NavigateTo("companies");
+                var message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Transportista modificado",
+                    Detail = "El transportista se ha modificado correctamente",
+                    Duration = 4000
+                };
+                Notify(message);
+                NavigationManager.NavigateTo("companies");
+            }
+            else
+                NotifyError();
+
         }
         catch (Exception)
         {
-            errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
-            var message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Se ha producido un error al añadir el transportista.",
-                Duration = 4000
-            };
-            Notify(message);
+            errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
+            NotifyError();
         }
     }
 
@@ -244,5 +256,15 @@
         notificationService.Notify(message);
     }
 
-
+    private void NotifyError()
+    {
+        var message = new NotificationMessage()
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Error",
+            Detail = "Se ha producido un error al modificar el transportista.",
+            Duration = 4000
+        };
+        Notify(message);
+    }
 }

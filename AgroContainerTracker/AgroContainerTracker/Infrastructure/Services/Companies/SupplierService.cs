@@ -42,6 +42,7 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch (Exception)
             {
+                _context.DetachAll();
                 throw;
             }
         }
@@ -85,10 +86,38 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch (Exception)
             {
+                _context.DetachAll();
                 return false;
             }
 
             return false;
+        }
+
+        public async Task<bool> UpdateAsync(Supplier supplier)
+        {
+            try
+            {
+                if (supplier == null)
+                    throw new ArgumentNullException();
+
+                SupplierEntity entity = await _context.Suppliers
+                    .FindAsync(supplier.SupplierId)
+                    .ConfigureAwait(false);
+
+                if (entity != null)
+                {
+                    _mapper.Map(supplier, entity);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                _context.DetachAll();
+                throw;
+            }
         }
     }
 }

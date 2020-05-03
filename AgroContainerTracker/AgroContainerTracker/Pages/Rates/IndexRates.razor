@@ -1,0 +1,126 @@
+﻿@page "/rates"
+
+@using AgroContainerTracker.Domain.Rates
+@using AgroContainerTracker.Core.Services
+
+@inject IRateService rateService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<h1>Tarifas</h1>
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/rates/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar tarifa</a>
+    </div>
+</div>
+
+@if (rates == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@rates" TItem="Rate" ColumnWidth="100px" EmptyText="No se han encontrado resultados.">
+                <Columns>
+                    <RadzenGridColumn TItem="Rate" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Rate" Property="Value" Title="Precio/día" />
+                    <RadzenGridColumn TItem="Rate" Property="SecondaryValue" Title="Precio/día adicional" />
+                    <RadzenGridColumn TItem="Rate" Property="Description" Title="Descripción" Width="200px"/>
+
+                    <RadzenGridColumn TItem="Rate" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenRateDetails(data.RateId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Rate" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenRateEdit(data.RateId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Rate" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveRateDialog(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code{
+    private List<Rate> rates = new List<Rate>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        rates = await rateService.GetAllAsync().ConfigureAwait(false);
+    }
+
+    private void OpenRateDetails(int customerId)
+    {
+        navigationManager.NavigateTo($"/rates/details/{customerId}");
+    }
+
+    private void OpenRateEdit(int customerId)
+    {
+        navigationManager.NavigateTo($"/rates/edit/{customerId}");
+    }
+
+    private async Task ShowRemoveRateDialog(Rate rate)
+    {
+        await dialogService.OpenAsync("Eliminar tarifa", ds =>
+            @<RadzenCard Style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta tarifa?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveRate(rate)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </RadzenCard>
+        );
+    }
+
+    private async Task RemoveRate(Rate rate)
+    {
+        bool deleted = await rateService.DeleteAsync(rate.RateId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+        if (deleted)
+        {
+            rates.Remove(rate);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Tarifa eliminada",
+                Detail = "La tarifa se ha eliminado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar la tarifa.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+}

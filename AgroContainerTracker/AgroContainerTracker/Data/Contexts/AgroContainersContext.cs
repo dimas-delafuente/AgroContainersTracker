@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using AgroContainerTracker.Data.Entities;
 using System.Reflection;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace AgroContainerTracker.Data.Contexts
 {
@@ -25,7 +27,7 @@ namespace AgroContainerTracker.Data.Contexts
         public virtual DbSet<DriverEntity> Drivers { get; set; }
         public virtual DbSet<FruitEntity> Fruits { get; set; }
         public virtual DbSet<PalotEntity> Palots { get; set; }
-        public virtual DbSet<RateEntity> RateEntity { get; set; }
+        public virtual DbSet<RateEntity> Rates { get; set; }
         public virtual DbSet<SupplierEntity> Suppliers { get; set; }
         public virtual DbSet<VehicleEntity> Vehicles { get; set; }
 
@@ -36,12 +38,43 @@ namespace AgroContainerTracker.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
             modelBuilder?.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             OnModelCreatingPartial(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public void DetachAll()
+        {
+            try
+            {
+                var entries = this.ChangeTracker.Entries()
+                    .Where(e => e.State == EntityState.Added ||
+                                e.State == EntityState.Modified ||
+                                e.State == EntityState.Deleted)
+                    .ToList();
+
+                foreach (var entry in entries)
+                    switch (entry.State)
+                    {
+                        case EntityState.Modified:
+                            entry.State = EntityState.Unchanged;
+                            break;
+                        case EntityState.Added:
+                            entry.State = EntityState.Detached;
+                            break;
+                        case EntityState.Deleted:
+                            entry.Reload();
+                            break;
+                    }
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
+            
+        }
     }
 }

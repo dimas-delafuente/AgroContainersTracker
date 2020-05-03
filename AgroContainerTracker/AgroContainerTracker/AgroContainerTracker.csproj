@@ -44,5 +44,7 @@
     <Folder Include="Pages\Companies\Creditors\" />
     <Folder Include="Pages\Companies\Carriers\" />
     <Folder Include="Data\Configurations\" />
+    <Folder Include="Pages\Rates\" />
+    <Folder Include="Infrastructure\Services\Companies\" />
   </ItemGroup>
 </Project>

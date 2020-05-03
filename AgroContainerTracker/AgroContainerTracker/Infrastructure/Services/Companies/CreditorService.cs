@@ -37,6 +37,7 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch (Exception)
             {
+                _context.DetachAll();
                 throw;
             }
         }
@@ -80,10 +81,38 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch (Exception)
             {
+                _context.DetachAll();
                 return false;
             }
 
             return false;
+        }
+
+        public async Task<bool> UpdateAsync(Creditor creditor)
+        {
+            try
+            {
+                if (creditor == null)
+                    throw new ArgumentNullException();
+
+                CreditorEntity entity = await _context.Creditors
+                    .FindAsync(creditor.CreditorId)
+                    .ConfigureAwait(false);
+
+                if (entity != null)
+                {
+                    _mapper.Map(creditor, entity);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                _context.DetachAll();
+                throw;
+            }
         }
     }
 }

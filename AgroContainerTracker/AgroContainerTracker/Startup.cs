@@ -28,22 +28,25 @@ namespace AgroContainerTracker
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<ICountryService, CountryService>();
+            services.AddTransient<ICountryService, CountryService>();
 
-            services.AddScoped<IContainerService, ContainerService>();
-            services.AddScoped<IPalotService, PalotService>();
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<ISupplierService, SupplierService>();
-            services.AddScoped<ICreditorService, CreditorService>();
-            services.AddScoped<ICarrierService, CarrierService>();
+            services.AddTransient<IContainerService, ContainerService>();
+            services.AddTransient<IPalotService, PalotService>();
+            services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<ISupplierService, SupplierService>();
+            services.AddTransient<ICreditorService, CreditorService>();
+            services.AddTransient<ICarrierService, CarrierService>();
+            services.AddTransient<IRateService, RateService>();
+
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddDbContext<ApplicationContext>(options => options
-                .UseMySql(Configuration.GetConnectionString("sqlConnection")
-            ));
+                .UseMySql(Configuration.GetConnectionString("sqlConnection")),
+                ServiceLifetime.Transient
+            );
 
         }
 
