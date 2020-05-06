@@ -44,7 +44,8 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         public async Task<List<Customer>> GetAllAsync()
         {
-            IEnumerable<CustomerEntity> entities = await _context.Customers.AsNoTracking()
+            IEnumerable<CustomerEntity> entities = await _context.Customers
+                .AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
             return _mapper.Map<List<Customer>>(entities);
         }

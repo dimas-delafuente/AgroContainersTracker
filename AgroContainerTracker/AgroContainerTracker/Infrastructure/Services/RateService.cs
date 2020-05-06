@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AgroContainerTracker.Core.Services;
@@ -89,11 +90,47 @@ namespace AgroContainerTracker.Infrastructure.Services
             if (rateId < 0)
                 throw new ArgumentOutOfRangeException();
 
-             RateEntity entity = await _context.Rates
-                .FindAsync(rateId)
-                .ConfigureAwait(false);
+            RateEntity entity = await _context.Rates
+               .FindAsync(rateId)
+               .ConfigureAwait(false);
 
+            
             return _mapper.Map<Rate>(entity);
+        }
+
+        public async Task<RateDetails> GetDetailsByIdAsync(int rateId)
+        {
+            if (rateId < 0)
+                throw new ArgumentOutOfRangeException();
+
+            try
+            {
+                var entity = await _context.Rates
+                    .AsNoTracking()
+                    .AsQueryable()
+                    .Where(x => x.RateId.Equals(rateId))
+                     .Select(x => new {
+                         Rate = x,
+                         Customers = x.Customers.Select(c => new CustomerEntity
+                         {
+                             CustomerId = c.CustomerId,
+                             CustomerNumber = c.CustomerNumber,
+                             Name = c.Name
+                         })
+                     })
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+
+                var rate = entity.Rate;
+                rate.Customers = (ICollection<CustomerEntity>)entity.Customers;
+
+                return _mapper.Map<RateDetails>(rate);
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
+            
         }
 
         public async Task<bool> UpdateAsync(Rate rate)

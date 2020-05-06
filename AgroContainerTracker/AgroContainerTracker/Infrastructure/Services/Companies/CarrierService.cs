@@ -45,7 +45,8 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         public async Task<List<Carrier>> GetAllAsync()
         {
-            IEnumerable<CarrierEntity> entities = await _context.Carriers.AsNoTracking()
+            IEnumerable<CarrierEntity> entities = await _context.Carriers
+                .AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
 
             return _mapper.Map<List<Carrier>>(entities);

@@ -11,6 +11,9 @@ namespace AgroContainerTracker.Infrastructure.Profiles
             CreateMap<RateEntity, Rate>().ReverseMap();
             CreateMap<AddRateRequest, RateEntity>();
 
+            CreateMap<RateEntity, RateDetails>()
+                .ForMember(src => src.Customers, opt => opt.MapFrom(src => src.Customers));
+
         }
     }
 }

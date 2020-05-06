@@ -9,6 +9,7 @@ namespace AgroContainerTracker.Core.Services
     {
         Task<List<Rate>> GetAllAsync();
         Task<Rate> GetByIdAsync(int rateId);
+        Task<RateDetails> GetDetailsByIdAsync(int rateId);
         Task<bool> DeleteAsync(int rateId);
         Task<bool> UpdateAsync(Rate rate);
         Task AddAsync(AddRateRequest rate);

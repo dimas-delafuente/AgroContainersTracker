@@ -36,4 +36,14 @@ namespace AgroContainerTracker.Domain.Companies
 
         public string BankAccount { get; set; }
     }
+
+    public class CustomerDto
+    {
+        public int CustomerId { get; set; }
+
+        public int CustomerNumber { get; set; }
+
+        public string Name { get; set; }
+
+    }
 }

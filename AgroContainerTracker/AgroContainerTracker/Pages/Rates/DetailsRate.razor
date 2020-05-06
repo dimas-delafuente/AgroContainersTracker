@@ -1,8 +1,11 @@
 ﻿@page "/rates/details/{Id:int}"
 
 @using AgroContainerTracker.Domain.Rates
+@using AgroContainerTracker.Domain.Companies
+
 @using AgroContainerTracker.Core.Services
 @inject IRateService rateService
+@inject NavigationManager navigationManager
 
 <div class="row">
     <div class="col-sm-4">
@@ -18,37 +21,64 @@
 }
 else
 {
-<RadzenPanel AllowCollapse="true">
-    <HeaderTemplate>
-        <span style="float:left;">
-            <RadzenIcon Icon="euro" /><b style="font-size:30px">DETALLES</b>
-        </span>
-    </HeaderTemplate>
-    <ChildContent>
-        <RadzenCard>
-            <div class="row">
-                <div class="form-group col-lg-6">
-                    <label for="name">Nombre:</label>
-                    <RadzenTextBox Value="@rate.Name" Disabled="true" class="form-control" />
+    <RadzenPanel AllowCollapse="true">
+        <HeaderTemplate>
+            <span style="float:left;">
+                <RadzenIcon Icon="euro" /><b style="font-size:30px">TARIFA</b>
+            </span>
+        </HeaderTemplate>
+        <ChildContent>
+            <RadzenCard>
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="name">Nombre:</label>
+                        <RadzenTextBox Value="@rate.Name" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="description">Descripción:</label>
+                        <RadzenTextArea Value="@rate.Description" Disabled="true" class="form-control" />
+                    </div>
                 </div>
-                <div class="form-group col-lg-6">
-                    <label for="description">Descripción:</label>
-                    <RadzenTextArea Value="@rate.Description" Disabled="true" class="form-control" />
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="value">Precio/día:</label>
+                        <RadzenNumeric Value="@rate.Value" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="value2">Precio/día adicional:</label>
+                        <RadzenNumeric Value="@rate.SecondaryValue" Disabled="true" class="form-control" />
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-lg-6">
-                    <label for="value">Precio/día:</label>
-                    <RadzenNumeric Value="@rate.Value" Disabled="true" class="form-control" />
-                </div>
-                <div class="form-group col-lg-6">
-                    <label for="value2">Precio/día adicional:</label>
-                    <RadzenNumeric Value="@rate.SecondaryValue" Disabled="true" class="form-control" />
-                </div>
-            </div>
-        </RadzenCard>
-    </ChildContent>
-</RadzenPanel>
+            </RadzenCard>
+        </ChildContent>
+    </RadzenPanel>
+
+    <RadzenPanel AllowCollapse="true" class="m-t-4">
+        <HeaderTemplate>
+            <span style="float:left;">
+                <RadzenIcon Icon="account_box" /><b style="font-size:30px">Clientes con esta tarifa:</b>
+            </span>
+        </HeaderTemplate>
+        <ChildContent>
+            @foreach (var customer in rate.Customers)
+            {
+                <RadzenCard>
+                    <div class="row align-items-center">
+                        <div class="col-lg-1">
+                            <p>Nº: @customer.CustomerNumber</p>
+                        </div>
+                        <div class="col-lg-9">
+                            <p><strong>@customer.Name</strong></p>
+                        </div>
+                        <div class="col-lg-2">
+                            <button type="button" class="btn btn-outline-primary"
+                                    @onclick="() => OpenCustomerDetails(customer.CustomerId)">Ver detalles</button>
+                        </div>
+                    </div>
+                </RadzenCard>
+            }
+        </ChildContent>
+    </RadzenPanel>
 }
 
 <div class="row">
@@ -64,10 +94,15 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private Rate rate;
+    private RateDetails rate;
 
     protected override async Task OnInitializedAsync()
     {
-        rate = await rateService.GetByIdAsync(Id).ConfigureAwait(false);
+        rate = await rateService.GetDetailsByIdAsync(Id).ConfigureAwait(false);
+    }
+
+    private void OpenCustomerDetails(int customerId)
+    {
+        navigationManager.NavigateTo($"/customers/details/{customerId}");
     }
 }

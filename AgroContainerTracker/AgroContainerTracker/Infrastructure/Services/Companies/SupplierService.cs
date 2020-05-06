@@ -49,7 +49,8 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         public async Task<List<Supplier>> GetAllAsync()
         {
-            IEnumerable<SupplierEntity> entities = await _context.Suppliers.AsNoTracking()
+            IEnumerable<SupplierEntity> entities = await _context.Suppliers
+                .AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
 
             return _mapper.Map<List<Supplier>>(entities);
@@ -61,6 +62,7 @@ namespace AgroContainerTracker.Infrastructure.Services
                 throw new ArgumentOutOfRangeException();
 
             SupplierEntity entity = await _context.Suppliers
+                .AsNoTracking()
                 .Include(x => x.Country)
                 .FirstOrDefaultAsync(x => x.SupplierId.Equals(supplierId))
                 .ConfigureAwait(false);

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using AgroContainerTracker.Domain.Companies;
 
 namespace AgroContainerTracker.Domain.Rates
 {
@@ -20,5 +22,10 @@ namespace AgroContainerTracker.Domain.Rates
 
         [MaxLength(300)]
         public string Description { get; set; }
+    }
+
+    public class RateDetails : Rate
+    {
+        public IEnumerable<CustomerDto> Customers { get; set; }
     }
 }

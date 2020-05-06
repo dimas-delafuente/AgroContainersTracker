@@ -44,7 +44,8 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         public async Task<List<Creditor>> GetAllAsync()
         {
-            IEnumerable<CreditorEntity> entities = await _context.Creditors.AsNoTracking()
+            IEnumerable<CreditorEntity> entities = await _context.Creditors
+                .AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
 
             return _mapper.Map<List<Creditor>>(entities);
@@ -56,6 +57,7 @@ namespace AgroContainerTracker.Infrastructure.Services
                 throw new ArgumentOutOfRangeException();
 
             CreditorEntity entity = await _context.Creditors
+                .AsNoTracking()
                 .Include(x => x.Country)
                 .FirstOrDefaultAsync(x => x.CreditorId.Equals(creditorId))
                 .ConfigureAwait(false);
