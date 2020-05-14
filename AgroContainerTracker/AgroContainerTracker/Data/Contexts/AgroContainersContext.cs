@@ -30,6 +30,9 @@ namespace AgroContainerTracker.Data.Contexts
         public virtual DbSet<RateEntity> Rates { get; set; }
         public virtual DbSet<SupplierEntity> Suppliers { get; set; }
         public virtual DbSet<VehicleEntity> Vehicles { get; set; }
+        public virtual DbSet<PackagingEntity> Packagings { get; set; }
+        public virtual DbSet<PackagingMovementEntity> PackagingMovements { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

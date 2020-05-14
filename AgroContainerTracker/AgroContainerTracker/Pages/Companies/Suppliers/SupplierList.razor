@@ -23,7 +23,11 @@ else
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                         AllowSorting="true" Data="@suppliers" TItem="Supplier" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="Supplier" Property="SupplierNumber" Title="Número" Width="50px" />
+                    <RadzenGridColumn TItem="Supplier" Property="SupplierNumber" Title="Número" Width="75px">
+                        <FooterTemplate>
+                            Total: <b>@suppliers.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="Supplier" Property="Name" Title="Nombre" />
                     <RadzenGridColumn TItem="Supplier" Property="Email" Title="Email" />
                     <RadzenGridColumn TItem="Supplier" Property="Phone" Title="Teléfono" />

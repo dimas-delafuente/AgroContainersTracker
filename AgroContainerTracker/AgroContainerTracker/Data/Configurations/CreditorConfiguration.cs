@@ -8,6 +8,8 @@ namespace AgroContainerTracker.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<CreditorEntity> entityBuilder)
         {
+            entityBuilder.ToTable("Creditors");
+
             entityBuilder.HasKey(e => e.CreditorId)
                     .HasName("PRIMARY");
 

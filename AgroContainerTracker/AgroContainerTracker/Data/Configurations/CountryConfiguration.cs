@@ -8,6 +8,8 @@ namespace AgroContainerTracker.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<CountryEntity> entityBuilder)
         {
+            entityBuilder.ToTable("Countries");
+
             entityBuilder.HasKey(e => e.CountryId)
                     .HasName("PRIMARY");
 

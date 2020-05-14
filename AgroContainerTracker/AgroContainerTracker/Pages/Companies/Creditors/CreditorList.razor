@@ -23,7 +23,11 @@ else
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                         AllowSorting="true" Data="@creditors" TItem="Creditor" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="Creditor" Property="CreditorNumber" Title="Número" Width="50px" />
+                    <RadzenGridColumn TItem="Creditor" Property="CreditorNumber" Title="Número" Width="75px">
+                        <FooterTemplate>
+                            Total: <b>@creditors.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="Creditor" Property="Name" Title="Nombre" />
                     <RadzenGridColumn TItem="Creditor" Property="Email" Title="Email" />
                     <RadzenGridColumn TItem="Creditor" Property="Phone" Title="Teléfono" />

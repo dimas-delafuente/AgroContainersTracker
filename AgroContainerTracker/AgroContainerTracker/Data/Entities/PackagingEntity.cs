@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,54 +7,41 @@ namespace AgroContainerTracker.Data.Entities
 {
     public enum PackagingMaterial
     {
-        Wood,
-        Plastic
+        Madera,
+        Plastico
     }
 
-    public enum PackaginType
+    public enum PackagingType
     {
         Palot,
         Palet,
-        Box
+        Caja
     }
 
     public class PackagingEntity
     {
-        [Key]
         public int PackagingId { get; set; }
 
-        [Required]
         public string Code { get; set; }
 
-        [Required]
+        [EnumDataType(typeof(PackagingType))]
+        public PackagingType Type { get; set; }
+
+        public string Description { get; set; }
+
+        public int? CustomerId { get; set; }
+
+        public string Color { get; set; }
         [EnumDataType(typeof(PackagingMaterial))]
         public PackagingMaterial Material { get; set; }
 
-        [Required]
-        [Range(0, Double.MaxValue)]
+
         public double Weight { get; set; }
-
-        [MaxLength(100)]
-        public string Description { get; set; }
-
-        [Required]
-        [ForeignKey(nameof(Customer))]
-        public int CustomerId { get; set; }
-
-        public CustomerEntity Customer { get; set; }
-
-        [MaxLength(15)]
-        public string Color { get; set; }
-
-        [Required]
-        [EnumDataType(typeof(PackaginType))]
-        public PackaginType Type { get; set; }
+        public int Total { get; set; }
 
         public bool Active { get; set; }
 
-        [Required]
-        [Range(0, Int32.MaxValue)]
-        public int Total { get; set; }
-
+        public virtual CustomerEntity Owner { get; set; }
+        public virtual ICollection<PackagingMovementEntity> PackagingMovements { get; set; }
     }
 }

@@ -28,8 +28,8 @@ namespace AgroContainerTracker
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddTransient<ICountryService, CountryService>();
 
+            services.AddTransient<ICountryService, CountryService>();
             services.AddTransient<IContainerService, ContainerService>();
             services.AddTransient<IPalotService, PalotService>();
             services.AddTransient<ICustomerService, CustomerService>();
@@ -37,6 +37,7 @@ namespace AgroContainerTracker
             services.AddTransient<ICreditorService, CreditorService>();
             services.AddTransient<ICarrierService, CarrierService>();
             services.AddTransient<IRateService, RateService>();
+            services.AddTransient<IPackagingService, PackagingService>();
 
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();

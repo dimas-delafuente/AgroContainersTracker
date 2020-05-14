@@ -8,6 +8,9 @@ namespace AgroContainerTracker.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<CustomerEntity> entityBuilder)
         {
+            entityBuilder.ToTable("Customers");
+
+
             entityBuilder.HasKey(e => e.CustomerId)
                 .HasName("PRIMARY");
 
@@ -92,7 +95,6 @@ namespace AgroContainerTracker.Data.Configurations
                 .WithMany(p => p.Customers)
                 .HasForeignKey(d => d.RateId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
-
         }
     }
 }

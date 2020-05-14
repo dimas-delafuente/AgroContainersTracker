@@ -27,7 +27,11 @@ else
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                         AllowSorting="true" Data="@rates" TItem="Rate" ColumnWidth="100px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="Rate" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Rate" Property="Name" Title="Nombre">
+                        <FooterTemplate>
+                            Total: <b>@rates.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="Rate" Property="Value" Title="Precio/día" />
                     <RadzenGridColumn TItem="Rate" Property="SecondaryValue" Title="Precio/día adicional" />
                     <RadzenGridColumn TItem="Rate" Property="Description" Title="Descripción" Width="200px"/>

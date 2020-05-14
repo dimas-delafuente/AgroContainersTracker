@@ -8,6 +8,9 @@ namespace AgroContainerTracker.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<DriverEntity> entityBuilder)
         {
+            entityBuilder.ToTable("Drivers");
+
+
             entityBuilder.HasKey(e => e.DriverId)
                     .HasName("PRIMARY");
 

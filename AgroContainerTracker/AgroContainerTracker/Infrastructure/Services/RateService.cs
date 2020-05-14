@@ -91,10 +91,11 @@ namespace AgroContainerTracker.Infrastructure.Services
                 throw new ArgumentOutOfRangeException();
 
             RateEntity entity = await _context.Rates
-               .FindAsync(rateId)
+                .AsNoTracking()
+               .FirstOrDefaultAsync(x => x.RateId.Equals(rateId))
                .ConfigureAwait(false);
 
-            
+
             return _mapper.Map<Rate>(entity);
         }
 
@@ -109,7 +110,8 @@ namespace AgroContainerTracker.Infrastructure.Services
                     .AsNoTracking()
                     .AsQueryable()
                     .Where(x => x.RateId.Equals(rateId))
-                     .Select(x => new {
+                     .Select(x => new
+                     {
                          Rate = x,
                          Customers = x.Customers.Select(c => new CustomerEntity
                          {
@@ -126,11 +128,11 @@ namespace AgroContainerTracker.Infrastructure.Services
 
                 return _mapper.Map<RateDetails>(rate);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw;
             }
-            
+
         }
 
         public async Task<bool> UpdateAsync(Rate rate)

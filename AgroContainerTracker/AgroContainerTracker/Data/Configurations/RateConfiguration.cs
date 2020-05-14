@@ -8,6 +8,9 @@ namespace AgroContainerTracker.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<RateEntity> entityBuilder)
         {
+            entityBuilder.ToTable("Rates");
+
+
             entityBuilder.HasKey(e => e.RateId)
                     .HasName("PRIMARY");
 
@@ -20,11 +23,11 @@ namespace AgroContainerTracker.Data.Configurations
                 .HasCollation("utf8mb4_general_ci");
 
             entityBuilder.Property(e => e.Value)
-                .HasColumnType("double")
+                .HasColumnType("decimal(7,5)")
                 .HasDefaultValue(0.00);
 
             entityBuilder.Property(e => e.SecondaryValue)
-                .HasColumnType("double")
+                .HasColumnType("decimal(7,5)")
                 .HasDefaultValue(0.00);
 
             entityBuilder.Property(e => e.Description)

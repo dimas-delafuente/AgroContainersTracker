@@ -33,5 +33,8 @@ namespace AgroContainerTracker.Data.Entities
         public virtual RateEntity Rate { get; set; }
         public virtual ICollection<PalotEntity> PalotsBuyer { get; set; }
         public virtual ICollection<PalotEntity> PalotsSeller { get; set; }
+        public virtual ICollection<PackagingEntity> Packagings { get; set; }
+        public virtual ICollection<PackagingMovementEntity> PackagingMovements { get; set; }
+
     }
 }

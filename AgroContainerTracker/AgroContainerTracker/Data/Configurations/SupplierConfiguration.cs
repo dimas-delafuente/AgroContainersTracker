@@ -8,6 +8,8 @@ namespace AgroContainerTracker.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<SupplierEntity> entityBuilder)
         {
+            entityBuilder.ToTable("Suppliers");
+
             entityBuilder.HasKey(e => e.SupplierId)
                     .HasName("PRIMARY");
 
