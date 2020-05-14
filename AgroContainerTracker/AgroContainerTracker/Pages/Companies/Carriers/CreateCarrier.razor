@@ -28,7 +28,7 @@
 }
 
 
-<EditForm Model="@carrier" OnValidSubmit="AddSupplier">
+<EditForm Model="@carrier" OnValidSubmit="AddCarrier">
     <DataAnnotationsValidator />
 
     <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
@@ -185,11 +185,12 @@
         countries = await countryService.GetAll().ConfigureAwait(false);
     }
 
-    public async Task AddSupplier()
+    public async Task AddCarrier()
     {
-        try
+        Carrier carrierCreated = await carrierService.AddAsync(carrier).ConfigureAwait(false);
+
+        if (carrierCreated != null)
         {
-            await carrierService.AddAsync(carrier).ConfigureAwait(false);
             var message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
@@ -199,8 +200,8 @@
             };
             Notify(message);
             NavigationManager.NavigateTo("companies");
-        }
-        catch (Exception)
+
+        } else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             var message = new NotificationMessage()

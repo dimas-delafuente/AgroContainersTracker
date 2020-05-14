@@ -8,21 +8,25 @@ using AgroContainerTracker.Data.Entities;
 using AgroContainerTracker.Domain.Rates;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace AgroContainerTracker.Infrastructure.Services
 {
     public class RateService : IRateService
     {
+        private readonly ILogger<RateService> _logger;
         private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
 
-        public RateService(ApplicationContext context, IMapper mapper)
+        public RateService(ApplicationContext context, IMapper mapper, ILogger<RateService> logger)
         {
             _context = context;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task AddAsync(AddRateRequest rate)
+        public async Task<Rate> AddAsync(AddRateRequest rate)
         {
             try
             {
@@ -34,13 +38,18 @@ namespace AgroContainerTracker.Infrastructure.Services
                 var addResponse = await _context.Rates.AddAsync(entity).ConfigureAwait(false);
 
                 if (addResponse.State.Equals(EntityState.Added))
-                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                {
+                    bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                    return created ? _mapper.Map<Rate>(addResponse.Entity) : null;
+                }
             }
             catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while adding new Rate: {rate}", e.Message, JsonSerializer.Serialize(rate));
             }
+
+            return null;
         }
 
         public async Task<bool> DeleteAsync(int rateId)
@@ -62,6 +71,7 @@ namespace AgroContainerTracker.Infrastructure.Services
             catch (Exception e)
             {
                 _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while deleting Rate: {rateId}", e.Message, rateId);
                 return false;
             }
 
@@ -81,22 +91,32 @@ namespace AgroContainerTracker.Infrastructure.Services
             catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all rates.", e.Message);
+                return new List<Rate>();
             }
         }
 
         public async Task<Rate> GetByIdAsync(int rateId)
         {
-            if (rateId < 0)
-                throw new ArgumentOutOfRangeException();
+            try
+            {
+                if (rateId < 0)
+                    throw new ArgumentOutOfRangeException();
 
-            RateEntity entity = await _context.Rates
-                .AsNoTracking()
-               .FirstOrDefaultAsync(x => x.RateId.Equals(rateId))
-               .ConfigureAwait(false);
+                RateEntity entity = await _context.Rates
+                    .AsNoTracking()
+                   .FirstOrDefaultAsync(x => x.RateId.Equals(rateId))
+                   .ConfigureAwait(false);
 
 
-            return _mapper.Map<Rate>(entity);
+                return _mapper.Map<Rate>(entity);
+
+            } catch (Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving rate with Id: {rateId}", e.Message, rateId);
+                return null;
+            }
+            
         }
 
         public async Task<RateDetails> GetDetailsByIdAsync(int rateId)
@@ -130,7 +150,8 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
             catch (Exception e)
             {
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving rate details with Id: {rateId}", e.Message, rateId);
+                return null;
             }
 
         }
@@ -153,13 +174,14 @@ namespace AgroContainerTracker.Infrastructure.Services
                     return true;
                 }
 
-                return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while updating Rate: {rate}", e.Message, JsonSerializer.Serialize(rate));
             }
+
+            return false;
         }
     }
 }

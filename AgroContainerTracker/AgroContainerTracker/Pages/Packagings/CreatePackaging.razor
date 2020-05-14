@@ -116,9 +116,9 @@
 
     public async Task AddPackaging()
     {
-        try
+        Packaging packagingCreated = await packagingService.AddAsync(packaging).ConfigureAwait(false);
+        if (packagingCreated != null)
         {
-            await packagingService.AddAsync(packaging).ConfigureAwait(false);
             var message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
@@ -128,8 +128,8 @@
             };
             Notify(message);
             NavigationManager.NavigateTo("packagings");
-        }
-        catch (Exception)
+
+        } else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             var message = new NotificationMessage()

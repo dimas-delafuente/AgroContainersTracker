@@ -11,7 +11,7 @@ namespace AgroContainerTracker.Core.Services
 
         Task<Creditor> GetByIdAsync(int creditorId);
 
-        Task AddAsync(AddCreditorRequest creditor);
+        Task<Creditor> AddAsync(AddCreditorRequest creditor);
 
         Task<bool> DeleteAsync(int creditorId);
 

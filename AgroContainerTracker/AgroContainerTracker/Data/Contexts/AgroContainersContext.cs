@@ -73,7 +73,7 @@ namespace AgroContainerTracker.Data.Contexts
                             break;
                     }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 throw;
             }

@@ -10,7 +10,7 @@ namespace AgroContainerTracker.Core.Services
         
         Task<Carrier> GetByIdAsync(int carrierId);
 
-        Task AddAsync(AddCarrierRequest carrier);
+        Task<Carrier> AddAsync(AddCarrierRequest carrier);
 
         Task<bool> DeleteAsync(int carrierId);
 

@@ -29,14 +29,8 @@
 
     public async Task AddContainer()
     {
-        try
-        {
+
             await containerService.AddContainerAsync(container).ConfigureAwait(false);
             NavigationManager.NavigateTo("containers");
-        }
-        catch (Exception e)
-        {
-
-        }
     }
 }

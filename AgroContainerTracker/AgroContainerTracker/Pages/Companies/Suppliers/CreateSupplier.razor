@@ -142,9 +142,10 @@
 
     public async Task AddSupplier()
     {
-        try
+        Supplier supplierCreated = await supplierService.AddAsync(supplier).ConfigureAwait(false);
+
+        if (supplierCreated != null)
         {
-            await supplierService.AddAsync(supplier).ConfigureAwait(false);
             var message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
@@ -154,8 +155,8 @@
             };
             Notify(message);
             NavigationManager.NavigateTo("companies");
-        }
-        catch (Exception)
+
+        } else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             var message = new NotificationMessage()

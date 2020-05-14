@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Data.Contexts;
@@ -8,23 +8,25 @@ using AgroContainerTracker.Data.Entities;
 using AgroContainerTracker.Domain.Packagings;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Operation = AgroContainerTracker.Domain.Packagings.Operation;
 
 namespace AgroContainerTracker.Infrastructure.Services
 {
     public class PackagingService : IPackagingService
     {
-
+        private readonly ILogger<PackagingService> _logger;
         private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
 
-        public PackagingService(ApplicationContext context, IMapper mapper)
+        public PackagingService(ApplicationContext context, IMapper mapper, ILogger<PackagingService> logger)
         {
             _context = context;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task AddAsync(AddPackagingRequest packaging)
+        public async Task<Packaging> AddAsync(AddPackagingRequest packaging)
         {
             try
             {
@@ -36,13 +38,19 @@ namespace AgroContainerTracker.Infrastructure.Services
                 var addResponse = await _context.Packagings.AddAsync(entity).ConfigureAwait(false);
 
                 if (addResponse.State.Equals(EntityState.Added))
-                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                {
+                    bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                    return created ? _mapper.Map<Packaging>(addResponse.Entity) : null;
+                }
             }
-            catch (Exception exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while adding new Packaging: {packaging}",
+                    e.Message, JsonSerializer.Serialize(packaging));
             }
+
+            return null;
         }
 
         public async Task<bool> DeleteAsync(int packagingId)
@@ -61,10 +69,11 @@ namespace AgroContainerTracker.Infrastructure.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
-                return false;
+                _logger.LogError(e, "Exception: {e} // Internal Error while removing Packaging: {packagingId}",
+                    e.Message, packagingId);
             }
 
             return false;
@@ -82,27 +91,40 @@ namespace AgroContainerTracker.Infrastructure.Services
 
                 return _mapper.Map<List<Packaging>>(packagings);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
-                return new List<Packaging>();
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all Packagings",
+                    e.Message);
             }
+
+            return new List<Packaging>();
         }
 
         public async Task<Packaging> GetByIdAsync(int packagingId)
         {
-            if (packagingId < 0)
-                throw new ArgumentOutOfRangeException();
+            try
+            {
+                if (packagingId < 0)
+                    throw new ArgumentOutOfRangeException();
 
-            var entity = await _context.Packagings
-                .AsNoTracking()
-                .Include(x => x.Owner)
-                .Include(x => x.PackagingMovements)
-                    .ThenInclude(pm => pm.Customer)
-               .FirstOrDefaultAsync(x => x.PackagingId.Equals(packagingId))
-               .ConfigureAwait(false);
+                var entity = await _context.Packagings
+                    .AsNoTracking()
+                    .Include(x => x.Owner)
+                    .Include(x => x.PackagingMovements)
+                        .ThenInclude(pm => pm.Customer)
+                   .FirstOrDefaultAsync(x => x.PackagingId.Equals(packagingId))
+                   .ConfigureAwait(false);
 
-            return _mapper.Map<Packaging>(entity);
+                return _mapper.Map<Packaging>(entity);
+
+            } catch(Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving Packaging: {packagingId}",
+                    e.Message, packagingId);
+            }
+
+            return null;
         }
 
         public async Task<bool> UpdateAsync(Packaging packaging)
@@ -127,6 +149,8 @@ namespace AgroContainerTracker.Infrastructure.Services
             catch (Exception e)
             {
                 _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while updating Packaging: {packaging}",
+                    e.Message, JsonSerializer.Serialize(packaging));
             }
 
             return false;
@@ -164,9 +188,11 @@ namespace AgroContainerTracker.Infrastructure.Services
                 _context.DetachAll();
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while adding new Packaging movement: {packagingMovement}",
+                    e.Message, JsonSerializer.Serialize(packagingMovement));
             }
 
             return null;

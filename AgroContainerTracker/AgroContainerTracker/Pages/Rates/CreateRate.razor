@@ -76,9 +76,10 @@
 
     public async Task AddRate()
     {
-        try
+        Rate newRate = await rateService.AddAsync(rate).ConfigureAwait(false);
+
+        if (newRate != null)
         {
-            await rateService.AddAsync(rate).ConfigureAwait(false);
             var message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
@@ -88,8 +89,8 @@
             };
             Notify(message);
             NavigationManager.NavigateTo("rates");
-        }
-        catch (Exception)
+
+        } else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             var message = new NotificationMessage()
@@ -101,6 +102,7 @@
             };
             Notify(message);
         }
+
     }
 
     public void OnCancel()

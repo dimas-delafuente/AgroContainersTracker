@@ -11,7 +11,7 @@ namespace AgroContainerTracker.Core.Services
         Task<Packaging> GetByIdAsync(int packagingId);
         Task<bool> DeleteAsync(int packagingId);
         Task<bool> UpdateAsync(Packaging packaging);
-        Task AddAsync(AddPackagingRequest packaging);
+        Task<Packaging> AddAsync(AddPackagingRequest packaging);
         Task<Packaging> AddPackagingMovementAsync(AddPackagingMovementRequest packagingMovement);
     }
 }

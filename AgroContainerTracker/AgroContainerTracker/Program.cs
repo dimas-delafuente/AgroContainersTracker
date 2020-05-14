@@ -2,6 +2,9 @@ using ElectronNET.API;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 namespace AgroContainerTracker
 {
@@ -24,7 +27,14 @@ namespace AgroContainerTracker
         {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(
-                    webBuilder => webBuilder.UseStartup<Startup>());
+                    webBuilder => webBuilder.UseStartup<Startup>())
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddNLog();
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Information);
+                })
+                .UseNLog();
         }
 
 

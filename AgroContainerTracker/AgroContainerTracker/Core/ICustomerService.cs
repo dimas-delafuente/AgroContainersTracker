@@ -10,7 +10,7 @@ namespace AgroContainerTracker.Core.Services
 
         Task<Customer> GetByIdAsync(int customerId);
 
-        Task AddAsync(AddCustomerRequest customer);
+        Task<Customer> AddAsync(AddCustomerRequest customer);
 
         Task<bool> DeleteAsync(int customerId);
 

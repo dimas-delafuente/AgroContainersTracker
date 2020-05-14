@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Data.Contexts;
@@ -7,22 +8,25 @@ using AgroContainerTracker.Data.Entities;
 using AgroContainerTracker.Domain.Companies;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AgroContainerTracker.Infrastructure.Services
 {
     public class CarrierService : ICarrierService
     {
+        private readonly ILogger<CarrierService> _logger;
         private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
 
-        public CarrierService(ApplicationContext context, IMapper mapper)
+        public CarrierService(ApplicationContext context, IMapper mapper, ILogger<CarrierService> logger)
         {
             _context = context;
             _mapper = mapper;
+            _logger = logger;
         }
 
 
-        public async Task AddAsync(AddCarrierRequest carrier)
+        public async Task<Carrier> AddAsync(AddCarrierRequest carrier)
         {
             try
             {
@@ -34,23 +38,38 @@ namespace AgroContainerTracker.Infrastructure.Services
                 var addResponse = await _context.Carriers.AddAsync(entity).ConfigureAwait(false);
 
                 if (addResponse.State.Equals(EntityState.Added))
-                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                {
+                    bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                    return created ? _mapper.Map<Carrier>(addResponse.Entity) : null;
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while adding new Carrier: {carrier}", e.Message, JsonSerializer.Serialize(carrier));
             }
+
+            return null;
         }
 
         public async Task<List<Carrier>> GetAllAsync()
         {
-            IEnumerable<CarrierEntity> entities = await _context.Carriers
+            try
+            {
+                IEnumerable<CarrierEntity> entities = await _context.Carriers
                 .AsNoTracking()
                 .ToListAsync().ConfigureAwait(false);
 
-            return _mapper.Map<List<Carrier>>(entities);
-        }
+                return _mapper.Map<List<Carrier>>(entities);
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all rates.", e.Message);
+            }
+
+            return new List<Carrier>();
+        }            
 
         public async Task<Carrier> GetByIdAsync(int carrierId)
         {
@@ -69,12 +88,13 @@ namespace AgroContainerTracker.Infrastructure.Services
 
                 return _mapper.Map<Carrier>(entity);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving Carrier: {carrierId}", e.Message, carrierId);
             }
 
+            return null;
         }
 
         public async Task<bool> DeleteAsync(int carrierId)
@@ -96,7 +116,7 @@ namespace AgroContainerTracker.Infrastructure.Services
             catch (Exception e)
             {
                 _context.DetachAll();
-                return false;
+                _logger.LogError(e, "Exception: {e} // Internal Error while removing Carrier: {carrierId}", e.Message, carrierId);
             }
 
             return false;
@@ -122,13 +142,14 @@ namespace AgroContainerTracker.Infrastructure.Services
                     return true;
                 }
 
-                return false;
             }
             catch (Exception e)
             {
                 _context.DetachAll();
-                throw;
+                _logger.LogError(e, "Exception: {e} // Internal Error while updating Carrier: {carrier}", e.Message, JsonSerializer.Serialize(carrier));
             }
+
+            return false;
         }
     }
 }

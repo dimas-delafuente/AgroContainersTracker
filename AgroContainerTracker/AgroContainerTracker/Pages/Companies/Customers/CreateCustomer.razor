@@ -167,9 +167,10 @@
 
     public async Task AddCustomer()
     {
-        try
+        Customer customerCreated = await customerService.AddAsync(customer).ConfigureAwait(false);
+
+        if (customerCreated != null)
         {
-            await customerService.AddAsync(customer).ConfigureAwait(false);
             var message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
@@ -179,8 +180,8 @@
             };
             Notify(message);
             NavigationManager.NavigateTo("companies");
-        }
-        catch (Exception)
+
+        } else
         {
             errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
             var message = new NotificationMessage()
