@@ -79,7 +79,7 @@ else
     private async Task ShowRemoveRateDialog(Rate rate)
     {
         await dialogService.OpenAsync("Eliminar tarifa", ds =>
-            @<RadzenCard Style="padding: 20px;">
+            @<div class="text-center" style="padding: 20px;">
                 <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta tarifa?</p>
                 <div class="row">
                     <div class="col-md-12 text-center">
@@ -87,7 +87,7 @@ else
                         <RadzenButton Text="Eliminar" Click="() => RemoveRate(rate)" ButtonStyle="ButtonStyle.Danger" />
                     </div>
                 </div>
-            </RadzenCard>
+            </div>
         );
     }
 

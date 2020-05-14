@@ -104,7 +104,7 @@ else
 
     private async Task ShowRemoveCustomerDialog(Customer customer) {
         await dialogService.OpenAsync("Eliminar cliente", ds =>
-            @<RadzenCard Style="padding: 20px;">
+            @<div class="text-center" style="padding: 20px;">
                 <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este cliente?</p>
                 <div class="row">
                     <div class="col-md-12 text-center">
@@ -112,7 +112,7 @@ else
                         <RadzenButton Text="Eliminar" Click="() => RemoveCustomer(customer)" ButtonStyle="ButtonStyle.Danger" />
                     </div>
                 </div>
-            </RadzenCard>);
+            </div>);
     }
 
     private void Notify(NotificationMessage message)
