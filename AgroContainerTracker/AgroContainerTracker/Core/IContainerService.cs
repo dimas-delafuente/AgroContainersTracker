@@ -1,11 +1,16 @@
-﻿using System;
+﻿using AgroContainerTracker.Domain;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace AgroContainerTracker.Services
+namespace AgroContainerTracker.Core.Services
 {
     public interface IContainerService
     {
+        Task<IEnumerable<Container>> GetContainersAsync();
+
+        Task<Container> GetContainerAsync(int id);
+
+        Task AddContainerAsync(AddContainerRequest container);
+
     }
 }

@@ -1,0 +1,133 @@
+﻿@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+
+@inject ICarrierService carrierService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/carriers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar transportista</a>
+    </div>
+</div>
+
+@if (carriers == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@carriers" TItem="Carrier" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
+                <Columns>
+                    <RadzenGridColumn TItem="Carrier" Property="CarrierNumber" Title="Número" Width="75px">
+                        <FooterTemplate>
+                            Total: <b>@carriers.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Carrier" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Carrier" Property="Email" Title="Email" />
+                    <RadzenGridColumn TItem="Carrier" Property="Phone" Title="Teléfono" />
+                    <RadzenGridColumn TItem="Carrier" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenCarrierDetails(data.CarrierId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Carrier" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenCarrierEdit(data.CarrierId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Carrier" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveCarrierDialog(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code {
+    private List<Carrier> carriers = new List<Carrier>();
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            carriers = await carrierService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private void OpenCarrierDetails(int carrierId)
+    {
+        navigationManager.NavigateTo($"/carriers/details/{carrierId}");
+    }
+
+    private void OpenCarrierEdit(int carrierId)
+    {
+        navigationManager.NavigateTo($"/carriers/edit/{carrierId}");
+    }
+
+    private async Task RemoveCarrier(Carrier carrier)
+    {
+        bool deleted = await carrierService.DeleteAsync(carrier.CarrierId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+        if (deleted)
+        {
+            carriers.Remove(carrier);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Transportista eliminado",
+                Detail = "El transportista se ha eliminado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar el transportista.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private async Task ShowRemoveCarrierDialog(Carrier carrier)
+    {
+        await dialogService.OpenAsync("Eliminar Transportista", ds =>
+            @<div class="text-center" style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este transportista?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveCarrier(carrier)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </div>);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+      notificationService.Notify(message);
+    }
+
+}

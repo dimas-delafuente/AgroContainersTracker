@@ -1,0 +1,277 @@
+﻿@page "/carriers/edit/{Id:int}"
+
+@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Domain
+
+@using AgroContainerTracker.Core.Services
+
+@inject ICarrierService carrierService
+@inject ICountryService countryService
+@inject NavigationManager NavigationManager
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<h1>Editar Transportista</h1>
+
+<div class="row mt-4">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@if (carrier == null)
+{
+    <p><em>No se ha encontrado el transportista @Id</em></p>
+}
+else
+{
+
+    <EditForm Model="@carrier" OnValidSubmit="UpdateCarrier">
+        <DataAnnotationsValidator />
+
+        <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
+            <div class="row">
+                <div class="form-group col-lg-2">
+                    <label for="number">Nº Transportista:</label>
+                    <InputNumber id="number" name="number" @bind-Value="carrier.CarrierNumber" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.CarrierNumber)" />
+                </div>
+                <div class="form-group col-lg-5">
+                    <label for="name">Nombre:</label>
+                    <InputText id="name" @bind-Value="carrier.Name" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.Name)" />
+                </div>
+                <div class="form-group col-lg-5">
+                    <label for="cif">CIF:</label>
+                    <InputText id="cif" name="cif" @bind-Value="carrier.CompanyCode" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.CompanyCode)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6">
+                    <label for="name">Contacto:</label>
+                    <InputText id="name" @bind-Value="carrier.ContactName" class="form-control" />
+                </div>
+                <div class="form-group col-lg-6">
+                    <label for="email">Email:</label>
+                    <InputText id="email" @bind-Value="carrier.Email" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.Email)" />
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6">
+                    <label for="phone">Teléfono:</label>
+                    <InputText id="phone" @bind-Value="carrier.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.Phone)" />
+
+                </div>
+                <div class="form-group col-lg-6">
+                    <label for="mobile">Móvil:</label>
+                    <InputText id="mobile" @bind-Value="carrier.Mobile" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.Mobile)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-12">
+                    <label for="description">Observaciones:</label>
+                    <InputTextArea id="description" @bind-Value="carrier.Description" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.Description)" />
+                </div>
+            </div>
+        </RadzenFieldset>
+
+
+
+        <RadzenFieldset Text="DIRECCIÓN" class="mt-2">
+            <div class="row">
+                <div class="form-group col-lg-8">
+                    <label for="address">Dirección:</label>
+                    <InputText id="address" @bind-Value="carrier.Address" class="form-control" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="locality">Localidad:</label>
+                    <InputText id="locality" @bind-Value="carrier.Locality" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-lg-4">
+                    <label for="postal_code">Código Postal:</label>
+                    <InputText id="postal_code" @bind-Value="carrier.PostalCode" class="form-control" />
+                    <ValidationMessage For="@(() => carrier.PostalCode)" />
+
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="state">Provincia:</label>
+                    <InputText id="state" @bind-Value="carrier.State" class="form-control" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="country">País:</label>
+                    <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@countries" @bind-Value="carrier.Country.CountryId"
+                                    TextProperty="Name" ValueProperty="CountryId" Style="display: block;" Required />
+                </div>
+            </div>
+        </RadzenFieldset>
+
+        <RadzenFieldset Text="MATRÍCULAS" class="mt-2">
+            @foreach (var vehicle in carrier.Vehicles)
+            {
+                <div class="row">
+                    <div class="form-group col-lg-5">
+                        <label for="license">Matrícula:</label>
+                        <InputText name="license" @bind-Value="vehicle.RegistrationNumber" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <label for="carriage">Remolque:</label>
+                        <InputText name="carriage" @bind-Value="vehicle.CarriageRegistrationNumber" class="form-control" />
+                    </div>
+                    <div class="col-lg-1 form-button">
+                        <span class="oi oi-trash" @onclick="() => RemoveVehicle(vehicle)"></span>
+                    </div>
+                </div>
+            }
+
+            <div class="text-center">
+                <button type="button" class="btn btn-outline-primary" @onclick="AddVehicle">Añadir matrícula</button>
+            </div>
+        </RadzenFieldset>
+
+        <RadzenFieldset Text="CONDUCTORES" class="mt-2">
+            @foreach (var driver in carrier.Drivers)
+            {
+                <div class="row">
+                    <div class="form-group col-lg-5">
+                        <label for="driverid">DNI:</label>
+                        <InputText name="driverid" @bind-Value="driver.IdentificationNumber" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="drivername">Nombre:</label>
+                        <InputText name="drivername" @bind-Value="driver.Name" class="form-control" />
+                    </div>
+                    <div class="col-lg-1 form-button">
+                        <span class="oi oi-trash" @onclick="() => RemoveDriver(driver)"></span>
+                    </div>
+                </div>
+            }
+
+            <div class="text-center">
+                <button type="button" class="btn btn-outline-primary" @onclick="AddDriver">Añadir conductor</button>
+            </div>
+        </RadzenFieldset>
+
+        <hr />
+        <div class="row mt-4 mb-4">
+            <div class="col-lg-12">
+                <div class="float-right">
+                    <button type="button" class="btn btn-outline-dark" @onclick="OnCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Carrier carrier = new Carrier();
+    private IEnumerable<Country> countries;
+
+    private string errorMessage;
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            carrier = await carrierService.GetByIdAsync(Id).ConfigureAwait(false);
+            countries = await countryService.GetAll().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    public async Task UpdateCarrier()
+    {
+        try
+        {
+            bool updated = await carrierService.UpdateAsync(carrier).ConfigureAwait(false);
+
+            if (updated)
+            {
+                var message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Transportista modificado",
+                    Detail = "El transportista se ha modificado correctamente",
+                    Duration = 4000
+                };
+                Notify(message);
+                NavigationManager.NavigateTo("companies");
+            }
+            else
+                NotifyError();
+
+        }
+        catch (Exception)
+        {
+            errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
+            NotifyError();
+        }
+    }
+
+    public void AddVehicle()
+    {
+        carrier.Vehicles.Add(new Vehicle());
+    }
+
+    public void AddDriver()
+    {
+        carrier.Drivers.Add(new Driver());
+    }
+
+    public void RemoveVehicle(Vehicle vehicle)
+    {
+        carrier.Vehicles.Remove(vehicle);
+    }
+
+    public void RemoveDriver(Driver driver)
+    {
+        carrier.Drivers.Remove(driver);
+    }
+
+    public void OnCancel()
+    {
+        NavigationManager.NavigateTo("companies");
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+
+    private void NotifyError()
+    {
+        var message = new NotificationMessage()
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Error",
+            Detail = "Se ha producido un error al modificar el transportista.",
+            Duration = 4000
+        };
+        Notify(message);
+    }
+}

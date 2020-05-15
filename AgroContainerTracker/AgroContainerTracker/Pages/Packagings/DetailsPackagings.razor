@@ -1,0 +1,153 @@
+﻿@page "/packagings/details/{Id:int}"
+
+@using AgroContainerTracker.Domain.Packagings
+@using AgroContainerTracker.Core.Services
+@inject IPackagingService packagingService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<div class="row">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/packagings" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (packaging == null)
+{
+    <p><em>No se ha encontrado el envase @Id</em></p>
+}
+else
+{
+    <RadzenPanel AllowCollapse="true">
+        <HeaderTemplate>
+            <span style="float:left;">
+                <i class="oi oi-box details-icon"></i>
+                <b style="font-size:30px">DETALLES</b>
+            </span>
+        </HeaderTemplate>
+        <ChildContent>
+            <RadzenCard>
+                <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="code">Código Envase:</label>
+                            <RadzenTextBox name="code" Value="@packaging.Code" Disabled="true" class="form-control" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="type">Tipo:</label>
+                            <RadzenTextBox name="type" Value="@packaging.Type.ToString()" Disabled="true" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="material">Material:</label>
+                            <RadzenTextBox name="material" Value="@packaging.Material.ToString()" Disabled="true" class="form-control" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="color">Color:</label>
+                            <RadzenTextBox name="color" Value="@packaging.Color" Disabled="true" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="owner">Propietario:</label>
+                            <RadzenTextBox name="owner" Value="@packaging.Owner?.Name" Disabled="true" class="form-control" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="description">Descripción:</label>
+                            <RadzenTextBox name="description" Value="@packaging.Description" Disabled="true" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="total">Cantidad:</label>
+                            <RadzenTextBox name="total" Value="@packaging.Total.ToString()" Disabled="true" class="form-control" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="weight">Peso:</label>
+                            <RadzenTextBox name="weight" Value="@packaging.Weight.ToString()" Disabled="true" class="form-control" />
+                        </div>
+                    </div>
+                </RadzenFieldset>
+            </RadzenCard>
+        </ChildContent>
+    </RadzenPanel>
+
+    <RadzenPanel AllowCollapse="true">
+        <HeaderTemplate>
+            <span style="float:left;">
+                <RadzenIcon Icon="calendar_today" />
+                <b style="font-size:30px">HISTÓRICO</b>
+            </span>
+        </HeaderTemplate>
+        <ChildContent>
+            <RadzenCard>
+                <div class="row mt-5">
+                    <div class="col-lg-12">
+                        <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                                    AllowSorting="true" Data="@packaging.PackagingMovements" TItem="PackagingMovement" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
+                            <Columns>
+                                <RadzenGridColumn TItem="PackagingMovement" Property="Created" Title="Fecha">
+                                    <Template Context="pkg">
+                                        @pkg.Created.ToString("dd/MM/yyyy HH:mm")
+                                    </Template>
+                                    <FooterTemplate>
+                                        Total: <b>@packaging.PackagingMovements.Count()</b>
+                                    </FooterTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="PackagingMovement" Property="Amount" Title="Cantidad" Type="integer" TextAlign="TextAlign.Right">
+                                    <Template Context="pkg">
+                                        @if (pkg.Operation.Equals(Operation.Add))
+                                        {
+                                            <span style="color: #01a050"><i class="oi oi-arrow-top"></i> @pkg.Amount</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: red"><i class="oi oi-arrow-bottom"></i> @pkg.Amount</span>
+                                        }
+
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="PackagingMovement" Property="Total" Title="Total" Type="integer" TextAlign="TextAlign.Right" />
+                                <RadzenGridColumn TItem="PackagingMovement" Property="Customer.Name" Title="Cliente" />
+                            </Columns>
+                        </RadzenGrid>
+                    </div>
+                </div>
+            </RadzenCard>
+        </ChildContent>
+    </RadzenPanel>
+}
+
+<div class="row">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/packagings" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Packaging packaging;
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
+    }
+}

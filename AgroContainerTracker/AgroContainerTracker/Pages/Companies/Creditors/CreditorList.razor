@@ -1,0 +1,133 @@
+﻿@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+
+@inject ICreditorService creditorService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/creditors/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar acreedor</a>
+    </div>
+</div>
+
+@if (creditors == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@creditors" TItem="Creditor" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
+                <Columns>
+                    <RadzenGridColumn TItem="Creditor" Property="CreditorNumber" Title="Número" Width="75px">
+                        <FooterTemplate>
+                            Total: <b>@creditors.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Creditor" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Creditor" Property="Email" Title="Email" />
+                    <RadzenGridColumn TItem="Creditor" Property="Phone" Title="Teléfono" />
+                    <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenCreditorDetails(data.CreditorId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenCreditorEdit(data.CreditorId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Creditor" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveCreditorDialog(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code {
+    private List<Creditor> creditors = new List<Creditor>();
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            creditors = await creditorService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private void OpenCreditorDetails(int creditorId)
+    {
+        navigationManager.NavigateTo($"/creditors/details/{creditorId}");
+    }
+
+    private void OpenCreditorEdit(int creditorId)
+    {
+        navigationManager.NavigateTo($"/creditors/edit/{creditorId}");
+    }
+
+    private async Task RemoveCreditor(Creditor customer)
+    {
+        bool deleted = await creditorService.DeleteAsync(customer.CreditorId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+        if (deleted)
+        {
+            creditors.Remove(customer);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Acreedor eliminado",
+                Detail = "El acreedor se ha eliminado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar el acreedor.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private async Task ShowRemoveCreditorDialog(Creditor creditor)
+    {
+        await dialogService.OpenAsync("Eliminar acreedor", ds =>
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este acreedor?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveCreditor(creditor)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>);
+}
+
+private void Notify(NotificationMessage message)
+{
+  notificationService.Notify(message);
+}
+
+}

@@ -1,0 +1,117 @@
+﻿@page "/rates/create"
+
+@using AgroContainerTracker.Domain.Rates
+
+@using AgroContainerTracker.Core.Services
+
+@inject IRateService rateService
+@inject NavigationManager NavigationManager
+@inject NotificationService notificationService
+
+<h1>Añadir Tarifa</h1>
+
+<div class="row mt-4">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/rates" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+
+<EditForm Model="@rate" OnValidSubmit="AddRate">
+    <DataAnnotationsValidator />
+
+    <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="name">Nombre:</label>
+                <InputText id="name" @bind-Value="rate.Name" class="form-control" />
+                <ValidationMessage For="@(() => rate.Name)" />
+            </div>
+            <div class="form-group col-lg-6">
+                <label for="description">Descripción:</label>
+                <InputTextArea id="description" @bind-Value="rate.Description" class="form-control" />
+                <ValidationMessage For="@(() => rate.Description)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="value">Precio/día:</label>
+                <InputNumber id="value" name="value" @bind-Value="rate.Value" class="form-control" />
+                <ValidationMessage For="@(() => rate.Value)" />
+            </div>
+            <div class="form-group col-lg-6">
+                <label for="value2">Precio/día adicional:</label>
+                <InputNumber id="value2" name="value2" @bind-Value="rate.SecondaryValue" class="form-control" />
+                <ValidationMessage For="@(() => rate.SecondaryValue)" />
+            </div>
+
+        </div>
+    </RadzenFieldset>
+
+    <hr />
+    <div class="row mt-4 mb-4">
+        <div class="col-lg-12">
+            <div class="float-right">
+                <button type="button" class="btn btn-outline-dark" @onclick="OnCancel">Cancelar</button>
+                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    private AddRateRequest rate = new AddRateRequest();
+    public string errorMessage;
+
+    public async Task AddRate()
+    {
+        Rate newRate = await rateService.AddAsync(rate).ConfigureAwait(false);
+
+        if (newRate != null)
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Tarifa añadida",
+                Detail = "La tarifa se ha añadido correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+            NavigationManager.NavigateTo("rates");
+
+        } else
+        {
+            errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al añadir la tarifa.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+
+    }
+
+    public void OnCancel()
+    {
+        NavigationManager.NavigateTo("rates");
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+}

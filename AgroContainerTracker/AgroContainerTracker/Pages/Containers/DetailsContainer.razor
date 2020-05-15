@@ -1,0 +1,61 @@
+﻿@page "/containers/details/{Id:int}"
+
+@using AgroContainerTracker.Domain
+@using AgroContainerTracker.Core.Services
+@inject IContainerService containerService
+
+
+<h3>Detalles Cámara @Id</h3>
+
+@if (container == null)
+{
+    <p><em>No se ha encontrado la cámara @Id</em></p>
+}
+else
+{
+    <p>Tamaño: @container.Size</p>
+    <p>Palots: @container.Palots.Count</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Palot</th>
+                <th>Entrada</th>
+                <th>Fecha Entrada</th>
+                <th>Peso</th>
+                <th>Comprador</th>
+                <th>Vendedor</th>
+                <th>Salida</th>
+                <th>Fruta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var palot in container.Palots)
+            {
+            <tr>
+                <td>@palot.PalotId</td>
+                <td>@palot.ArrivalNumber</td>
+                <td>@palot.Arrival.ToShortDateString()</td>
+                <td>@palot.Weight</td>
+                <td>@palot.Buyer.Name</td>
+                <td>@palot.Seller.Name</td>
+                <td>@palot.Departure.ToShortDateString()</td>
+                <td>@palot.Fruit.Name</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Container container;
+
+    protected override async Task OnInitializedAsync()
+    {
+        container = await containerService.GetContainerAsync(Id);
+    }
+}

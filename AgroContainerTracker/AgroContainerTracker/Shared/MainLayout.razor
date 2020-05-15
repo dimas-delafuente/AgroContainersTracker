@@ -1,11 +1,15 @@
 ﻿@inherits LayoutComponentBase
+@using Radzen
+@using Radzen.Blazor
 
+<RadzenDialog></RadzenDialog>
+<RadzenNotification></RadzenNotification>
 <div class="sidebar">
     <NavMenu />
 </div>
 
 <div class="main">
-    <div class="content px-4">
+    <div class="container content px-4">
         @Body
     </div>
 </div>

@@ -1,0 +1,133 @@
+﻿@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+
+@inject ICustomerService customerService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <a href="/customers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cliente</a>
+    </div>
+</div>
+
+@if (customers == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@customers" TItem="Customer" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
+                <Columns>
+                    <RadzenGridColumn TItem="Customer" Property="CustomerNumber" Title="Número" Width="75px">
+                        <FooterTemplate>
+                            Total: <b>@customers.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Customer" Property="Name" Title="Nombre" />
+                    <RadzenGridColumn TItem="Customer" Property="Email" Title="Email" />
+                    <RadzenGridColumn TItem="Customer" Property="Phone" Title="Teléfono" />
+                    <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenCustomerDetails(data.CustomerId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenCustomerEdit(data.CustomerId)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Customer" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveCustomerDialog(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code {
+    private List<Customer> customers = new List<Customer>();
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            customers = await customerService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private void OpenCustomerDetails(int customerId)
+    {
+        navigationManager.NavigateTo($"/customers/details/{customerId}");
+    }
+
+    private void OpenCustomerEdit(int customerId)
+    {
+        navigationManager.NavigateTo($"/customers/edit/{customerId}");
+    }
+
+    private async Task RemoveCustomer(Customer customer)
+    {
+        bool deleted = await customerService.DeleteAsync(customer.CustomerId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+        if (deleted)
+        {
+            customers.Remove(customer);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Cliente eliminado",
+                Detail = "El cliente se ha eliminado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar el cliente.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private async Task ShowRemoveCustomerDialog(Customer customer)
+    {
+        await dialogService.OpenAsync("Eliminar cliente", ds =>
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este cliente?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveCustomer(customer)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>);
+}
+
+private void Notify(NotificationMessage message)
+{
+notificationService.Notify(message);
+}
+
+}

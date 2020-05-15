@@ -1,0 +1,182 @@
+﻿@page "/carriers/details/{Id:int}"
+
+@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+@inject ICarrierService carrierService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<div class="row">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (carrier == null)
+{
+    <p><em>No se ha encontrado el transportista @Id</em></p>
+}
+else
+{
+<RadzenPanel AllowCollapse="true">
+    <HeaderTemplate>
+        <span style="float:left;">
+            <RadzenIcon Icon="account_box" /><b style="font-size:30px">DETALLES</b>
+        </span>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
+                <div class="row">
+                    <div class="form-group col-lg-2">
+                        <label for="number">Nº Cliente:</label>
+                        <RadzenTextBox Value="@carrier.CarrierNumber.ToString()" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <label for="name">Nombre:</label>
+                        <RadzenTextBox Value="@carrier.Name" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-5">
+                        <label for="cif">CIF:</label>
+                        <RadzenTextBox Value="@carrier.CompanyCode" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="name">Contacto:</label>
+                        <RadzenTextBox Value="@carrier.ContactName" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="email">Email:</label>
+                        <RadzenTextBox Value="@carrier.Email" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="phone">Teléfono:</label>
+                        <RadzenTextBox Value="@carrier.Phone" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="mobile">Móvil:</label>
+                        <RadzenTextBox Value="@carrier.Mobile" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <label for="description">Observaciones:</label>
+                        <RadzenTextArea Value="@carrier.Description" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+            </RadzenFieldset>
+
+            <RadzenFieldset Text="DIRECCIÓN" class="mt-2">
+                <div class="row">
+                    <div class="form-group col-lg-8">
+                        <label for="address">Dirección:</label>
+                        <RadzenTextBox Value="@carrier.Address" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label for="locality">Localidad:</label>
+                        <RadzenTextBox Value="@carrier.Locality" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label for="postal_code">Código Postal:</label>
+                        <RadzenTextBox Value="@carrier.PostalCode" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label for="state">Provincia:</label>
+                        <RadzenTextBox Value="@carrier.State" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label for="country">País:</label>
+                        <RadzenTextBox Value="@carrier.Country.Name" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+            </RadzenFieldset>
+
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
+
+<RadzenPanel AllowCollapse="true">
+    <HeaderTemplate>
+        <span style="float:left;">
+            <RadzenIcon Icon="account_box" /><b style="font-size:30px">MATRÍCULAS</b>
+        </span>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            @foreach (var vehicle in carrier.Vehicles)
+            {
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="license">Matrícula:</label>
+                        <RadzenTextBox Value="@vehicle.RegistrationNumber" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="carriage">Remolque:</label>
+                        <RadzenTextBox Value="@vehicle.CarriageRegistrationNumber" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+            }
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
+
+<RadzenPanel AllowCollapse="true">
+    <HeaderTemplate>
+        <span style="float:left;">
+            <RadzenIcon Icon="account_box" /><b style="font-size:30px">CONDUCTORES</b>
+        </span>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            @foreach (var driver in carrier.Drivers)
+            {
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="driverid">DNI:</label>
+                        <RadzenTextBox Value="@driver.IdentificationNumber" Disabled="true" class="form-control" />
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="drivername">Nombre:</label>
+                        <RadzenTextBox Value="@driver.Name" Disabled="true" class="form-control" />
+                    </div>
+                </div>
+            }
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
+}
+
+<div class="row">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Carrier carrier;
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            carrier = await carrierService.GetByIdAsync(Id).ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+}

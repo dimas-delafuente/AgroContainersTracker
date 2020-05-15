@@ -1,0 +1,28 @@
+﻿@page "/companies"
+@using AgroContainerTracker.Pages.Companies.Customers
+@using AgroContainerTracker.Pages.Companies.Suppliers
+@using AgroContainerTracker.Pages.Companies.Creditors
+@using AgroContainerTracker.Pages.Companies.Carriers
+
+<h1>Clientes</h1>
+
+<RadzenTabs class="m-t-4">
+    <Tabs>
+        <RadzenTabsItem Text="Clientes">
+            <CustomerList></CustomerList>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Proveedores">
+            <SupplierList></SupplierList>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Acreedores">
+            <CreditorList></CreditorList>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Transportistas">
+            <CarrierList></CarrierList>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code{
+
+}

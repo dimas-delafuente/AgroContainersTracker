@@ -1,0 +1,211 @@
+﻿@page "/creditors/edit/{Id:int}"
+
+@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Domain
+
+@using AgroContainerTracker.Core.Services
+
+@inject ICreditorService creditorService
+@inject ICountryService countryService
+@inject NavigationManager NavigationManager
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<h1>Editar Acreedor</h1>
+
+<div class="row mt-4">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@if (creditor == null)
+{
+    <p><em>No se ha encontrado el acreedor @Id</em></p>
+}
+else
+{
+
+    <EditForm Model="@creditor" OnValidSubmit="UpdateCreditor">
+        <DataAnnotationsValidator />
+
+        <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
+            <div class="row">
+                <div class="form-group col-lg-2">
+                    <label for="number">Nº Acreedor:</label>
+                    <InputNumber id="number" name="number" @bind-Value="creditor.CreditorNumber" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.CreditorNumber)" />
+                </div>
+                <div class="form-group col-lg-5">
+                    <label for="name">Nombre:</label>
+                    <InputText id="name" @bind-Value="creditor.Name" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.Name)" />
+                </div>
+                <div class="form-group col-lg-5">
+                    <label for="cif">CIF:</label>
+                    <InputText id="cif" name="cif" @bind-Value="creditor.CompanyCode" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.CompanyCode)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6">
+                    <label for="name">Contacto:</label>
+                    <InputText id="name" @bind-Value="creditor.ContactName" class="form-control" />
+                </div>
+                <div class="form-group col-lg-6">
+                    <label for="email">Email:</label>
+                    <InputText id="email" @bind-Value="creditor.Email" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.Email)" />
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6">
+                    <label for="phone">Teléfono:</label>
+                    <InputText id="phone" @bind-Value="creditor.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.Phone)" />
+
+                </div>
+                <div class="form-group col-lg-6">
+                    <label for="mobile">Móvil:</label>
+                    <InputText id="mobile" @bind-Value="creditor.Mobile" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.Mobile)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-12">
+                    <label for="description">Observaciones:</label>
+                    <InputTextArea id="description" @bind-Value="creditor.Description" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.Description)" />
+                </div>
+            </div>
+        </RadzenFieldset>
+
+
+
+        <RadzenFieldset Text="DIRECCIÓN" class="mt-2">
+            <div class="row">
+                <div class="form-group col-lg-8">
+                    <label for="address">Dirección:</label>
+                    <InputText id="address" @bind-Value="creditor.Address" class="form-control" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="locality">Localidad:</label>
+                    <InputText id="locality" @bind-Value="creditor.Locality" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-lg-4">
+                    <label for="postal_code">Código Postal:</label>
+                    <InputText id="postal_code" @bind-Value="creditor.PostalCode" class="form-control" />
+                    <ValidationMessage For="@(() => creditor.PostalCode)" />
+
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="state">Provincia:</label>
+                    <InputText id="state" @bind-Value="creditor.State" class="form-control" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="country">País:</label>
+                    <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@countries" @bind-Value="creditor.Country.CountryId"
+                                    TextProperty="Name" ValueProperty="CountryId" Style="display: block;" Required />
+                </div>
+            </div>
+        </RadzenFieldset>
+
+        <hr />
+        <div class="row mt-4 mb-4">
+            <div class="col-lg-12">
+                <div class="float-right">
+                    <button type="button" class="btn btn-outline-dark" @onclick="OnCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Creditor creditor = new Creditor();
+    private IEnumerable<Country> countries;
+
+    private string errorMessage;
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            creditor = await creditorService.GetByIdAsync(Id).ConfigureAwait(false);
+            countries = await countryService.GetAll().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    public async Task UpdateCreditor()
+    {
+        try
+        {
+            bool updated = await creditorService.UpdateAsync(creditor).ConfigureAwait(false);
+
+            if (updated)
+            {
+                var message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Acreedor modificado",
+                    Detail = "El acreedor se ha modificado correctamente",
+                    Duration = 4000
+                };
+                Notify(message);
+                NavigationManager.NavigateTo("companies");
+            }
+            else
+                NotifyError();
+
+        }
+        catch (Exception)
+        {
+            errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
+            NotifyError();
+        }
+    }
+
+    public void OnCancel()
+    {
+        NavigationManager.NavigateTo("companies");
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+
+    private void NotifyError()
+    {
+        var message = new NotificationMessage()
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Error",
+            Detail = "Se ha producido un error al modificar el acreedor.",
+            Duration = 4000
+        };
+        Notify(message);
+    }
+}

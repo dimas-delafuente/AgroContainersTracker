@@ -1,0 +1,103 @@
+﻿@page "/palots/create/{ContainerId:int}"
+
+@using AgroContainerTracker.Domain
+@using AgroContainerTracker.Domain.Companies
+
+@using AgroContainerTracker.Core.Services
+@inject IPalotService palotService
+
+<h1>Añadir Palot</h1>
+
+<EditForm Model="@palot" OnValidSubmit="AddPalot">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label for="size">Cámara</label>
+    <InputSelect id="size" @bind-Value="palot.ContainerId" class="form-control">
+        @foreach (var container in containers)
+        {
+            <option value="@container.ContainerId" selected="@container.ContainerId.Equals(palot.ContainerId)">Cámara @container.ContainerId</option>
+
+        }
+    </InputSelect>
+
+    <label for="palotCode">Palot</label>
+    <InputText id="palotCode" name="palotCode" @bind-Value="palot.PalotCode" class="form-control" />
+
+    <label for="arrivalNumber">Número de entrada</label>
+    <InputText id="arrivalNumber" name="arrivalNumber" @bind-Value="palot.ArrivalNumber" class="form-control" />
+
+    <label for="arrival">Fecha de entrada</label>
+    <InputDate id="arrival" name="arrival" @bind-Value="palot.Arrival" class="form-control" />
+
+    <label for="weight">Peso</label>
+    <InputNumber id="weight" name="weight" @bind-Value="palot.Weight" class="form-control" />
+
+    <label for="buyer">Comprador</label>
+    <InputSelect id="buyer" name="buyer" @bind-Value="palot.BuyerId" class="form-control">
+        @foreach (var customer in customers)
+        {
+            <option value="@customer.CustomerId">@customer.Name</option>
+
+        }
+    </InputSelect>
+
+    <label for="grower">Agricultor</label>
+    <InputSelect id="grower" @bind-Value="palot.SellerId" class="form-control">
+        @foreach (var customer in customers)
+        {
+            <option value="@customer.CustomerId">@customer.Name</option>
+
+        }
+    </InputSelect>
+
+    <label for="fruit">Fruta</label>
+    <InputSelect id="fruit" @bind-Value="palot.FruitId" class="form-control">
+        @foreach (var fruit in fruits)
+        {
+            <option value="@fruit.FruitId">@fruit.Name</option>
+
+        }
+    </InputSelect>
+
+
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int ContainerId { get; set; }
+
+    private AddPalotRequest palot;
+    private List<Container> containers = new List<Container> {
+        new Container
+        {
+            ContainerId = 1,
+        },
+        new Container
+        {
+            ContainerId = 2
+        }
+    };
+
+    private List<Customer> customers;
+    private List<Fruit> fruits;
+
+
+    protected override void OnInitialized()
+    {
+        palot = new AddPalotRequest { ContainerId = ContainerId };
+        customers = new List<Customer>();
+        fruits = new List<Fruit>();
+
+        base.OnInitialized();
+    }
+
+    public void AddPalot()
+    {
+        palotService.AddPalotAsync(palot);
+    }
+}
