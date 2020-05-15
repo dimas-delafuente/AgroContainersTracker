@@ -6,6 +6,8 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row mt-3">
     <div class="col-lg-4">
         <a href="/suppliers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar proveedor</a>
@@ -55,10 +57,16 @@ else
 
 @code {
     private List<Supplier> suppliers = new List<Supplier>();
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        suppliers = await supplierService.GetAllAsync().ConfigureAwait(false);
+        if (firstRender)
+        {
+            suppliers = await supplierService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     private void OpenSupplierDetails(int supplierId)
@@ -106,20 +114,20 @@ else
     private async Task ShowRemoveSupplierDialog(Supplier supplier)
     {
         await dialogService.OpenAsync("Eliminar proveedor", ds =>
-            @<div class="text-center" style="padding: 20px;">
-                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este proveedor?</p>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                        <RadzenButton Text="Eliminar" Click="() => RemoveSupplier(supplier)" ButtonStyle="ButtonStyle.Danger" />
-                    </div>
-                </div>
-            </div>);
-    }
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este proveedor?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveSupplier(supplier)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>);
+}
 
-    private void Notify(NotificationMessage message)
-    {
-        notificationService.Notify(message);
-    }
+private void Notify(NotificationMessage message)
+{
+notificationService.Notify(message);
+}
 
 }

@@ -7,6 +7,8 @@
 @inject IRateService rateService
 @inject NavigationManager navigationManager
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row">
     <div class="col-sm-4">
         <NavLink class="nav-link" href="/rates" Match="NavLinkMatch.All">
@@ -72,7 +74,9 @@ else
                         </div>
                         <div class="col-lg-2">
                             <button type="button" class="btn btn-outline-primary"
-                                    @onclick="() => OpenCustomerDetails(customer.CustomerId)">Ver detalles</button>
+                                    @onclick="() => OpenCustomerDetails(customer.CustomerId)">
+                                Ver detalles
+                            </button>
                         </div>
                     </div>
                 </RadzenCard>
@@ -95,10 +99,16 @@ else
     public int Id { get; set; }
 
     private RateDetails rate;
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        rate = await rateService.GetDetailsByIdAsync(Id).ConfigureAwait(false);
+        if (firstRender)
+        {
+            rate = await rateService.GetDetailsByIdAsync(Id).ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     private void OpenCustomerDetails(int customerId)

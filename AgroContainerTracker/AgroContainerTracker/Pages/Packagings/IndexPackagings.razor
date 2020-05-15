@@ -10,6 +10,8 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <h1>Gestión de envases</h1>
 
 <div class="row m-t-3">
@@ -68,165 +70,171 @@ else
 }
 
 @code {
-private List<Packaging> packagings = new List<Packaging>();
-private List<Customer> customers = new List<Customer>();
+    private List<Packaging> packagings = new List<Packaging>();
+    private List<Customer> customers = new List<Customer>();
+    private bool isLoading = true;
 
-protected override async Task OnInitializedAsync()
-{
-    packagings = await packagingService.GetAllAsync();
-    customers = await customerService.GetAllAsync().ConfigureAwait(false);
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            packagings = await packagingService.GetAllAsync();
+            customers = await customerService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private void OpenPackagingDetails(int packagingId)
+    {
+        navigationManager.NavigateTo($"/packagings/details/{packagingId}");
+    }
+
+    private void OpenPackagingEdit(int packagingId)
+    {
+        navigationManager.NavigateTo($"/packagings/edit/{packagingId}");
+    }
+
+    private async Task ShowRemovePackagingDialog(Packaging packaging)
+    {
+        await dialogService.OpenAsync("Eliminar envase", ds =>
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este envase?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemovePackaging(packaging)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>
+    );
 }
 
-private void OpenPackagingDetails(int packagingId)
+private async Task ShowNewMovementDialog(Operation operation)
 {
-    navigationManager.NavigateTo($"/packagings/details/{packagingId}");
-}
+string dialogTitle = operation.Equals(Operation.Add) ? "Nueva entrada" : "Nueva salida";
+AddPackagingMovementRequest packagingMovement = new AddPackagingMovementRequest
+{
+    Operation = operation,
+    Created = DateTime.Now
+};
 
-private void OpenPackagingEdit(int packagingId)
-{
-    navigationManager.NavigateTo($"/packagings/edit/{packagingId}");
-}
+await dialogService.OpenAsync(dialogTitle, ds =>
+@<EditForm Model="@packagingMovement" OnValidSubmit="() => AddPackagingMovement(packagingMovement)">
+    <DataAnnotationsValidator />
 
-private async Task ShowRemovePackagingDialog(Packaging packaging)
-{
-    await dialogService.OpenAsync("Eliminar envase", ds =>
-        @<div class="text-center" style="padding: 20px;">
-            <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este envase?</p>
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                    <RadzenButton Text="Eliminar" Click="() => RemovePackaging(packaging)" ButtonStyle="ButtonStyle.Danger" />
+    <div>
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="type">Envase:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@packagings" @bind-Value="packagingMovement.PackagingId"
+                                TextProperty="Code" ValueProperty="PackagingId" Style="display: block;" Required />
+            </div>
+            <div class="form-group col-lg-6">
+                <label for="type">Fecha:</label>
+                <InputDate @bind-Value="packagingMovement.Created" class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="type">Cliente:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@customers" @bind-Value="packagingMovement.CustomerId"
+                                TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" Required />
+            </div>
+            <div class="form-group col-lg-6">
+                <label for="type">Cantidad:</label>
+                <InputNumber id="amount" name="amount" @bind-Value="packagingMovement.Amount" class="form-control" />
+            </div>
+        </div>
+
+        <hr />
+        <div class="row mt-4 mb-4">
+            <div class="col-lg-12">
+                <div class="float-right">
+                    <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
+                    <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
                 </div>
             </div>
         </div>
-        );
-    }
+    </div>
+</EditForm>
 
-    private async Task ShowNewMovementDialog(Operation operation)
+);
+}
+
+private async Task AddPackagingMovement(AddPackagingMovementRequest packagingMovement)
+{
+if (packagingMovement != null)
+{
+    Packaging updatedPackaging = await packagingService.AddPackagingMovementAsync(packagingMovement);
+
+    if (updatedPackaging != null)
     {
-        string dialogTitle = operation.Equals(Operation.Add) ? "Nueva entrada" : "Nueva salida";
-        AddPackagingMovementRequest packagingMovement = new AddPackagingMovementRequest
-        {
-            Operation = operation,
-            Created = DateTime.Now
-        };
-
-        await dialogService.OpenAsync(dialogTitle, ds =>
-        @<EditForm Model="@packagingMovement" OnValidSubmit="() => AddPackagingMovement(packagingMovement)">
-            <DataAnnotationsValidator />
-
-            <div>
-                <div class="row">
-                    <div class="form-group col-lg-6">
-                        <label for="type">Envase:</label>
-                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        Data="@packagings" @bind-Value="packagingMovement.PackagingId"
-                                        TextProperty="Code" ValueProperty="PackagingId" Style="display: block;" Required />
-                    </div>
-                    <div class="form-group col-lg-6">
-                        <label for="type">Fecha:</label>
-                        <InputDate @bind-Value="packagingMovement.Created" class="form-control" />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-lg-6">
-                        <label for="type">Cliente:</label>
-                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        Data="@customers" @bind-Value="packagingMovement.CustomerId"
-                                        TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" Required />
-                    </div>
-                    <div class="form-group col-lg-6">
-                        <label for="type">Cantidad:</label>
-                        <InputNumber id="amount" name="amount" @bind-Value="packagingMovement.Amount" class="form-control" />
-                    </div>
-                </div>
-
-                <hr />
-                <div class="row mt-4 mb-4">
-                    <div class="col-lg-12">
-                        <div class="float-right">
-                            <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
-                            <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </EditForm>
-
-        );
-    }
-
-    private async Task AddPackagingMovement(AddPackagingMovementRequest packagingMovement)
-    {
-        if (packagingMovement != null)
-        {
-            Packaging updatedPackaging = await packagingService.AddPackagingMovementAsync(packagingMovement);
-
-            if (updatedPackaging != null)
-            {
-                dialogService.Close(true);
-
-                packagings.FirstOrDefault(x => x.Code.Equals(updatedPackaging.Code)).Total = updatedPackaging.Total;
-                await InvokeAsync(() => { StateHasChanged(); });
-
-                var message = new NotificationMessage()
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Entrada creda",
-                    Detail = $"La entrada para el envase {updatedPackaging.Code} se ha guardado correctamente.",
-                    Duration = 4000
-                };
-                Notify(message);
-
-            }
-            else
-            {
-                var message = new NotificationMessage()
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Se ha producido un error crear la entrada.",
-                    Duration = 4000
-                };
-                Notify(message);
-            }
-        }
-    }
-
-    private async Task RemovePackaging(Packaging packaging)
-    {
-        bool deleted = await packagingService.DeleteAsync(packaging.PackagingId).ConfigureAwait(false);
         dialogService.Close(true);
 
-        if (deleted)
-        {
-            packagings.Remove(packaging);
-            await InvokeAsync(() => { StateHasChanged(); });
+        packagings.FirstOrDefault(x => x.Code.Equals(updatedPackaging.Code)).Total = updatedPackaging.Total;
+        await InvokeAsync(() => { StateHasChanged(); });
 
-            var message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Envase eliminado",
-                Detail = "El envase se ha eliminado correctamente",
-                Duration = 4000
-            };
-            Notify(message);
-        }
-        else
+        var message = new NotificationMessage()
         {
-            var message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Se ha producido un error al borrar el envase.",
-                Duration = 4000
-            };
-            Notify(message);
-        }
+            Severity = NotificationSeverity.Success,
+            Summary = "Entrada creda",
+            Detail = $"La entrada para el envase {updatedPackaging.Code} se ha guardado correctamente.",
+            Duration = 4000
+        };
+        Notify(message);
+
     }
-
-    private void Notify(NotificationMessage message)
+    else
     {
-        notificationService.Notify(message);
+        var message = new NotificationMessage()
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Error",
+            Detail = "Se ha producido un error crear la entrada.",
+            Duration = 4000
+        };
+        Notify(message);
     }
+}
+}
+
+private async Task RemovePackaging(Packaging packaging)
+{
+bool deleted = await packagingService.DeleteAsync(packaging.PackagingId).ConfigureAwait(false);
+dialogService.Close(true);
+
+if (deleted)
+{
+    packagings.Remove(packaging);
+    await InvokeAsync(() => { StateHasChanged(); });
+
+    var message = new NotificationMessage()
+    {
+        Severity = NotificationSeverity.Success,
+        Summary = "Envase eliminado",
+        Detail = "El envase se ha eliminado correctamente",
+        Duration = 4000
+    };
+    Notify(message);
+}
+else
+{
+    var message = new NotificationMessage()
+    {
+        Severity = NotificationSeverity.Error,
+        Summary = "Error",
+        Detail = "Se ha producido un error al borrar el envase.",
+        Duration = 4000
+    };
+    Notify(message);
+}
+}
+
+private void Notify(NotificationMessage message)
+{
+notificationService.Notify(message);
+}
 }

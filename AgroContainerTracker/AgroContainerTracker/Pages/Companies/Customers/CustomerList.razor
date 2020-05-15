@@ -6,6 +6,8 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row mt-3">
     <div class="col-lg-4">
         <a href="/customers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cliente</a>
@@ -55,10 +57,16 @@ else
 
 @code {
     private List<Customer> customers = new List<Customer>();
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        customers = await customerService.GetAllAsync().ConfigureAwait(false);
+        if (firstRender)
+        {
+            customers = await customerService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     private void OpenCustomerDetails(int customerId)
@@ -81,7 +89,8 @@ else
             customers.Remove(customer);
             await InvokeAsync(() => { StateHasChanged(); });
 
-            var message = new NotificationMessage() {
+            var message = new NotificationMessage()
+            {
                 Severity = NotificationSeverity.Success,
                 Summary = "Cliente eliminado",
                 Detail = "El cliente se ha eliminado correctamente",
@@ -102,22 +111,23 @@ else
         }
     }
 
-    private async Task ShowRemoveCustomerDialog(Customer customer) {
-        await dialogService.OpenAsync("Eliminar cliente", ds =>
-            @<div class="text-center" style="padding: 20px;">
-                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este cliente?</p>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                        <RadzenButton Text="Eliminar" Click="() => RemoveCustomer(customer)" ButtonStyle="ButtonStyle.Danger" />
-                    </div>
-                </div>
-            </div>);
-    }
-
-    private void Notify(NotificationMessage message)
+    private async Task ShowRemoveCustomerDialog(Customer customer)
     {
-        notificationService.Notify(message);
-    }
+        await dialogService.OpenAsync("Eliminar cliente", ds =>
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este cliente?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveCustomer(customer)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>);
+}
+
+private void Notify(NotificationMessage message)
+{
+notificationService.Notify(message);
+}
 
 }

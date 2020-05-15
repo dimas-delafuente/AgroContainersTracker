@@ -10,6 +10,8 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <h1>Editar Proveedor</h1>
 
 <div class="row mt-4">
@@ -139,17 +141,22 @@ else
 
     [Parameter]
     public int Id { get; set; }
-    public string errorMessage;
 
     private Supplier supplier = new Supplier();
-
     private IEnumerable<Country> countries;
 
-    protected override async Task OnInitializedAsync()
-    {
-        supplier = await supplierService.GetByIdAsync(Id).ConfigureAwait(false);
-        countries = await countryService.GetAll().ConfigureAwait(false);
+    private string errorMessage;
+    private bool isLoading = true;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            supplier = await supplierService.GetByIdAsync(Id).ConfigureAwait(false);
+            countries = await countryService.GetAll().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     public async Task UpdateSupplier()

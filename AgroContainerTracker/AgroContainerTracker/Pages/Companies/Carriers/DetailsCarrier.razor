@@ -4,6 +4,8 @@
 @using AgroContainerTracker.Core.Services
 @inject ICarrierService carrierService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row">
     <div class="col-sm-4">
         <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
@@ -166,9 +168,15 @@ else
     public int Id { get; set; }
 
     private Carrier carrier;
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        carrier = await carrierService.GetByIdAsync(Id).ConfigureAwait(false);
+        if (firstRender)
+        {
+            carrier = await carrierService.GetByIdAsync(Id).ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 }

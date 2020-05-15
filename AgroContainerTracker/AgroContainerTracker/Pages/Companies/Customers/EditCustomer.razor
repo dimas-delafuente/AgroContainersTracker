@@ -12,6 +12,8 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <h1>Editar Cliente</h1>
 
 <div class="row mt-4">
@@ -156,20 +158,24 @@ else
 
     [Parameter]
     public int Id { get; set; }
-    public string errorMessage;
 
     private Customer customer = new Customer();
-
     private List<Rate> rates = new List<Rate>();
-
     private IEnumerable<Country> countries;
 
-    protected override async Task OnInitializedAsync()
-    {
-        customer = await customerService.GetByIdAsync(Id).ConfigureAwait(false);
-        countries = await countryService.GetAll().ConfigureAwait(false);
-        rates = await rateService.GetAllAsync().ConfigureAwait(false);
+    private string errorMessage;
+    private bool isLoading = true;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            customer = await customerService.GetByIdAsync(Id).ConfigureAwait(false);
+            countries = await countryService.GetAll().ConfigureAwait(false);
+            rates = await rateService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     public async Task UpdateCustomer()

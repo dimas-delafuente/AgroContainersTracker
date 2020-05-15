@@ -4,6 +4,8 @@
 @using AgroContainerTracker.Core.Services
 @inject IPackagingService packagingService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row">
     <div class="col-sm-4">
         <NavLink class="nav-link" href="/packagings" Match="NavLinkMatch.All">
@@ -108,7 +110,7 @@ else
 
                                     </Template>
                                 </RadzenGridColumn>
-                                <RadzenGridColumn TItem="PackagingMovement" Property="Total" Title="Total" Type="integer" TextAlign="TextAlign.Right"/>
+                                <RadzenGridColumn TItem="PackagingMovement" Property="Total" Title="Total" Type="integer" TextAlign="TextAlign.Right" />
                                 <RadzenGridColumn TItem="PackagingMovement" Property="Customer.Name" Title="Cliente" />
                             </Columns>
                         </RadzenGrid>
@@ -133,7 +135,17 @@ else
     public int Id { get; set; }
 
     private Packaging packaging;
+    private bool isLoading = true;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);

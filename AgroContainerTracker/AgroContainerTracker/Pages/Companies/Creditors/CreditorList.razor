@@ -6,6 +6,8 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row mt-3">
     <div class="col-lg-4">
         <a href="/creditors/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar acreedor</a>
@@ -55,10 +57,16 @@ else
 
 @code {
     private List<Creditor> creditors = new List<Creditor>();
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        creditors = await creditorService.GetAllAsync().ConfigureAwait(false);
+        if (firstRender)
+        {
+            creditors = await creditorService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     private void OpenCreditorDetails(int creditorId)
@@ -106,20 +114,20 @@ else
     private async Task ShowRemoveCreditorDialog(Creditor creditor)
     {
         await dialogService.OpenAsync("Eliminar acreedor", ds =>
-            @<div class="text-center" style="padding: 20px;">
-                 <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este acreedor?</p>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                        <RadzenButton Text="Eliminar" Click="() => RemoveCreditor(creditor)" ButtonStyle="ButtonStyle.Danger" />
-                    </div>
-                </div>
-            </div>);
-    }
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este acreedor?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveCreditor(creditor)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>);
+}
 
-    private void Notify(NotificationMessage message)
-    {
-        notificationService.Notify(message);
-    }
+private void Notify(NotificationMessage message)
+{
+  notificationService.Notify(message);
+}
 
 }

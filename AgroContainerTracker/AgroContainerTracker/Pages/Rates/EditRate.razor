@@ -7,6 +7,8 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <h1>Editar Tarifa</h1>
 
 <div class="row mt-4">
@@ -81,12 +83,17 @@ else
     public int Id { get; set; }
 
     private Rate rate = new Rate();
-    public string errorMessage;
+    private string errorMessage;
+    private bool isLoading = true;
 
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        rate = await rateService.GetByIdAsync(Id).ConfigureAwait(false);
+        if (firstRender)
+        {
+            rate = await rateService.GetByIdAsync(Id).ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     public async Task UpdateCreditor()

@@ -8,6 +8,8 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <h1>Tarifas</h1>
 
 <div class="row mt-3">
@@ -34,7 +36,7 @@ else
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Rate" Property="Value" Title="Precio/día" />
                     <RadzenGridColumn TItem="Rate" Property="SecondaryValue" Title="Precio/día adicional" />
-                    <RadzenGridColumn TItem="Rate" Property="Description" Title="Descripción" Width="200px"/>
+                    <RadzenGridColumn TItem="Rate" Property="Description" Title="Descripción" Width="200px" />
 
                     <RadzenGridColumn TItem="Rate" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
@@ -60,10 +62,16 @@ else
 
 @code{
     private List<Rate> rates = new List<Rate>();
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        rates = await rateService.GetAllAsync().ConfigureAwait(false);
+        if (firstRender)
+        {
+            rates = await rateService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     private void OpenRateDetails(int customerId)

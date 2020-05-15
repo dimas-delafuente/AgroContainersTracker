@@ -6,6 +6,8 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <div class="row mt-3">
     <div class="col-lg-4">
         <a href="/carriers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar transportista</a>
@@ -55,10 +57,16 @@ else
 
 @code {
     private List<Carrier> carriers = new List<Carrier>();
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        carriers = await carrierService.GetAllAsync().ConfigureAwait(false);
+        if (firstRender)
+        {
+            carriers = await carrierService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     private void OpenCarrierDetails(int carrierId)
@@ -107,7 +115,7 @@ else
     {
         await dialogService.OpenAsync("Eliminar Transportista", ds =>
             @<div class="text-center" style="padding: 20px;">
-                 <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este transportista?</p>
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este transportista?</p>
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
@@ -119,7 +127,7 @@ else
 
     private void Notify(NotificationMessage message)
     {
-        notificationService.Notify(message);
+      notificationService.Notify(message);
     }
 
 }

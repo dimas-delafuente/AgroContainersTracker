@@ -11,6 +11,8 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
+<Loading ShowSpinner="@isLoading"></Loading>
+
 <h1>Editar Envase</h1>
 
 <div class="row mt-4">
@@ -115,13 +117,18 @@ else
 
     private Packaging packaging = new Packaging();
     private List<Customer> customers = new List<Customer>();
+    private string errorMessage;
+    private bool isLoading = true;
 
-    public string errorMessage;
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
-        customers = await customerService.GetAllAsync().ConfigureAwait(false);
+        if (firstRender)
+        {
+            packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
+            customers = await customerService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
     }
 
     public async Task UpdatePackaging()
@@ -139,7 +146,8 @@ else
             };
             Notify(message);
             NavigationManager.NavigateTo("packagings");
-        } else
+        }
+        else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             var message = new NotificationMessage()
