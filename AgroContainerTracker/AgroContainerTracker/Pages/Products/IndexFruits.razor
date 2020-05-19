@@ -1,0 +1,288 @@
+﻿@page "/fruits"
+@using Microsoft.AspNetCore.Components.Web
+@using AgroContainerTracker.Domain.Fruits
+@using AgroContainerTracker.Core.Services
+
+@inject IFruitService fruitService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<h1>Tarifas</h1>
+
+<div class="row mt-3">
+    <div class="col-lg-4">
+        <button @onclick="() => OpenAddFruit()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar fruta</button>
+    </div>
+</div>
+
+@if (fruits == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                        AllowSorting="true" Data="@fruits" TItem="Fruit" ColumnWidth="100px" EmptyText="No se han encontrado resultados.">
+                <Columns>
+                    <RadzenGridColumn TItem="Fruit" Property="Code" Title="Código">
+                        <FooterTemplate>
+                            Total: <b>@fruits.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Fruit" Property="Name" Title="Variedad" />
+                    <RadzenGridColumn TItem="Fruit" Property="Description" Title="Descripción" Width="200px" />
+
+                    <RadzenGridColumn TItem="Fruit" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenFruitEdit(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Fruit" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveFruitDialog(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+
+}
+
+@code{
+    private List<Fruit> fruits = new List<Fruit>();
+    private bool isLoading = true;
+    private string errorMessage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            fruits = await fruitService.GetAllAsync().ConfigureAwait(false);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private async Task OpenAddFruit()
+    {
+        AddFruitRequest fruit = new AddFruitRequest();
+
+        await dialogService.OpenAsync("Añadir fruta", ds =>
+            @<EditForm Model="@fruit" OnValidSubmit="() => AddFruit(fruit)">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div>
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="code">Código:</label>
+                            <InputText id="code" @bind-Value="fruit.Code" class="form-control" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="name">Variedad:</label>
+                            <InputText id="name" @bind-Value="fruit.Name" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="description">Descripción:</label>
+                            <InputTextArea id="description" @bind-Value="fruit.Description" class="form-control" />
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row mt-4 mb-4">
+                        <div class="col-lg-12">
+                            <div class="float-right">
+                                <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
+                                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+            );
+    }
+
+    private async Task OpenFruitEdit(Fruit fruitOld)
+    {
+        Fruit fruit = new Fruit {
+            FruitId = fruitOld.FruitId,
+            Code = fruitOld.Code,
+            Name = fruitOld.Name,
+            Description = fruitOld.Description
+        };
+
+        await dialogService.OpenAsync("Editar fruta", ds =>
+            @<EditForm Model="@fruit" OnValidSubmit="() => EditFruit(fruit)">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div>
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="code">Código:</label>
+                            <InputText id="code" @bind-Value="fruit.Code" class="form-control" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="name">Variedad:</label>
+                            <InputText id="name" @bind-Value="fruit.Name" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="description">Descripción:</label>
+                            <InputTextArea id="description" @bind-Value="fruit.Description" class="form-control" />
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row mt-4 mb-4">
+                        <div class="col-lg-12">
+                            <div class="float-right">
+                                <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
+                                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+        );
+    }
+
+    private void OpenFruitDetails(int fruitId)
+    {
+        navigationManager.NavigateTo($"/fruits/details/{fruitId}");
+    }
+
+    private async Task ShowRemoveFruitDialog(Fruit fruit)
+    {
+        await dialogService.OpenAsync("Eliminar fruta", ds =>
+            @<div class="text-center" style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta fruta?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveFruit(fruit)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    private async Task AddFruit(AddFruitRequest fruit)
+    {
+        NotificationMessage message;
+        Fruit fruitCreated = await fruitService.AddAsync(fruit).ConfigureAwait(false);
+
+        if (fruitCreated != null)
+        {
+            dialogService.Close(true);
+            fruits.Add(fruitCreated);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Fruta añadida",
+                Detail = "La fruta se ha añadido correctamente",
+                Duration = 4000
+            };
+            errorMessage = string.Empty;
+        }
+        else
+        {
+            errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al añadir el envase.",
+                Duration = 4000
+            };
+        }
+
+        Notify(message);
+    }
+
+    private async Task EditFruit(Fruit fruit)
+    {
+        NotificationMessage message;
+        bool fruitUpdated = await fruitService.UpdateAsync(fruit).ConfigureAwait(false);
+
+        if (fruitUpdated)
+        {
+            int fruitToUpdate = fruits.FindIndex(x => x.FruitId.Equals(fruit.FruitId));
+            fruits[fruitToUpdate] = fruit;
+
+            dialogService.Close(true);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Fruta añadida",
+                Detail = "La fruta se ha añadido correctamente",
+                Duration = 4000
+            };
+            errorMessage = string.Empty;
+        }
+        else
+        {
+            errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al añadir el envase.",
+                Duration = 4000
+            };
+        }
+
+        Notify(message);
+    }
+
+    private async Task RemoveFruit(Fruit fruit)
+    {
+        bool deleted = await fruitService.DeleteAsync(fruit.FruitId).ConfigureAwait(false);
+        dialogService.Close(true);
+        NotificationMessage message;
+
+        if (deleted)
+        {
+            fruits.Remove(fruit);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Fruta eliminada",
+                Detail = "La fruta se ha eliminado correctamente",
+                Duration = 4000
+            };
+        }
+        else
+        {
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar la fruta.",
+                Duration = 4000
+            };
+        }
+
+        Notify(message);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+}

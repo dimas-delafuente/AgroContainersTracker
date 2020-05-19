@@ -103,6 +103,11 @@ app {
                 color: white;
             }
 
+            .sidebar .nav-item a .navbar-icon {
+                width: 33px;
+                float: left;
+            }
+
 .content {
     padding-top: 1.1rem;
 }

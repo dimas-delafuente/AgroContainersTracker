@@ -81,6 +81,7 @@ else
 
     private async Task RemoveCreditor(Creditor customer)
     {
+        NotificationMessage message;
         bool deleted = await creditorService.DeleteAsync(customer.CreditorId).ConfigureAwait(false);
         dialogService.Close(true);
 
@@ -89,45 +90,45 @@ else
             creditors.Remove(customer);
             await InvokeAsync(() => { StateHasChanged(); });
 
-            var message = new NotificationMessage()
+            message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
                 Summary = "Acreedor eliminado",
                 Detail = "El acreedor se ha eliminado correctamente",
                 Duration = 4000
             };
-            Notify(message);
         }
         else
         {
-            var message = new NotificationMessage()
+            message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Error,
                 Summary = "Error",
                 Detail = "Se ha producido un error al borrar el acreedor.",
                 Duration = 4000
             };
-            Notify(message);
         }
+
+        Notify(message);
     }
 
     private async Task ShowRemoveCreditorDialog(Creditor creditor)
     {
         await dialogService.OpenAsync("Eliminar acreedor", ds =>
-    @<div class="text-center" style="padding: 20px;">
-        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este acreedor?</p>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                <RadzenButton Text="Eliminar" Click="() => RemoveCreditor(creditor)" ButtonStyle="ButtonStyle.Danger" />
-            </div>
-        </div>
-    </div>);
-}
+            @<div class="text-center" style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este acreedor?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveCreditor(creditor)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </div>);
+    }
 
-private void Notify(NotificationMessage message)
-{
-  notificationService.Notify(message);
-}
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
 
 }

@@ -38,6 +38,7 @@ namespace AgroContainerTracker
             services.AddTransient<ICarrierService, CarrierService>();
             services.AddTransient<IRateService, RateService>();
             services.AddTransient<IPackagingService, PackagingService>();
+            services.AddTransient<IFruitService, FruitService>();
 
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();

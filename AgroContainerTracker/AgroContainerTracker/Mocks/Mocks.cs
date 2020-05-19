@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AgroContainerTracker.Domain;
 using AgroContainerTracker.Domain.Companies;
+using AgroContainerTracker.Domain.Fruits;
 
 namespace AgroContainerTracker.Mocks
 {

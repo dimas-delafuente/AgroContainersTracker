@@ -206,31 +206,26 @@ else
 
     public async Task UpdateCarrier()
     {
-        try
-        {
-            bool updated = await carrierService.UpdateAsync(carrier).ConfigureAwait(false);
+        bool updated = await carrierService.UpdateAsync(carrier).ConfigureAwait(false);
 
-            if (updated)
+        if (updated)
+        {
+            var message = new NotificationMessage()
             {
-                var message = new NotificationMessage()
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Transportista modificado",
-                    Detail = "El transportista se ha modificado correctamente",
-                    Duration = 4000
-                };
-                Notify(message);
-                NavigationManager.NavigateTo("companies");
-            }
-            else
-                NotifyError();
-
+                Severity = NotificationSeverity.Success,
+                Summary = "Transportista modificado",
+                Detail = "El transportista se ha modificado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+            NavigationManager.NavigateTo("companies");
         }
-        catch (Exception)
+        else
         {
-            errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
             NotifyError();
+            errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
         }
+
     }
 
     public void AddVehicle()

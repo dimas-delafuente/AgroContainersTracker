@@ -11,7 +11,9 @@ namespace AgroContainerTracker.Data.Entities
         }
 
         public int FruitId { get; set; }
+        public string Code { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
 
         public virtual ICollection<PalotEntity> Palots { get; set; }
     }

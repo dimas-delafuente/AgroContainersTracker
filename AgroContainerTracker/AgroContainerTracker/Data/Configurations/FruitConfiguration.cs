@@ -19,6 +19,16 @@ namespace AgroContainerTracker.Data.Configurations
                 .HasColumnType("longtext")
                 .HasCharSet("utf8mb4")
                 .HasCollation("utf8mb4_general_ci");
+
+            entityBuilder.Property(e => e.Code)
+                .HasColumnType("varchar(5)")
+                .HasCharSet("utf8mb4")
+                .HasCollation("utf8mb4_general_ci");
+
+            entityBuilder.Property(e => e.Description)
+                .HasColumnType("varchar(100)")
+                .HasCharSet("utf8mb4")
+                .HasCollation("utf8mb4_general_ci");
         }
     }
 }

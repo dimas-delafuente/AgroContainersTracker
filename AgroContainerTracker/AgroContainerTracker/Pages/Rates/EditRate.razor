@@ -98,30 +98,25 @@ else
 
     public async Task UpdateCreditor()
     {
-        try
+        bool updated = await rateService.UpdateAsync(rate).ConfigureAwait(false);
+
+        if (updated)
         {
-            bool updated = await rateService.UpdateAsync(rate).ConfigureAwait(false);
-
-            if (updated)
+            var message = new NotificationMessage()
             {
-                var message = new NotificationMessage()
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Tarifa modificada",
-                    Detail = "La tarifa se ha modificado correctamente",
-                    Duration = 4000
-                };
-                Notify(message);
-                NavigationManager.NavigateTo("rates");
-            }
-            else
-                NotifyError();
-
+                Severity = NotificationSeverity.Success,
+                Summary = "Tarifa modificada",
+                Detail = "La tarifa se ha modificado correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+            NavigationManager.NavigateTo("rates");
         }
-        catch (Exception)
+        else
         {
             errorMessage = "Se ha producido un error. Revise los campos e inténtelo de nuevo.";
             NotifyError();
+
         }
     }
 

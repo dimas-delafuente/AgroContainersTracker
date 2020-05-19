@@ -72,7 +72,6 @@ namespace AgroContainerTracker.Infrastructure.Services
             {
                 _context.DetachAll();
                 _logger.LogError(e, "Exception: {e} // Internal Error while deleting Rate: {rateId}", e.Message, rateId);
-                return false;
             }
 
             return false;
@@ -92,8 +91,9 @@ namespace AgroContainerTracker.Infrastructure.Services
             {
                 _context.DetachAll();
                 _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all rates.", e.Message);
-                return new List<Rate>();
             }
+
+            return new List<Rate>();
         }
 
         public async Task<Rate> GetByIdAsync(int rateId)
@@ -114,9 +114,9 @@ namespace AgroContainerTracker.Infrastructure.Services
             } catch (Exception e)
             {
                 _logger.LogError(e, "Exception: {e} // Internal Error while retrieving rate with Id: {rateId}", e.Message, rateId);
-                return null;
             }
-            
+
+            return null;
         }
 
         public async Task<RateDetails> GetDetailsByIdAsync(int rateId)
@@ -151,9 +151,9 @@ namespace AgroContainerTracker.Infrastructure.Services
             catch (Exception e)
             {
                 _logger.LogError(e, "Exception: {e} // Internal Error while retrieving rate details with Id: {rateId}", e.Message, rateId);
-                return null;
             }
 
+            return null;
         }
 
         public async Task<bool> UpdateAsync(Rate rate)

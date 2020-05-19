@@ -87,7 +87,9 @@ else
                 <div class="row mt-5">
                     <div class="col-lg-12">
                         <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                                    AllowSorting="true" Data="@packaging.PackagingMovements" TItem="PackagingMovement" ColumnWidth="200px" EmptyText="No se han encontrado resultados.">
+                                    AllowSorting="true" Data="@packaging.PackagingMovements" TItem="PackagingMovement" ColumnWidth="200px" EmptyText="No se han encontrado resultados."
+                                    EqualsText="Igual a" NotEqualsText="Distinto de" LessThanText="Menor que" LessThanOrEqualsText="Menor o igual que" GreaterThanText="Mayor que"
+                                    GreaterThanOrEqualsText="Mayor o igual que" ApplyFilterText="Filtrar" ClearFilterText="Limpiar">
                             <Columns>
                                 <RadzenGridColumn TItem="PackagingMovement" Property="Created" Title="Fecha">
                                     <Template Context="pkg">
