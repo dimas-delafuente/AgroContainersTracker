@@ -5,6 +5,12 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroContainerTracker", "AgroContainerTracker\AgroContainerTracker.csproj", "{7BAE3A61-28EE-4FCE-9AFF-BD63555A27DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroContainerTracker.Application", "AgroContainerTracker.Application\AgroContainerTracker.Application.csproj", "{D9F45AC7-D95C-4C5A-8AA3-0DC8BD73E2B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroContainerTracker.Infrastructure", "AgroContainerTracker.Infrastructure\AgroContainerTracker.Infrastructure.csproj", "{0A99D5CB-4FA4-4445-88CA-C2A36C05536A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroContainerTracker.Data", "AgroContainerTracker.Data\AgroContainerTracker.Data.csproj", "{02FBC297-AD42-416B-97A7-8146190F45D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{7BAE3A61-28EE-4FCE-9AFF-BD63555A27DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BAE3A61-28EE-4FCE-9AFF-BD63555A27DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BAE3A61-28EE-4FCE-9AFF-BD63555A27DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9F45AC7-D95C-4C5A-8AA3-0DC8BD73E2B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9F45AC7-D95C-4C5A-8AA3-0DC8BD73E2B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9F45AC7-D95C-4C5A-8AA3-0DC8BD73E2B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9F45AC7-D95C-4C5A-8AA3-0DC8BD73E2B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A99D5CB-4FA4-4445-88CA-C2A36C05536A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A99D5CB-4FA4-4445-88CA-C2A36C05536A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A99D5CB-4FA4-4445-88CA-C2A36C05536A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A99D5CB-4FA4-4445-88CA-C2A36C05536A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02FBC297-AD42-416B-97A7-8146190F45D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02FBC297-AD42-416B-97A7-8146190F45D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02FBC297-AD42-416B-97A7-8146190F45D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02FBC297-AD42-416B-97A7-8146190F45D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

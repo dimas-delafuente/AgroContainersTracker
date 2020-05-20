@@ -32,21 +32,14 @@ namespace AgroContainerTracker.Domain.Packagings
 
     public class AddPackagingMovementRequest
     {
-        [Required]
-        public int PackagingId { get; set; }
+        public int? PackagingId { get; set; }
 
-        [Required]
-        [EnumDataType(typeof(Operation))]
         public Operation Operation { get; set; }
 
-        [Required]
-        [Range(0, Int32.MaxValue)]
         public int Amount { get; set; }
 
-        [Required]
         public DateTime Created { get; set; }
 
-        [Required]
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
     }
 }

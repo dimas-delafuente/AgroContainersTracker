@@ -127,6 +127,29 @@ namespace AgroContainerTracker.Infrastructure.Services
             return null;
         }
 
+        public async Task<Packaging> FindAsync(int? packagingId)
+        {
+            try
+            {
+                if (packagingId < 0)
+                    throw new ArgumentOutOfRangeException();
+
+                PackagingEntity packaging = await _context.Packagings
+                    .FindAsync(packagingId)
+                    .ConfigureAwait(false);
+
+                return _mapper.Map<Packaging>(packaging);
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving Packaging: {packagingId}",
+                    e.Message, packagingId);
+            }
+
+            return null;
+        }
+
         public async Task<bool> UpdateAsync(Packaging packaging)
         {
             try
@@ -156,6 +179,14 @@ namespace AgroContainerTracker.Infrastructure.Services
             return false;
         }
 
+        public async Task<bool> ExistsAsync(string packagingCode)
+        {
+            if (string.IsNullOrEmpty(packagingCode))
+                return false;
+
+            return await _context.Packagings.AnyAsync(x => x.Code.Equals(packagingCode, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         public async Task<Packaging> AddPackagingMovementAsync(AddPackagingMovementRequest packagingMovement)
         {
             try
@@ -167,7 +198,7 @@ namespace AgroContainerTracker.Infrastructure.Services
                     .FindAsync(packagingMovement.PackagingId)
                     .ConfigureAwait(false);
 
-                if (packaging != null && IsValidAmount(packaging.Total, packagingMovement))
+                if (packaging != null)
                 {
                     packaging.Total = packagingMovement.Operation.Equals(Operation.Add) ?
                         packaging.Total + packagingMovement.Amount :
@@ -199,12 +230,7 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         }
 
-        private bool IsValidAmount(int currentTotal, AddPackagingMovementRequest packagingMovement)
-        {
-            return packagingMovement.Operation.Equals(Operation.Substract) ?
-                (currentTotal - packagingMovement.Amount) >= 0 :
-                packagingMovement.Amount >= 0;
-        }
+        
     }
     
 }

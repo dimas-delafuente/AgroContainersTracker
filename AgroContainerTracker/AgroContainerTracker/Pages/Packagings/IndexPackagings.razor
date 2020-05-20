@@ -14,7 +14,7 @@
 
 <h1>Gestión de envases</h1>
 
-<div class="row m-t-3">
+<div class="row mt-5">
     <div class="col-lg-4">
         <a href="/packagings/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar envase</a>
     </div>
@@ -121,19 +121,21 @@ else
 
         await dialogService.OpenAsync(dialogTitle, ds =>
             @<EditForm Model="@packagingMovement" OnValidSubmit="() => AddPackagingMovement(packagingMovement)">
-                <DataAnnotationsValidator />
-
+                <FluentValidator />
                 <div>
                     <div class="row">
                         <div class="form-group col-lg-6">
                             <label for="type">Envase:</label>
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                             Data="@packagings" @bind-Value="packagingMovement.PackagingId"
-                                            TextProperty="Code" ValueProperty="PackagingId" Style="display: block;" Required />
+                                            TextProperty="Code" ValueProperty="PackagingId" Style="display: block;" />
+                            <ValidationMessage For="() => packagingMovement.PackagingId"/>
+
                         </div>
                         <div class="form-group col-lg-6">
                             <label for="type">Fecha:</label>
                             <InputDate @bind-Value="packagingMovement.Created" class="form-control" />
+                            <ValidationMessage For="() => packagingMovement.Created" />
                         </div>
                     </div>
                     <div class="row">
@@ -141,11 +143,13 @@ else
                             <label for="type">Cliente:</label>
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                             Data="@customers" @bind-Value="packagingMovement.CustomerId"
-                                            TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" Required />
+                                            TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" />
+                            <ValidationMessage For="() => packagingMovement.CustomerId"/>
                         </div>
                         <div class="form-group col-lg-6">
                             <label for="type">Cantidad:</label>
                             <InputNumber id="amount" name="amount" @bind-Value="packagingMovement.Amount" class="form-control" />
+                            <ValidationMessage For="() => packagingMovement.Amount" />
                         </div>
                     </div>
 
@@ -168,6 +172,7 @@ else
     {
         if (packagingMovement != null)
         {
+            string operation = packagingMovement.Operation.Equals(Operation.Add) ? "entrada" : "salida";
             Packaging updatedPackaging = await packagingService.AddPackagingMovementAsync(packagingMovement);
             NotificationMessage message;
 
@@ -181,8 +186,8 @@ else
                 message = new NotificationMessage()
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Entrada creda",
-                    Detail = $"La entrada para el envase {updatedPackaging.Code} se ha guardado correctamente.",
+                    Summary = "Gestión completada",
+                    Detail = $"La {operation} para el envase {updatedPackaging.Code} se ha guardado correctamente.",
                     Duration = 4000
                 };
             }
@@ -192,7 +197,7 @@ else
                 {
                     Severity = NotificationSeverity.Error,
                     Summary = "Error",
-                    Detail = "Se ha producido un error crear la entrada.",
+                    Detail = $"Se ha producido un error crear la {operation}.",
                     Duration = 4000
                 };
             }

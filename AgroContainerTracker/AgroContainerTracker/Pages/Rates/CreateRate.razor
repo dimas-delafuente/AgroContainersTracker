@@ -1,7 +1,6 @@
 ﻿@page "/rates/create"
 
 @using AgroContainerTracker.Domain.Rates
-
 @using AgroContainerTracker.Core.Services
 
 @inject IRateService rateService
@@ -27,7 +26,7 @@
 
 
 <EditForm Model="@rate" OnValidSubmit="AddRate">
-    <DataAnnotationsValidator />
+    <FluentValidator></FluentValidator>
 
     <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
         <div class="row">

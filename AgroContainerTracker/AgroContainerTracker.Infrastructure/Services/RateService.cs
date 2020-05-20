@@ -183,5 +183,15 @@ namespace AgroContainerTracker.Infrastructure.Services
 
             return false;
         }
+
+        public async Task<bool> ExistsAsync(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return false;
+
+            return await _context.Rates
+                .AnyAsync(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                .ConfigureAwait(false);
+        }
     }
 }

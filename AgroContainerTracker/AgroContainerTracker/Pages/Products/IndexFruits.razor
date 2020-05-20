@@ -12,7 +12,7 @@
 
 <h1>Tarifas</h1>
 
-<div class="row mt-3">
+<div class="row mt-5">
     <div class="col-lg-4">
         <button @onclick="() => OpenAddFruit()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar fruta</button>
     </div>
@@ -76,22 +76,25 @@ else
         await dialogService.OpenAsync("Añadir fruta", ds =>
             @<EditForm Model="@fruit" OnValidSubmit="() => AddFruit(fruit)">
                 <DataAnnotationsValidator />
-                <ValidationSummary />
                 <div>
                     <div class="row">
                         <div class="form-group col-lg-6">
                             <label for="code">Código:</label>
                             <InputText id="code" @bind-Value="fruit.Code" class="form-control" />
+                            <ValidationMessage For="() => fruit.Code" />
                         </div>
                         <div class="form-group col-lg-6">
                             <label for="name">Variedad:</label>
                             <InputText id="name" @bind-Value="fruit.Name" class="form-control" />
+                            <ValidationMessage For="() => fruit.Name" />
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-12">
                             <label for="description">Descripción:</label>
                             <InputTextArea id="description" @bind-Value="fruit.Description" class="form-control" />
+                            <ValidationMessage For="() => fruit.Description" />
+
                         </div>
                     </div>
 

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Profiles\" />
+    <Folder Include="Services\" />
+    <Folder Include="Validators\" />
+    <Folder Include="Validators\Rates\" />
+    <Folder Include="Validators\Packagings\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AgroContainerTracker.Application\AgroContainerTracker.Application.csproj" />
+    <ProjectReference Include="..\AgroContainerTracker.Data\AgroContainerTracker.Data.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Validators\Rates\AddRateValidator.c" />
+  </ItemGroup>
+</Project>

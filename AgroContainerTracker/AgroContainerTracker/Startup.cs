@@ -5,13 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ElectronNET.API;
-using AgroContainerTracker.Data.Contexts;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using AgroContainerTracker.Core.Services;
-using AgroContainerTracker.Infrastructure.Services;
-using System;
 using Radzen;
+using AgroContainerTracker.Infrastructure;
+using AgroContainerTracker.Data;
+using FluentValidation.AspNetCore;
+using AgroContainerTracker.Infrastructure.Validators;
 
 namespace AgroContainerTracker
 {
@@ -26,30 +24,16 @@ namespace AgroContainerTracker
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            services.AddRazorPages()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RateValidator>());
             services.AddServerSideBlazor();
 
-            services.AddTransient<ICountryService, CountryService>();
-            services.AddTransient<IContainerService, ContainerService>();
-            services.AddTransient<IPalotService, PalotService>();
-            services.AddTransient<ICustomerService, CustomerService>();
-            services.AddTransient<ISupplierService, SupplierService>();
-            services.AddTransient<ICreditorService, CreditorService>();
-            services.AddTransient<ICarrierService, CarrierService>();
-            services.AddTransient<IRateService, RateService>();
-            services.AddTransient<IPackagingService, PackagingService>();
-            services.AddTransient<IFruitService, FruitService>();
+            services.AddInfrastructureServices();
+            services.AddDataLayerServices(Configuration.GetConnectionString("sqlConnection"));
 
+            // Radzen Services
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
-
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            services.AddDbContext<ApplicationContext>(options => options
-                .UseMySql(Configuration.GetConnectionString("sqlConnection")),
-                ServiceLifetime.Transient
-            );
-
         }
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)

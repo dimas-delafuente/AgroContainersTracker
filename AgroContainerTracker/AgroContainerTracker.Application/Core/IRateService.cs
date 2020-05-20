@@ -13,6 +13,6 @@ namespace AgroContainerTracker.Core.Services
         Task<bool> DeleteAsync(int rateId);
         Task<bool> UpdateAsync(Rate rate);
         Task<Rate> AddAsync(AddRateRequest rate);
-
+        Task<bool> ExistsAsync(string name);
     }
 }
