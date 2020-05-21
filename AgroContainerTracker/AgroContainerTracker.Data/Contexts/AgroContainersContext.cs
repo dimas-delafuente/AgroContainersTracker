@@ -1,23 +1,14 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using AgroContainerTracker.Data.Entities;
 using System.Reflection;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace AgroContainerTracker.Data.Contexts
 {
-    public partial class ApplicationContext : DbContext
+    public partial class ApplicationContext : IdentityDbContext
     {
-        public ApplicationContext()
-        {
-        }
-
-        public ApplicationContext(DbContextOptions<ApplicationContext> options)
-            : base(options)
-        {
-        }
 
         public virtual DbSet<CarrierEntity> Carriers { get; set; }
         public virtual DbSet<ContainerEntity> Containers { get; set; }
@@ -33,21 +24,17 @@ namespace AgroContainerTracker.Data.Contexts
         public virtual DbSet<PackagingEntity> Packagings { get; set; }
         public virtual DbSet<PackagingMovementEntity> PackagingMovements { get; set; }
 
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public ApplicationContext(DbContextOptions<ApplicationContext> options)
+            : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
             modelBuilder?.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-            OnModelCreatingPartial(modelBuilder);
+            base.OnModelCreating(modelBuilder);
         }
-
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
         public void DetachAll()
         {
