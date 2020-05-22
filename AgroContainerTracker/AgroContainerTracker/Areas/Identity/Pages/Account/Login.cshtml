@@ -1,11 +1,49 @@
-﻿@page
+﻿@page "/Identity/Account/Login"
 @model LoginModel
 
 @{
     ViewData["Title"] = "Iniciar sesión";
 }
+<h1 class="logo-name"
+    style="font-size: 155px; color: #e6e6e6;
+                font-weight: 800;
+                letter-spacing: -10px;
+                margin-bottom: 0;">
+    PiñuelaAgroFruit
+</h1>
+<hr />
+<div class="middle-box text-center loginscreen animated fadeInDown"
+     style="max-width: 50%;
+    z-index: 100;
+    margin: 0 auto;
+    padding-top: 40px;
+    width: 300px;">
+    <div>
+        <h3 class="text-center">@ViewData["Title"]</h3>
+        <form id="account" method="post" class="m-t" role="form">
 
-<h1 class="text-center">@ViewData["Title"]</h1>
+            <div class="form-group">
+                <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="Input.Password" class="form-control" placeholder="Contraseña" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="float: left">
+                <div class="checkbox">
+                    <label asp-for="Input.RememberMe">
+                        <input asp-for="Input.RememberMe" />
+                        Recuerdame!
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary m-b" style="width:100%; margin-bottom:5px">Iniciar sesión</button>
+            <a id="forgot-password" asp-page="./ForgotPassword">¿Has olvidado tu contraseña?</a>
+        </form>
+</div>
+</div>
+<!--
 <div class="row justify-content-center">
     <div class="col-md-8">
         <section>
@@ -49,7 +87,7 @@
         </section>
     </div>
 </div>
-
+-->
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

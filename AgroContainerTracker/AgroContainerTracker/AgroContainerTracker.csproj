@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Pages\Companies\Customers\CreateSupplier.razor" />
+    <Content Remove="Shared\RedirectToLogin.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="electron.manifest.json">
