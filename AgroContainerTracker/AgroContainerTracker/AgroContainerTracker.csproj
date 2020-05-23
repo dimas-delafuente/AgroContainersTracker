@@ -40,6 +40,8 @@
     <Folder Include="Pages\Companies\Carriers\" />
     <Folder Include="Pages\Rates\" />
     <Folder Include="Pages\Products\" />
+    <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\img\icon\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgroContainerTracker.Application\AgroContainerTracker.Application.csproj">

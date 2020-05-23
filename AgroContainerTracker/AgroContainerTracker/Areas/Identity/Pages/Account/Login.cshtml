@@ -4,20 +4,10 @@
 @{
     ViewData["Title"] = "Iniciar sesión";
 }
-<h1 class="logo-name"
-    style="font-size: 155px; color: #e6e6e6;
-                font-weight: 800;
-                letter-spacing: -10px;
-                margin-bottom: 0;">
-    PiñuelaAgroFruit
-</h1>
+<img class="index-logo" src="~/img/PAgrofruit_original.jpg" />
+
 <hr />
-<div class="middle-box text-center loginscreen animated fadeInDown"
-     style="max-width: 50%;
-    z-index: 100;
-    margin: 0 auto;
-    padding-top: 40px;
-    width: 300px;">
+<div class="middle-box text-center loginscreen animated fadeInDown">
     <div>
         <h3 class="text-center">@ViewData["Title"]</h3>
         <form id="account" method="post" class="m-t" role="form">
@@ -38,56 +28,12 @@
                     </label>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary m-b" style="width:100%; margin-bottom:5px">Iniciar sesión</button>
+            <button type="submit" class="btn btn-primary m-b full-width">Iniciar sesión</button>
             <a id="forgot-password" asp-page="./ForgotPassword">¿Has olvidado tu contraseña?</a>
         </form>
-</div>
-</div>
-<!--
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <section>
-            <form id="account" method="post">
-                <h4>Use una cuenta local para iniciar sesión.</h4>
-                <hr />
-                <div asp-validation-summary="All" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="Input.Email">Email:</label>
-                    <input asp-for="Input.Email" class="form-control" />
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Input.Password">Contraseña:</label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label asp-for="Input.RememberMe">
-                            <input asp-for="Input.RememberMe" />
-                            Recuerdame!
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-                </div>
-                <div class="form-group">
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">¿Has olvidado tu contraseña?</a>
-                    </p>
-                    @*<p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>*@
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Reenviar email de confirmación</a>
-                    </p>
-                </div>
-            </form>
-        </section>
     </div>
 </div>
--->
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

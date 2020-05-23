@@ -1,13 +1,25 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+:root {
+    --primary-color: #2B6239;
+    --secondary-color: #835E3A;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 a, .btn-link {
-    color: #0366d6;
+    color: var(--primary-color);
 }
+    a:hover,
+    .btn-link:hover {
+        color: var(--secondary-color);
+    }
 
+    .full-width {
+        width: 100%;
+    }
 app {
     position: relative;
     display: flex;
@@ -24,7 +36,7 @@ app {
     height: 3.5rem;
     display: flex;
     align-items: center;
-    z-index: 1000;
+    z-index: 999;
 }
 
 @media (max-width: 767.98px) {
@@ -106,7 +118,7 @@ app {
 
 /* SIDEBAR */
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-color: var(--primary-color);
 }
 
     .sidebar .top-row {
@@ -234,10 +246,44 @@ input:disabled {
 /* BUTTONS */
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2 !important;
-    border-color: #1861ac;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color);
 }
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+    }
+
 /* -BUTTONS */
+
+/* TABS */
+.ui-tabview-nav .ui-tabview-selected {
+    border-top-color: var(--primary-color) !important;
+    color: var(--primary-color);
+}
+
+.ui-state-active a[role='tab'] {
+    color: var(--primary-color) !important;
+}
+
+.ui-tabview-nav li:hover:not(.ui-tabview-selected):not(.ui-state-disabled) {
+    border-top-color: var(--primary-color) !important;
+}
+/* -TABS */
+
+
+/* DIALOG */
+
+.ui-dialog-titlebar {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+/* -DIALOG */
 
 
 /* LOGIN SCREEN */
@@ -260,10 +306,19 @@ input:disabled {
 }
 
 .logo-name {
-    color: #e6e6e6;
-    font-size: 180px;
+    color: var(--primary-color);
+    font-size: 155px;
     font-weight: 800;
     letter-spacing: -10px;
     margin-bottom: 0;
 }
 /* -LOGIN SCREEN */
+
+/* HOME */
+img.index-logo {
+    max-width: 60%;
+    margin: 0 auto;
+    display: flex;
+}
+
+/* -HOME */
