@@ -1,0 +1,39 @@
+﻿@page "/Identity/Account/Login"
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<img class="index-logo" src="~/img/PAgrofruit_original.jpg" />
+
+<hr />
+<div class="middle-box text-center loginscreen animated fadeInDown">
+    <div>
+        <h3 class="text-center">@ViewData["Title"]</h3>
+        <form id="account" method="post" class="m-t" role="form">
+
+            <div class="form-group">
+                <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="Input.Password" class="form-control" placeholder="Contraseña" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="float: left">
+                <div class="checkbox">
+                    <label asp-for="Input.RememberMe">
+                        <input asp-for="Input.RememberMe" />
+                        Recuerdame!
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary m-b full-width">Iniciar sesión</button>
+            <a id="forgot-password" asp-page="./ForgotPassword">¿Has olvidado tu contraseña?</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

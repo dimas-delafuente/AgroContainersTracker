@@ -10,8 +10,9 @@ namespace AgroContainerTracker.Data
         public static IServiceCollection AddDataLayerServices(this IServiceCollection services, string connectionString)
         {
             services.AddDbContext<ApplicationContext>(options => options
-                .UseMySql(connectionString),
-                ServiceLifetime.Transient
+                .UseMySql(
+                    connectionString,
+                    b => b.MigrationsAssembly(typeof(ApplicationContext).Assembly.FullName))
             );
 
             return services;

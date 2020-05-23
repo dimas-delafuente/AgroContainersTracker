@@ -14,9 +14,17 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="Accelist.FluentValidation.Blazor" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Pages\Companies\Customers\CreateSupplier.razor" />
+    <Content Remove="Shared\RedirectToLogin.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="electron.manifest.json">
@@ -32,6 +40,8 @@
     <Folder Include="Pages\Companies\Carriers\" />
     <Folder Include="Pages\Rates\" />
     <Folder Include="Pages\Products\" />
+    <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\img\icon\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgroContainerTracker.Application\AgroContainerTracker.Application.csproj">

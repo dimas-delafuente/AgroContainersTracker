@@ -1,0 +1,13 @@
+﻿@inject NavigationManager navigationManager 
+<p>Redirecting...</p>
+
+@code {
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            navigationManager.NavigateTo("Identity/Account/Login", true);
+        }
+    }
+}

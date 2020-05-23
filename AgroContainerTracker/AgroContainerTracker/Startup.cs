@@ -10,6 +10,10 @@ using AgroContainerTracker.Infrastructure;
 using AgroContainerTracker.Data;
 using FluentValidation.AspNetCore;
 using AgroContainerTracker.Infrastructure.Validators;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using AgroContainerTracker.Areas.Identity;
+using AgroContainerTracker.Data.Contexts;
 
 namespace AgroContainerTracker
 {
@@ -30,6 +34,14 @@ namespace AgroContainerTracker
 
             services.AddInfrastructureServices();
             services.AddDataLayerServices(Configuration.GetConnectionString("sqlConnection"));
+
+            services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+            }).AddEntityFrameworkStores<ApplicationContext>();
+
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+
 
             // Radzen Services
             services.AddScoped<DialogService>();
@@ -54,8 +66,12 @@ namespace AgroContainerTracker
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

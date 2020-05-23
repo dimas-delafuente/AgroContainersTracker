@@ -4,54 +4,57 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 </div>
+<AuthorizeView>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Inicio
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/containers">
-                <span class="oi oi-plus" aria-hidden="true"></span> Cámaras
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/palots">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Palots
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/packagings">
-                <span class="oi oi-box" aria-hidden="true"></span> Gestión de envases
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/companies">
-                <span class="oi oi-people" aria-hidden="true"></span> Clientes
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/rates">
-                <span class="oi oi-euro" aria-hidden="true"></span> Tarifas
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/fruits">
-                <i class="material-icons navbar-icon">eco</i> Frutas
-            </NavLink>
-        </li>
-    </ul>
-</div>
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
 
-@code {
-    private bool collapseNavMenu = true;
+        <ul class="nav flex-column">
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Inicio
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/containers">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Cámaras
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/palots">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Palots
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/packagings">
+                        <span class="oi oi-box" aria-hidden="true"></span> Gestión de envases
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/companies">
+                        <span class="oi oi-people" aria-hidden="true"></span> Clientes
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/rates">
+                        <span class="oi oi-euro" aria-hidden="true"></span> Tarifas
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/fruits">
+                        <i class="material-icons navbar-icon">eco</i> Frutas
+                    </NavLink>
+                </li>
+        </ul>
+    </div>
+</AuthorizeView>
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    @code {
+        private bool collapseNavMenu = true;
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
+        private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+        private void ToggleNavMenu()
+        {
+            collapseNavMenu = !collapseNavMenu;
+        }
     }
-}

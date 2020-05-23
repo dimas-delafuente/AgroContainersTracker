@@ -1,4 +1,5 @@
 ﻿@page "/rates"
+@attribute [Authorize]
 
 @using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Core.Services
@@ -87,53 +88,53 @@ else
     private async Task ShowRemoveRateDialog(Rate rate)
     {
         await dialogService.OpenAsync("Eliminar tarifa", ds =>
-            @<div class="text-center" style="padding: 20px;">
-                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta tarifa?</p>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                        <RadzenButton Text="Eliminar" Click="() => RemoveRate(rate)" ButtonStyle="ButtonStyle.Danger" />
-                    </div>
-                </div>
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta tarifa?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveRate(rate)" ButtonStyle="ButtonStyle.Danger" />
             </div>
-        );
-    }
+        </div>
+    </div>
+    );
+}
 
-    private async Task RemoveRate(Rate rate)
+private async Task RemoveRate(Rate rate)
+{
+    bool deleted = await rateService.DeleteAsync(rate.RateId).ConfigureAwait(false);
+    dialogService.Close(true);
+    NotificationMessage message;
+
+    if (deleted)
     {
-        bool deleted = await rateService.DeleteAsync(rate.RateId).ConfigureAwait(false);
-        dialogService.Close(true);
-        NotificationMessage message;
+        rates.Remove(rate);
+        await InvokeAsync(() => { StateHasChanged(); });
 
-        if (deleted)
+        message = new NotificationMessage()
         {
-            rates.Remove(rate);
-            await InvokeAsync(() => { StateHasChanged(); });
-
-            message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Tarifa eliminada",
-                Detail = "La tarifa se ha eliminado correctamente",
-                Duration = 4000
-            };
-        }
-        else
-        {
-            message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Se ha producido un error al borrar la tarifa.",
-                Duration = 4000
-            };
-        }
-
-        Notify(message);
+            Severity = NotificationSeverity.Success,
+            Summary = "Tarifa eliminada",
+            Detail = "La tarifa se ha eliminado correctamente",
+            Duration = 4000
+        };
     }
-
-    private void Notify(NotificationMessage message)
+    else
     {
-        notificationService.Notify(message);
+        message = new NotificationMessage()
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Error",
+            Detail = "Se ha producido un error al borrar la tarifa.",
+            Duration = 4000
+        };
     }
+
+    Notify(message);
+}
+
+private void Notify(NotificationMessage message)
+{
+    notificationService.Notify(message);
+}
 }
