@@ -1,3 +1,17 @@
 ﻿@page "/"
+@using AgroContainerTracker.Core.Services.Reports
+@inject IReportService reportService
+@inject IJSRuntime jsRuntime
 
-<img class="index-logo" src="img/PAgrofruit_original.jpg"/>
+<img class="index-logo" src="img/PAgrofruit_original.jpg" />
+
+<RadzenButton Text="Exportar" Click="() => GeneratePDF()" class="btn btn-outline-primary" />
+
+
+@code {
+    private async Task GeneratePDF()
+    {
+        await jsRuntime.InvokeVoidAsync
+            ("saveAsFile", $"test.pdf", Convert.ToBase64String(reportService.BuildReport()));
+    }
+}
