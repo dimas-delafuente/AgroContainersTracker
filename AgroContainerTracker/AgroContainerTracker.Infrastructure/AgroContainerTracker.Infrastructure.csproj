@@ -10,6 +10,7 @@
     <Folder Include="Validators\" />
     <Folder Include="Validators\Rates\" />
     <Folder Include="Validators\Packagings\" />
+    <Folder Include="Services\Reports\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgroContainerTracker.Application\AgroContainerTracker.Application.csproj" />
@@ -18,6 +19,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.6.7" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Validators\Rates\AddRateValidator.c" />

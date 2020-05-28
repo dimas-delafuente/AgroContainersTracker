@@ -2,17 +2,31 @@
 
 @using AgroContainerTracker.Domain.Packagings
 @using AgroContainerTracker.Domain.Companies
-
+@using AgroContainerTracker.Domain.Reports
 @using AgroContainerTracker.Core.Services
+@using AgroContainerTracker.Core.Services.Reports
+
+@inject IJSRuntime jsRuntime
 @inject IPackagingService packagingService
 @inject ICustomerService customerService
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
+@inject IReportService<PackagingReport> reportService
 <Loading ShowSpinner="@isLoading"></Loading>
 
-<h1>Gestión de envases</h1>
+<div class="row">
+    <div class="col-8">
+        <h1>Gestión de envases</h1>
+    </div>
+    <div class="col-4 float-right">
+        <button href="#" @onclick="() => ShowExportDialog()" class="btn btn-outline-primary float-right">
+            <span class="oi oi-document"></span> Imprimir histórico
+        </button>
+    </div>
+</div>
+ 
 
 <div class="row mt-5">
     <div class="col-lg-4">
@@ -129,7 +143,7 @@ else
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                             Data="@packagings" @bind-Value="packagingMovement.PackagingId"
                                             TextProperty="Code" ValueProperty="PackagingId" Style="display: block;" />
-                            <ValidationMessage For="() => packagingMovement.PackagingId"/>
+                            <ValidationMessage For="() => packagingMovement.PackagingId" />
 
                         </div>
                         <div class="form-group col-lg-6">
@@ -144,7 +158,7 @@ else
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                             Data="@customers" @bind-Value="packagingMovement.CustomerId"
                                             TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" />
-                            <ValidationMessage For="() => packagingMovement.CustomerId"/>
+                            <ValidationMessage For="() => packagingMovement.CustomerId" />
                         </div>
                         <div class="form-group col-lg-6">
                             <label for="type">Cantidad:</label>
@@ -243,5 +257,104 @@ else
     private void Notify(NotificationMessage message)
     {
         notificationService.Notify(message);
+    }
+
+    private async Task ShowExportDialog()
+    {
+        PackagingReport packagingReport = new PackagingReport {
+            InitDate = DateTime.Today.AddDays(-30),
+            EndDate = DateTime.Today
+        };
+
+        await dialogService.OpenAsync("Exportar", ds =>
+            @<EditForm Model="@packagingReport" OnValidSubmit="() => GetReportData(packagingReport)">
+                <div>
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="type">Cliente:</label>
+                            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                            Data="@customers" @bind-Value="packagingReport.Customer"
+                                            TextProperty="Name" Style="display: block;" />
+                            <ValidationMessage For="() => packagingReport.Customer" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="type">Fecha Inicio:</label>
+                            <InputDate @bind-Value="packagingReport.InitDate" class="form-control" />
+                            <ValidationMessage For="() => packagingReport.InitDate" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label for="type">Fecha Fin:</label>
+                            <InputDate @bind-Value="packagingReport.EndDate" class="form-control" />
+                            <ValidationMessage For="() => packagingReport.EndDate" />
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row mt-4 mb-4">
+                        <div class="col-lg-12">
+                            <div class="float-right">
+                                <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
+                                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Exportar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+        );
+    }
+
+    private async Task GetReportData(PackagingReport report) 
+    {
+        NotificationMessage message;
+        isLoading = true;
+
+        IEnumerable<PackagingMovement> customerPkgs = await packagingService
+            .GetCustomerPackagingMovementsAsync(report.Customer.CustomerId, report.InitDate, report.EndDate.AddDays(1)).ConfigureAwait(false);
+
+        if (customerPkgs?.Count() > 0)
+        {
+            dialogService.Close();
+            report.PackagingMovements = customerPkgs;
+            await GenerateReport(report);
+        } else 
+        {
+            isLoading = false;
+            message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Error",
+                    Detail = $"No se han encontrado movimientos para los datos seleccionados.",
+                    Duration = 4000
+                };
+
+            Notify(message);
+        }
+    }
+
+    private async Task GenerateReport(PackagingReport report)
+    {
+        report.ReportTitle = $"MOVIMIENTO DE ENVASES ({report.InitDate.ToString("dd/MM/yyyy")} - {report.EndDate.ToString("dd/MM/yyyy")})";
+        byte[] reportPDFData = reportService.BuildReport(report);
+
+        if (reportPDFData == null) {
+            var message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = $"Se ha producido un error al generar el documento.",
+                    Duration = 4000
+                };
+
+            Notify(message);
+        }
+        else 
+            await jsRuntime.InvokeVoidAsync
+                ("saveAsFile", $"Envases - {report.Customer.Name}", Convert.ToBase64String(reportPDFData));
+
+        isLoading = false;
     }
 }
