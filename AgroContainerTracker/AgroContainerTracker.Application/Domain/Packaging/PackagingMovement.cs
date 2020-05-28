@@ -28,6 +28,8 @@ namespace AgroContainerTracker.Domain.Packagings
         public int Total { get; set; }
 
         public Customer Customer { get; set; }
+
+        public Packaging Packaging { get; set; }
     }
 
     public class AddPackagingMovementRequest

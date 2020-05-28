@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using AgroContainerTracker.Areas.Identity;
 using AgroContainerTracker.Data.Contexts;
+using AgroContainerTracker.Domain.Reports;
 
 namespace AgroContainerTracker
 {
@@ -28,6 +29,8 @@ namespace AgroContainerTracker
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ReportsConfig>(Configuration.GetSection("ReportsConfig"));
+
             services.AddRazorPages()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RateValidator>());
             services.AddServerSideBlazor();

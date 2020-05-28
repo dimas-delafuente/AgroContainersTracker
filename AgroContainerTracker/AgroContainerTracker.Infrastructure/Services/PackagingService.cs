@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AgroContainerTracker.Core.Services;
@@ -82,10 +83,11 @@ namespace AgroContainerTracker.Infrastructure.Services
         public async Task<List<Packaging>> GetAllAsync()
         {
             try
-            {      
+            {
                 IEnumerable<PackagingEntity> packagings = await _context.Packagings
                     .AsNoTracking()
                     .Include(x => x.Owner)
+                    .OrderBy(x => x.Code)
                     .ToListAsync()
                     .ConfigureAwait(false);
 
@@ -118,7 +120,8 @@ namespace AgroContainerTracker.Infrastructure.Services
 
                 return _mapper.Map<Packaging>(entity);
 
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 _logger.LogError(e, "Exception: {e} // Internal Error while retrieving Packaging: {packagingId}",
                     e.Message, packagingId);
@@ -230,7 +233,41 @@ namespace AgroContainerTracker.Infrastructure.Services
 
         }
 
-        
+        public async Task<IEnumerable<PackagingMovement>> GetCustomerPackagingMovementsAsync(int customerId, DateTime initDate, DateTime endDate)
+        {
+            try
+            {
+                var packagings = await _context.Packagings
+                    .AsNoTracking()
+                    .Where(x => x.CustomerId.Equals(customerId))
+                    .SelectMany(x => x.PackagingMovements.Where(pm => pm.Created >= initDate && pm.Created <= endDate)
+                        .Select(pm => new PackagingMovementEntity
+                        {
+                            PackagingMovementId = pm.PackagingMovementId,
+                            Customer = pm.Customer,
+                            Packaging = pm.Packaging,
+                            Created = pm.Created,
+                            Operation = pm.Operation,
+                            Amount = pm.Amount,
+                            Total = pm.Total
+                        }))
+                    .OrderBy(x => x.Created)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
+                return _mapper.Map<IEnumerable<PackagingMovement>>(packagings);
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all Packagings",
+                    e.Message);
+            }
+
+            return new List<PackagingMovement>();
+        }
+
+
     }
-    
+
 }

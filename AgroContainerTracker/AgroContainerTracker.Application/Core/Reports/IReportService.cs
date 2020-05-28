@@ -1,8 +1,10 @@
 ﻿using System;
+using AgroContainerTracker.Domain.Reports;
+
 namespace AgroContainerTracker.Core.Services.Reports
 {
-    public interface IReportService
+    public interface IReportService<T> where T : ReportData
     {
-        byte[] BuildReport();
+        byte[] BuildReport(T reportData);
     }
 }
