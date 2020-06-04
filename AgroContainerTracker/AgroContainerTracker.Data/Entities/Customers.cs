@@ -7,8 +7,6 @@ namespace AgroContainerTracker.Data.Entities
     {
         public CustomerEntity()
         {
-            PalotsBuyer = new HashSet<PalotEntity>();
-            PalotsSeller = new HashSet<PalotEntity>();
         }
 
         public int CustomerId { get; set; }
@@ -31,8 +29,6 @@ namespace AgroContainerTracker.Data.Entities
 
         public virtual CountryEntity Country { get; set; }
         public virtual RateEntity Rate { get; set; }
-        public virtual ICollection<PalotEntity> PalotsBuyer { get; set; }
-        public virtual ICollection<PalotEntity> PalotsSeller { get; set; }
         public virtual ICollection<PackagingEntity> Packagings { get; set; }
         public virtual ICollection<PackagingMovementEntity> PackagingMovements { get; set; }
 

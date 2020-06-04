@@ -7,7 +7,6 @@ namespace AgroContainerTracker.Data.Entities
     {
         public FruitEntity()
         {
-            Palots = new HashSet<PalotEntity>();
         }
 
         public int FruitId { get; set; }
@@ -15,6 +14,5 @@ namespace AgroContainerTracker.Data.Entities
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public virtual ICollection<PalotEntity> Palots { get; set; }
     }
 }

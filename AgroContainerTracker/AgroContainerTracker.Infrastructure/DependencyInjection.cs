@@ -17,8 +17,7 @@ namespace AgroContainerTracker.Infrastructure
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.AddTransient<ICountryService, CountryService>();
-            services.AddTransient<IContainerService, ContainerService>();
-            services.AddTransient<IPalotService, PalotService>();
+            services.AddTransient<IColdRoomService, ColdRoomService>();
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<ICreditorService, CreditorService>();

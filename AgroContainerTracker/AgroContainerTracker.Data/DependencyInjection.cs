@@ -9,6 +9,9 @@ namespace AgroContainerTracker.Data
     {
         public static IServiceCollection AddDataLayerServices(this IServiceCollection services, string connectionString)
         {
+            //dotnet ef --startup-project ../AgroContainerTracker migrations add MigrationName (AgroContainerTracker.Data)
+            //Then: cd AgroContainerTracker -> dotnet ef database update
+
             services.AddDbContext<ApplicationContext>(options => options
                 .UseMySql(
                     connectionString,

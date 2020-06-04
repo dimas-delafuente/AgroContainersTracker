@@ -18,7 +18,7 @@ namespace AgroContainerTracker.Domain
         public double Weight { get; set; }
 
         [Required]
-        public int ContainerId { get; set; }
+        public int ColdRoomId { get; set; }
 
         [Required]
         public int SellerId { get; set; }

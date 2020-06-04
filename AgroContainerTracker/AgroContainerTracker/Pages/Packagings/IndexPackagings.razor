@@ -58,7 +58,11 @@ else
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Packaging" Property="Type.ToString()" Title="Tipo" />
                     <RadzenGridColumn TItem="Packaging" Property="Material.ToString()" Title="Material" />
-                    <RadzenGridColumn TItem="Packaging" Property="Weight" Title="Peso" TextAlign="TextAlign.Right" />
+                    <RadzenGridColumn TItem="Packaging" Property="Weight" Title="Peso" TextAlign="TextAlign.Right">
+                        <Template Context="data">
+                            @data.Weight.ToString("G", CultureInfo.CreateSpecificCulture("es-ES"))
+                        </Template>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="Packaging" Property="Owner.Name" Title="Propietario" Width="200px" />
                     <RadzenGridColumn TItem="Packaging" Property="Total" Title="Cantidad" TextAlign="TextAlign.Right" />
 

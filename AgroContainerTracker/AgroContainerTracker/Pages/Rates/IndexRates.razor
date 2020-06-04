@@ -35,8 +35,16 @@ else
                             Total: <b>@rates.Count()</b>
                         </FooterTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Rate" Property="Value" Title="Precio/día" />
-                    <RadzenGridColumn TItem="Rate" Property="SecondaryValue" Title="Precio/día adicional" />
+                    <RadzenGridColumn TItem="Rate" Property="Value" Title="Precio/día" TextAlign="TextAlign.Right">
+                        <Template Context="data">
+                            @data.Value.ToString("C4", CultureInfo.CreateSpecificCulture("es-ES"))
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Rate" Property="SecondaryValue" Title="Precio/día adicional" TextAlign="TextAlign.Right">
+                        <Template Context="data">
+                            @data.SecondaryValue.ToString("C4", CultureInfo.CreateSpecificCulture("es-ES"))
+                        </Template>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="Rate" Property="Description" Title="Descripción" Width="200px" />
 
                     <RadzenGridColumn TItem="Rate" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
