@@ -1,4 +1,4 @@
-﻿@page "/rates"
+﻿@page "/tarifas"
 @attribute [Authorize]
 
 @using AgroContainerTracker.Domain.Rates
@@ -15,7 +15,7 @@
 
 <div class="row mt-5">
     <div class="col-lg-4">
-        <a href="/rates/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar tarifa</a>
+        <a href="/tarifas/crear" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar tarifa</a>
     </div>
 </div>
 
@@ -85,12 +85,12 @@ else
 
     private void OpenRateDetails(int customerId)
     {
-        navigationManager.NavigateTo($"/rates/details/{customerId}");
+        navigationManager.NavigateTo($"/tarifas/detalles/{customerId}");
     }
 
     private void OpenRateEdit(int customerId)
     {
-        navigationManager.NavigateTo($"/rates/edit/{customerId}");
+        navigationManager.NavigateTo($"/tarifas/editar/{customerId}");
     }
 
     private async Task ShowRemoveRateDialog(Rate rate)

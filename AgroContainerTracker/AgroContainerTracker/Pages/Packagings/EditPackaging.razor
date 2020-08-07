@@ -1,4 +1,4 @@
-﻿@page "/packagings/edit/{Id:int}"
+﻿@page "/envases/editar/{Id:int}"
 
 @using AgroContainerTracker.Domain.Packagings
 @using AgroContainerTracker.Domain.Companies
@@ -17,7 +17,7 @@
 
 <div class="row mt-4">
     <div class="col-sm-4">
-        <NavLink class="nav-link" href="/packagings" Match="NavLinkMatch.All">
+        <NavLink class="nav-link" href="/envases" Match="NavLinkMatch.All">
             <span class="oi oi-arrow-left"></span> Volver a la lista
         </NavLink>
     </div>
@@ -145,7 +145,7 @@ else
                 Duration = 4000
             };
             Notify(message);
-            NavigationManager.NavigateTo("packagings");
+            NavigationManager.NavigateTo("envases");
         }
         else
         {
@@ -163,7 +163,7 @@ else
 
     public void OnCancel()
     {
-        NavigationManager.NavigateTo("packagings");
+        NavigationManager.NavigateTo("envases");
     }
 
     private void Notify(NotificationMessage message)

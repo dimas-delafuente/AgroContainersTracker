@@ -10,7 +10,7 @@
 
 <div class="row mt-3">
     <div class="col-lg-4">
-        <a href="/carriers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar transportista</a>
+        <a href="/transportistas/crear" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar transportista</a>
     </div>
 </div>
 
@@ -71,12 +71,12 @@ else
 
     private void OpenCarrierDetails(int carrierId)
     {
-        navigationManager.NavigateTo($"/carriers/details/{carrierId}");
+        navigationManager.NavigateTo($"/transportistas/detalles/{carrierId}");
     }
 
     private void OpenCarrierEdit(int carrierId)
     {
-        navigationManager.NavigateTo($"/carriers/edit/{carrierId}");
+        navigationManager.NavigateTo($"/transportistas/editar/{carrierId}");
     }
 
     private async Task RemoveCarrier(Carrier carrier)

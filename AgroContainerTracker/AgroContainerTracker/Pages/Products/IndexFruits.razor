@@ -1,4 +1,4 @@
-﻿@page "/fruits"
+﻿@page "/frutas"
 @using Microsoft.AspNetCore.Components.Web
 @using AgroContainerTracker.Domain.Fruits
 @using AgroContainerTracker.Core.Services
@@ -161,7 +161,7 @@ else
 
     private void OpenFruitDetails(int fruitId)
     {
-        navigationManager.NavigateTo($"/fruits/details/{fruitId}");
+        navigationManager.NavigateTo($"/frutas/detalles/{fruitId}");
     }
 
     private async Task ShowRemoveFruitDialog(Fruit fruit)

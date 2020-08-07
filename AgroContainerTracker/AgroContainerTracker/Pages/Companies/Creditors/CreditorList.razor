@@ -10,7 +10,7 @@
 
 <div class="row mt-3">
     <div class="col-lg-4">
-        <a href="/creditors/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar acreedor</a>
+        <a href="/acreedores/crear" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar acreedor</a>
     </div>
 </div>
 
@@ -71,12 +71,12 @@ else
 
     private void OpenCreditorDetails(int creditorId)
     {
-        navigationManager.NavigateTo($"/creditors/details/{creditorId}");
+        navigationManager.NavigateTo($"/acreedores/detalles/{creditorId}");
     }
 
     private void OpenCreditorEdit(int creditorId)
     {
-        navigationManager.NavigateTo($"/creditors/edit/{creditorId}");
+        navigationManager.NavigateTo($"/acreedores/editar/{creditorId}");
     }
 
     private async Task RemoveCreditor(Creditor customer)

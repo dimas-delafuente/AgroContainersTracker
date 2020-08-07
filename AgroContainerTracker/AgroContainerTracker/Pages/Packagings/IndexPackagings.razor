@@ -1,4 +1,4 @@
-﻿@page "/packagings"
+﻿@page "/envases"
 
 @using AgroContainerTracker.Domain.Packagings
 @using AgroContainerTracker.Domain.Companies
@@ -30,7 +30,7 @@
 
 <div class="row mt-5">
     <div class="col-lg-4">
-        <a href="/packagings/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar envase</a>
+        <a href="/envases/crear" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar envase</a>
     </div>
     <div class="col-lg-8">
         <div class="float-right">
@@ -105,12 +105,12 @@ else
 
     private void OpenPackagingDetails(int packagingId)
     {
-        navigationManager.NavigateTo($"/packagings/details/{packagingId}");
+        navigationManager.NavigateTo($"/envases/detalles/{packagingId}");
     }
 
     private void OpenPackagingEdit(int packagingId)
     {
-        navigationManager.NavigateTo($"/packagings/edit/{packagingId}");
+        navigationManager.NavigateTo($"/envases/editar/{packagingId}");
     }
 
     private async Task ShowRemovePackagingDialog(Packaging packaging)

@@ -1,4 +1,4 @@
-﻿@page "/rates/details/{Id:int}"
+﻿@page "/tarifas/detalles/{Id:int}"
 
 @using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Domain.Companies
@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-sm-4">
-        <NavLink class="nav-link" href="/rates" Match="NavLinkMatch.All">
+        <NavLink class="nav-link" href="/tarifas" Match="NavLinkMatch.All">
             <span class="oi oi-arrow-left"></span> Volver a la lista
         </NavLink>
     </div>
@@ -87,14 +87,13 @@ else
 
 <div class="row">
     <div class="col-sm-4">
-        <NavLink class="nav-link" href="/rates" Match="NavLinkMatch.All">
+        <NavLink class="nav-link" href="/tarifas" Match="NavLinkMatch.All">
             <span class="oi oi-arrow-left"></span> Volver a la lista
         </NavLink>
     </div>
 </div>
 
 @code {
-
     [Parameter]
     public int Id { get; set; }
 
@@ -113,6 +112,6 @@ else
 
     private void OpenCustomerDetails(int customerId)
     {
-        navigationManager.NavigateTo($"/customers/details/{customerId}");
+        navigationManager.NavigateTo($"/clientes/detalles/{customerId}");
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/creditors/edit/{Id:int}"
+﻿@page "/acreedores/editar/{Id:int}"
 
 @using AgroContainerTracker.Domain.Companies
 @using AgroContainerTracker.Domain
@@ -16,7 +16,7 @@
 
 <div class="row mt-4">
     <div class="col-sm-4">
-        <NavLink class="nav-link" href="/companies" Match="NavLinkMatch.All">
+        <NavLink class="nav-link" href="/empresas" Match="NavLinkMatch.All">
             <span class="oi oi-arrow-left"></span> Volver a la lista
         </NavLink>
     </div>
@@ -137,7 +137,6 @@ else
 }
 
 @code {
-
     [Parameter]
     public int Id { get; set; }
 
@@ -172,7 +171,7 @@ else
                 Duration = 4000
             };
             Notify(message);
-            NavigationManager.NavigateTo("companies");
+            NavigationManager.NavigateTo("empresas");
         }
         else
         {
@@ -184,7 +183,7 @@ else
 
     public void OnCancel()
     {
-        NavigationManager.NavigateTo("companies");
+        NavigationManager.NavigateTo("empresas");
     }
 
     private void Notify(NotificationMessage message)

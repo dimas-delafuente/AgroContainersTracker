@@ -10,7 +10,7 @@
 
 <div class="row mt-3">
     <div class="col-lg-4">
-        <a href="/customers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cliente</a>
+        <a href="/clientes/crear" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cliente</a>
     </div>
 </div>
 
@@ -71,12 +71,12 @@ else
 
     private void OpenCustomerDetails(int customerId)
     {
-        navigationManager.NavigateTo($"/customers/details/{customerId}");
+        navigationManager.NavigateTo($"/clientes/detalles/{customerId}");
     }
 
     private void OpenCustomerEdit(int customerId)
     {
-        navigationManager.NavigateTo($"/customers/edit/{customerId}");
+        navigationManager.NavigateTo($"/clientes/editar/{customerId}");
     }
 
     private async Task RemoveCustomer(Customer customer)

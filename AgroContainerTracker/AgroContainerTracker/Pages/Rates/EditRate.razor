@@ -1,4 +1,4 @@
-﻿@page "/rates/edit/{Id:int}"
+﻿@page "/tarifas/editar/{Id:int}"
 
 @using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Core.Services
@@ -13,7 +13,7 @@
 
 <div class="row mt-4">
     <div class="col-sm-4">
-        <NavLink class="nav-link" href="/rates" Match="NavLinkMatch.All">
+        <NavLink class="nav-link" href="/tarifas" Match="NavLinkMatch.All">
             <span class="oi oi-arrow-left"></span> Volver a la lista
         </NavLink>
     </div>
@@ -78,7 +78,6 @@ else
 
 }
 @code {
-
     [Parameter]
     public int Id { get; set; }
 
@@ -110,7 +109,7 @@ else
                 Duration = 4000
             };
             Notify(message);
-            NavigationManager.NavigateTo("rates");
+            NavigationManager.NavigateTo("tarifas");
         }
         else
         {
@@ -122,7 +121,7 @@ else
 
     public void OnCancel()
     {
-        NavigationManager.NavigateTo("rates");
+        NavigationManager.NavigateTo("tarifas");
     }
 
     private void Notify(NotificationMessage message)

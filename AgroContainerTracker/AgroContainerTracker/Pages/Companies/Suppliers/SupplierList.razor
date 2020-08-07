@@ -10,7 +10,7 @@
 
 <div class="row mt-3">
     <div class="col-lg-4">
-        <a href="/suppliers/create" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar proveedor</a>
+        <a href="/proveedores/crear" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar proveedor</a>
     </div>
 </div>
 
@@ -71,12 +71,12 @@ else
 
     private void OpenSupplierDetails(int supplierId)
     {
-        navigationManager.NavigateTo($"/suppliers/details/{supplierId}");
+        navigationManager.NavigateTo($"/proveedores/detalles/{supplierId}");
     }
 
     private void OpenSupplierEdit(int supplierId)
     {
-        navigationManager.NavigateTo($"/suppliers/edit/{supplierId}");
+        navigationManager.NavigateTo($"/proveedores/editar/{supplierId}");
     }
 
     private async Task RemoveSupplier(Supplier supplier)

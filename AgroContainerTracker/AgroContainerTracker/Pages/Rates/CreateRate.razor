@@ -1,4 +1,4 @@
-﻿@page "/rates/create"
+﻿@page "/tarifas/crear"
 
 @using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Core.Services
@@ -11,7 +11,7 @@
 
 <div class="row mt-4">
     <div class="col-sm-4">
-        <NavLink class="nav-link" href="/rates" Match="NavLinkMatch.All">
+        <NavLink class="nav-link" href="/tarifas" Match="NavLinkMatch.All">
             <span class="oi oi-arrow-left"></span> Volver a la lista
         </NavLink>
     </div>
@@ -69,7 +69,6 @@
 
 
 @code {
-
     private AddRateRequest rate = new AddRateRequest();
     public string errorMessage;
 
@@ -87,9 +86,10 @@
                 Duration = 4000
             };
             Notify(message);
-            NavigationManager.NavigateTo("rates");
+            NavigationManager.NavigateTo("tarifas");
 
-        } else
+        }
+        else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             var message = new NotificationMessage()
@@ -106,7 +106,7 @@
 
     public void OnCancel()
     {
-        NavigationManager.NavigateTo("rates");
+        NavigationManager.NavigateTo("tarifas");
     }
 
     private void Notify(NotificationMessage message)
