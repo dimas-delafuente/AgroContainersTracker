@@ -17,5 +17,7 @@ namespace AgroContainerTracker.Data.Entities
         public string Description { get; set; }
 
         public virtual ICollection<CustomerEntity> Customers { get; set; }
+        public virtual ICollection<ProductWeighingEntity> ProductWeighings { get; set; }
+
     }
 }

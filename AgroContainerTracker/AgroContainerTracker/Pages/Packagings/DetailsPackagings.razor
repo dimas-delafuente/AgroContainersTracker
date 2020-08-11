@@ -147,8 +147,4 @@ else
             await InvokeAsync(() => { StateHasChanged(); });
         }
     }
-    protected override async Task OnInitializedAsync()
-    {
-        packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
-    }
 }

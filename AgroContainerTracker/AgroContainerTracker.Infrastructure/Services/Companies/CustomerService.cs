@@ -63,7 +63,7 @@ namespace AgroContainerTracker.Infrastructure.Services
 
             } catch (Exception e)
             {
-                _logger.LogError(e, "Exception: {e} // Internal Error while retrievin all Customers.", e.Message);
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all Customers.", e.Message);
 
             }
             return new List<Customer>();

@@ -22,6 +22,11 @@ namespace AgroContainerTracker.Data.Contexts
         public virtual DbSet<VehicleEntity> Vehicles { get; set; }
         public virtual DbSet<PackagingEntity> Packagings { get; set; }
         public virtual DbSet<PackagingMovementEntity> PackagingMovements { get; set; }
+        public virtual DbSet<CampaingEntity> Campaings { get; set; }
+        public virtual DbSet<ProductEntryEntity> ProductEntries { get; set; }
+        public virtual DbSet<ProductEntrySellerEntity> ProductEntrySellers { get; set; }
+        public virtual DbSet<ProductWeighingEntity> ProductWeighings { get; set; }
+        public virtual DbSet<ProductRecordEntity> ProductRecords { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)

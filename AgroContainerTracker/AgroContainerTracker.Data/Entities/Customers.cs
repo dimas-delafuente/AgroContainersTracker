@@ -29,8 +29,20 @@ namespace AgroContainerTracker.Data.Entities
 
         public virtual CountryEntity Country { get; set; }
         public virtual RateEntity Rate { get; set; }
+
         public virtual ICollection<PackagingEntity> Packagings { get; set; }
         public virtual ICollection<PackagingMovementEntity> PackagingMovements { get; set; }
+
+        public virtual ICollection<ProductEntryEntity> BuyerProductEntries { get; set; }
+        public virtual ICollection<ProductWeighingEntity> BuyerProductWeighings { get; set; }
+        public virtual ICollection<ProductRecordEntity> BuyerProductRecords { get; set; }
+
+        public virtual ICollection<ProductEntrySellerEntity> SellerProductEntries { get; set; }
+        public virtual ICollection<ProductWeighingEntity> SellerProductWeighings { get; set; }
+        public virtual ICollection<ProductRecordEntity> SellerProductRecords { get; set; }
+
+
+        public virtual ICollection<ProductEntryEntity> PayerProductEntries { get; set; }
 
     }
 }

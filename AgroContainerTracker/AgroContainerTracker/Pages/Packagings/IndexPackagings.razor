@@ -278,7 +278,7 @@ else
                             <label for="type">Cliente:</label>
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                             Data="@customers" @bind-Value="packagingReport.Customer"
-                                            TextProperty="Name" Style="display: block;" />
+                                            TextProperty="Name" Style="display: block;" Required/>
                             <ValidationMessage For="() => packagingReport.Customer" />
                         </div>
                     </div>

@@ -31,7 +31,7 @@ namespace AgroContainerTracker.Infrastructure.Validators
                 .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE);
 
             RuleFor(v => v.Temperature)
-                .NotEmpty().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE);
+                .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE);
         }
     }
 }

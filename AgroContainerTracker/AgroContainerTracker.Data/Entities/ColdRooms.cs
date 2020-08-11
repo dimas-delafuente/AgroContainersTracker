@@ -17,5 +17,11 @@ namespace AgroContainerTracker.Data.Entities
         public double Surface { get; set; }
         public double Capacity { get; set; }
         public double Temperature { get; set; }
+        public double Humidity { get; set; }
+
+
+        public virtual ICollection<ProductWeighingEntity> ProductWeighings { get; set; }
+        public virtual ICollection<ProductRecordEntity> ProductRecords { get; set; }
+
     }
 }

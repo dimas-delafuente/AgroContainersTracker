@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace AgroContainerTracker.Domain
+﻿namespace AgroContainerTracker.Domain
 {
     public class AddColdRoomRequest
     {
@@ -10,5 +7,6 @@ namespace AgroContainerTracker.Domain
         public double Surface { get; set; }
         public double Capacity { get; set; }
         public double Temperature { get; set; }
+        public double Humidity { get; set; }
     }
 }

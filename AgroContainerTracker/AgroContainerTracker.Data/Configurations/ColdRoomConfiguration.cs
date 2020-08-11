@@ -27,6 +27,7 @@ namespace AgroContainerTracker.Data.Configurations
             entityBuilder.Property(e => e.Capacity).HasColumnType("double");
 
             entityBuilder.Property(e => e.Temperature).HasColumnType("double");
+            entityBuilder.Property(e => e.Humidity).HasColumnType("double");
 
 
         }

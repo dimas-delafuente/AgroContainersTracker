@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace AgroContainerTracker.Domain
+﻿namespace AgroContainerTracker.Domain
 {
     public class ColdRoom
     {
@@ -10,6 +8,7 @@ namespace AgroContainerTracker.Domain
         public double Surface { get; set; }
         public double Capacity { get; set; }
         public double Temperature { get; set; }
+        public double Humidity { get; set; }
 
     }
 }

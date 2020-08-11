@@ -1,0 +1,167 @@
+﻿@page "/entradas"
+
+@using AgroContainerTracker.Domain.ProductManagement
+@using AgroContainerTracker.Domain.Companies
+@using AgroContainerTracker.Core.Services
+
+@inject IJSRuntime jsRuntime
+@inject IProductEntryService productEntryService
+@inject ICustomerService customerService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<div class="row">
+    <div class="col-8">
+        <h1>Gestión de entradas</h1>
+    </div>
+    <div class="col-4 float-right">
+        @*<button href="#" @onclick="() => ShowExportDialog()" class="btn btn-outline-primary float-right">
+            <span class="oi oi-document"></span> Imprimir histórico
+        </button>*@
+    </div>
+</div>
+ 
+
+<div class="row mt-5">
+    <div class="col-lg-4">
+        <a href="/entradas/nueva-entrada" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva entrada</a>
+    </div>
+</div>
+
+@if (productEntries == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                        AllowSorting="true" Data="@productEntries" TItem="ProductEntry" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
+                <Columns>
+                    <RadzenGridColumn TItem="ProductEntry" Property="ProductEntryNumber" Title="Código Entrada">
+                        <Template Context="data">
+                            @data.CampaingId@data.ProductEntryNumber.ToString("000")
+                        </Template>
+                        <FooterTemplate>
+                            Total: <b>@productEntries.Count()</b>
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductEntry" Property="EntryDate.ToString()" Title="Fecha Entrada" />
+                    <RadzenGridColumn TItem="ProductEntry" Property="ExitDate.ToString()" Title="Fecha Salida" />
+                    <RadzenGridColumn TItem="ProductEntry" Property="Buyer.Name" Title="Comprador"/>
+                    <RadzenGridColumn TItem="ProductEntry" Property="Payer.Name" Title="Pagador"/>
+                        
+                    <RadzenGridColumn TItem="ProductEntry" Property="Sellers" Title="Fruticultores" Width="200px">
+                        <Template Context="data">
+                            @foreach(var seller in data?.Sellers)
+                            {
+                                <p>@seller.Name</p>
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+
+                    <RadzenGridColumn TItem="ProductEntry" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenEntryDetails(data.ProductEntryNumber)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductEntry" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-pencil" @onclick="() => OpenEntryEdit(data.ProductEntryNumber)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductEntry" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                        <Template Context="data">
+                            <span class="oi oi-trash" @onclick="() => ShowRemoveEntryDialog(data)"></span>
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProductEntry> productEntries = new List<ProductEntry>();
+    private List<Customer> customers = new List<Customer>();
+    private bool isLoading = true;
+    private int currentCampaing = DateTime.Now.Year;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            productEntries = await productEntryService.GetByCampaingIdAsync(currentCampaing);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private void OpenEntryDetails(long productEntryNumber)
+    {
+        navigationManager.NavigateTo($"/entradas/{currentCampaing}/detalles/{productEntryNumber}");
+    }
+
+    private void OpenEntryEdit(long productEntryNumber)
+    {
+        navigationManager.NavigateTo($"/entradas/editar/{productEntryNumber}");
+    }
+
+    private async Task ShowRemoveEntryDialog(ProductEntry productEntry)
+    {
+        await dialogService.OpenAsync("Eliminar entrada", ds =>
+            @<div class="text-center" style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este envase?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveEntry(productEntry)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
+            </div>
+            );
+    }
+
+    private async Task RemoveEntry(ProductEntry productEntry)
+    {
+        NotificationMessage message;
+        bool deleted = false; // await packagingService.DeleteAsync(packaging.PackagingId).ConfigureAwait(false);
+        dialogService.Close(true);
+
+
+        if (deleted)
+        {
+            productEntries.Remove(productEntry);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Entrada eliminada",
+                Detail = "La entrada se ha eliminado correctamente",
+                Duration = 4000
+            };
+        }
+        else
+        {
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar la entrada.",
+                Duration = 4000
+            };
+        }
+
+        Notify(message);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+}

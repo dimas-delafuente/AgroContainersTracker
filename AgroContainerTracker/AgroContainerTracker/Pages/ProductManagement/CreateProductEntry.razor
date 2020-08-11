@@ -1,0 +1,189 @@
+﻿@page "/entradas/nueva-entrada"
+
+@using AgroContainerTracker.Domain.ProductManagement
+@using AgroContainerTracker.Domain.Companies
+
+@using AgroContainerTracker.Core.Services
+
+@inject IProductEntryService productEntryService
+@inject ICampaingService campaingService
+@inject ICustomerService customerService
+
+@inject NavigationManager NavigationManager
+@inject NotificationService notificationService
+
+<h1>Nueva Entrada</h1>
+
+<div class="row mt-4">
+    <div class="col-sm-4">
+        <NavLink class="nav-link" href="/entradas" Match="NavLinkMatch.All">
+            <span class="oi oi-arrow-left"></span> Volver a la lista
+        </NavLink>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+
+<EditForm Model="@productEntry" OnValidSubmit="AddProductEntry">
+    <FluentValidator />
+
+    <div class="row">
+        <RadzenFieldset Text="DATOS DE LA ENTRADA" class="mt-4 col-lg-7">
+            <div class="row">
+                <div class="form-group col-lg-3">
+                    <label for="campaing">Campaña:</label>
+                    <RadzenDropDown AllowFiltering="false"
+                                    Data="campaings" @bind-Value="productEntry.CampaingId"
+                                    Style="display: block;" Required TextProperty="CampaingId" ValueProperty="CampaingId"
+                                    Change="@((value) => ChangeCampaing(value))" />
+                    <ValidationMessage For="@(() => productEntry.CampaingId)" />
+                </div>
+                <div class="form-group col-lg-3">
+                    <label for="entryNumber">Nº de Entrada:</label>
+                    <InputNumber id="entryNumber" @bind-Value="productEntry.ProductEntryNumber" class="form-control" required />
+                    <ValidationMessage For="@(() => productEntry.ProductEntryNumber)" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="date">Fecha de Entrada:</label>
+                    <InputDate @bind-Value="productEntry.EntryDate" class="form-control" />
+                    <ValidationMessage For="() => productEntry.EntryDate" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-12">
+                    <label for="sellers">Fruticultores/Vendedores:</label>
+                    <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    @bind-Value="productEntry.Sellers" Multiple="true" Placeholder="Seleccione fruticultores..." Data="@customers" TextProperty="Name"
+                                    Style="display: block;" Required />
+                    <ValidationMessage For="@(() => productEntry.Sellers)" />
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-12">
+                    <label for="buyer">Comprador:</label>
+                    <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    @bind-Value="productEntry.Buyer" Placeholder="Seleccione comprador..." Data="@customers" TextProperty="Name"
+                                    Style="display: block;" Required />
+                    <ValidationMessage For="@(() => productEntry.Buyer)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-12">
+                    <label for="payer">Pagador:</label>
+                    <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    @bind-Value="productEntry.Payer" Placeholder="Seleccione pagador..." Data="@customers" TextProperty="Name"
+                                    Style="display: block;" Required />
+                    <ValidationMessage For="@(() => productEntry.Payer)" />
+
+                </div>
+            </div>
+        </RadzenFieldset>
+        <RadzenFieldset Text="INFORMACIÓN ADICIONAL" class="mt-4 col-lg-5">
+            <div class="row mt-1">
+                <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" /><RadzenLabel Text="Granizo" class="ml-1" />
+            </div>
+            <div class="row mt-1">
+                <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" /><RadzenLabel Text="Plaga" class="ml-1"/>
+            </div>
+            <div class="row mt-1">
+                <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" /><RadzenLabel Text="Segundos pases" class="ml-1"/>
+            </div>
+            <div class="row mt-4">
+                <div class="form-group col-lg-12">
+                    <label for="observations">Observaciones:</label>
+                    <InputTextArea id="observations" @bind-Value="productEntry.Observations" class="form-control" rows="5"/>
+                    <ValidationMessage For="@(() => productEntry.Observations)" />
+                </div>
+            </div>
+        </RadzenFieldset>
+    </div>
+
+
+
+    <hr />
+    <div class="row mt-4 mb-4">
+        <div class="col-lg-12">
+            <div class="float-right">
+                <button type="button" class="btn btn-outline-dark" @onclick="OnCancel">Cancelar</button>
+                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    private ProductEntry productEntry = new ProductEntry();
+    private IEnumerable<Campaing> campaings = new List<Campaing>();
+    private IEnumerable<Customer> customers = new List<Customer>();
+    private int currentCampaing = DateTime.Now.Year;
+
+    public string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int nextEntryNumber = await campaingService.GetCampaingNextEntryId(currentCampaing).ConfigureAwait(false);
+        productEntry = new ProductEntry
+        {
+            CampaingId = currentCampaing,
+            ProductEntryNumber = nextEntryNumber,
+            EntryDate = DateTime.Now,
+            ExitDate = null
+        };
+
+        customers = await customerService.GetAllAsync().ConfigureAwait(false);
+        campaings = await campaingService.GetAllAsync().ConfigureAwait(false);
+    }
+
+    public async Task AddProductEntry()
+    {
+        ProductEntry productEntryCreated = await productEntryService.AddAsync(productEntry).ConfigureAwait(false);
+        if (productEntryCreated != null)
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Entrada añadida",
+                Detail = "La entrada se ha añadido correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+            NavigationManager.NavigateTo($"entradas/{productEntry.CampaingId}/detalles/{productEntry.ProductEntryNumber}");
+
+        }
+        else
+        {
+            errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al añadir la entrada.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    public async Task ChangeCampaing(object campaingId)
+    {
+        productEntry.ProductEntryNumber = await campaingService.GetCampaingNextEntryId((int) currentCampaing).ConfigureAwait(false);
+    }
+
+    public void OnCancel()
+    {
+        NavigationManager.NavigateTo("entradas");
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+}

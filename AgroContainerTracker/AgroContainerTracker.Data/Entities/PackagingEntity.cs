@@ -43,5 +43,8 @@ namespace AgroContainerTracker.Data.Entities
 
         public virtual CustomerEntity Owner { get; set; }
         public virtual ICollection<PackagingMovementEntity> PackagingMovements { get; set; }
+
+        public virtual ICollection<ProductRecordEntity> ProductRecords { get; set; }
+
     }
 }

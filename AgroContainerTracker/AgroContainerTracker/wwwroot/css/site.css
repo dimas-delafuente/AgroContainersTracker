@@ -29,8 +29,16 @@ app {
   flex-direction: column;
 }
 
+.container {
+    max-width: 80%;
+}
+
 .container h1 {
   color: var(--primary-color);
+}
+
+.bold {
+    font-weight: bold;
 }
 /* NAVBAR */
 
