@@ -40,6 +40,9 @@ app {
 .bold {
     font-weight: bold;
 }
+.block {
+    display: block;
+}
 /* NAVBAR */
 
 .navbar-toggler {
@@ -434,3 +437,10 @@ div.row.box-header > div > a::hover {
   width: 100%;
 }
 /* -COLD ROOMS */
+
+/* PRODUCT WEIGHINGS*/
+
+.property-block.ui-chkbox {
+    display: block !important;
+}
+/* -PRODUCT WEIGHINGS*/

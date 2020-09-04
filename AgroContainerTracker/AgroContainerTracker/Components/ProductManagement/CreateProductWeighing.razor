@@ -1,0 +1,327 @@
+﻿@using AgroContainerTracker.Domain.ProductManagement
+@using AgroContainerTracker.Domain.Fruits
+@using AgroContainerTracker.Domain.Packagings
+@using AgroContainerTracker.Domain.Rates
+@using AgroContainerTracker.Domain
+@using AgroContainerTracker.Core.Services
+@inject IProductWeighingService productWeighingService
+@inject IFruitService fruitService
+@inject IColdRoomService coldRoomService
+@inject IPackagingService packagingService
+@inject IRateService rateService
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<EditForm Model="@productWeighing" OnValidSubmit="AddProductWeighing">
+    <FluentValidator />
+
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="form-group col-lg-6">
+                <label for="type">Fruticultor/Vendedor:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@ProductEntry.Sellers" @bind-Value="productWeighing.SellerId"
+                                TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" />
+                <ValidationMessage For="() => productWeighing.SellerId" />
+
+            </div>
+            <div class="form-group col-lg-6">
+                <label for="type">Comprador:</label>
+                <RadzenTextBox name="code" Value="@ProductEntry.Buyer?.Name" Disabled="true" class="form-control block" />
+                <ValidationMessage For="@(() => productWeighing.BuyerId)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4">
+                <label for="type">Variedad de Fruta:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@fruits" @bind-Value="productWeighing.FruitId" ValueProperty="FruitId"
+                                TextProperty="Name" Style="display: block;" />
+                <ValidationMessage For="() => productWeighing.FruitId" />
+            </div>
+            <div class="form-group col-lg-4">
+                <label for="type">Cámara:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@coldRooms" @bind-Value="productWeighing.ColdRoomId" ValueProperty="ColdRoomId"
+                                TextProperty="Number" Style="display: block;" />
+                <ValidationMessage For="() => productWeighing.RateId" />
+            </div>
+            <div class="form-group col-lg-4">
+                <label for="rate">Tarifa:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@rates" @bind-Value="productWeighing.RateId" ValueProperty="RateId"
+                                TextProperty="Name" Style="display: block;" />
+                <ValidationMessage For="() => productWeighing.ColdRoomId" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4">
+                <label for="grossweight">Peso Bruto:</label>
+                <RadzenNumeric TValue="double" @bind-Value="productWeighing.GrossWeight" Min="0" Change="@(_ => UpdateProductWeight())" class="form-control" />
+                <ValidationMessage For="@(() => productWeighing.GrossWeight)" />
+
+            </div>
+            <div class="form-group col-lg-4">
+                <label for="tareWeight">Destare:</label>
+                <RadzenNumeric TValue="double" @bind-Value="productWeighing.TareWeight" Min="0" Disabled="true" class="form-control" />
+                <ValidationMessage For="@(() => productWeighing.TareWeight)" />
+
+            </div>
+            <div class="form-group col-lg-4">
+                <label for="netWeight">Peso Neto:</label>
+                <RadzenNumeric TValue="double" @bind-Value="productWeighing.NetWeight" Min="0" Disabled="true" class="form-control" />
+                <ValidationMessage For="@(() => productWeighing.NetWeight)" />
+
+            </div>
+        </div>
+        <div class="row">
+            <RadzenFieldset Text="Palots" class="mt-2 col-lg-12">
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label for="type">Palot:</label>
+                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="@palotPackagings" @bind-Value="palotRecordPackaging.Packaging" Disabled="@disablePalots"
+                                        TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(palotRecordPackaging)" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="property">Propiedad:</label>
+                        <RadzenCheckBox @bind-Value="palotRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disablePalots" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="quantity">Cantidad:</label>
+                        <RadzenNumeric TValue="int" @bind-Value="palotRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(palotRecordPackaging))" class="form-control" Disabled="@disablePalots" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="weight">Peso/unidad:</label>
+                        <InputNumber id="weight_palot" @bind-Value="palotRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="weight">Peso Total:</label>
+                        <InputNumber id="weight_palot" @bind-Value="@palotRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
+                    </div>
+                </div>
+
+            </RadzenFieldset>
+        </div>
+        <div class="row">
+            <RadzenFieldset Text="Palets" class="mt-2 col-lg-12">
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label for="type">Palets:</label>
+                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="@paletPackagings" @bind-Value="paletRecordPackaging.Packaging" Disabled="@disablePalets"
+                                        TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(paletRecordPackaging)" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="property">Propiedad:</label>
+                        <RadzenCheckBox @bind-Value="paletRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disablePalets" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="quantity">Cantidad:</label>
+                        <RadzenNumeric TValue="int" @bind-Value="paletRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(paletRecordPackaging))" class="form-control" Disabled="@disablePalets" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="weight">Peso/unidad:</label>
+                        <InputNumber id="weight_palot" @bind-Value="paletRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="weight">Peso Total:</label>
+                        <InputNumber id="weight_palot" @bind-Value="paletRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
+                    </div>
+                </div>
+
+            </RadzenFieldset>
+        </div>
+        <div class="row">
+            <RadzenFieldset Text="Cajas" class="mt-2 col-lg-12">
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label for="type">Cajas:</label>
+                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                        Data="@boxPackagings" @bind-Value="boxRecordPackaging.Packaging" Disabled="@disableBoxes"
+                                        TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(boxRecordPackaging)" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="property">Propiedad:</label>
+                        <RadzenCheckBox @bind-Value="boxRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disableBoxes" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="quantity">Cantidad:</label>
+                        <RadzenNumeric TValue="int" @bind-Value="boxRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(boxRecordPackaging))" class="form-control" Disabled="@disableBoxes" />
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="weight">Peso/unidad:</label>
+                        <InputNumber id="weight_palot" @bind-Value="boxRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label for="weight">Peso Total:</label>
+                        <InputNumber id="weight_palot" @bind-Value="boxRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
+                    </div>
+                </div>
+
+            </RadzenFieldset>
+        </div>
+        <ValidationMessage For="@(() => productWeighing.ProductRecords)" />
+
+        <hr />
+        <div class="row mt-4 mb-4">
+            <div class="col-lg-12">
+                <div class="float-right">
+                    <button type="button" class="btn btn-outline-dark" @onclick="() => OnFormCancelled()">Cancelar</button>
+                    <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public EventCallback<ProductWeighing> OnProductWeighingCreated { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public ProductEntry ProductEntry { get; set; }
+
+    private AddProductWeighingRequest productWeighing = new AddProductWeighingRequest();
+    private ProductRecordPackaging palotRecordPackaging = new ProductRecordPackaging();
+    private ProductRecordPackaging paletRecordPackaging = new ProductRecordPackaging();
+    private ProductRecordPackaging boxRecordPackaging = new ProductRecordPackaging();
+
+    private List<Fruit> fruits = new List<Fruit>();
+    private List<ColdRoom> coldRooms = new List<ColdRoom>();
+    private List<Rate> rates = new List<Rate>();
+    private List<Packaging> palotPackagings = new List<Packaging>();
+    private List<Packaging> paletPackagings = new List<Packaging>();
+    private List<Packaging> boxPackagings = new List<Packaging>();
+
+    private bool isLoading = true;
+    private bool disablePalots = false;
+    private bool disablePalets = false;
+    private bool disableBoxes = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            productWeighing = new AddProductWeighingRequest
+            {
+                CampaingId = ProductEntry.CampaingId,
+                ProductEntryNumber = ProductEntry.ProductEntryNumber,
+                BuyerId = ProductEntry.Buyer.CustomerId,
+                ProductRecords = new List<ProductRecordPackaging>()
+            };
+
+            fruits = await fruitService.GetAllAsync().ConfigureAwait(false);
+            coldRooms = await coldRoomService.GetAllAsync().ConfigureAwait(false);
+            rates = await rateService.GetAllAsync().ConfigureAwait(false);
+            await LoadPackagings();
+
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+
+    }
+
+    private async Task AddProductWeighing()
+    {
+        isLoading = true;
+        ProductWeighing productWeighingCreated = await productWeighingService.AddAsync(this.productWeighing).ConfigureAwait(false);
+
+        if (productWeighingCreated != null)
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Pesada añadida",
+                Detail = "La entrada se ha añadido correctamente",
+                Duration = 4000
+            };
+            Notify(message);
+            await OnProductWeighingCreated.InvokeAsync(productWeighingCreated);
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al añadir la pesada.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+
+        isLoading = false;
+    }
+
+    private void SelectPackaging(ProductRecordPackaging productPackaging)
+    {
+        if (productPackaging?.Packaging != null)
+        {
+            productPackaging.PackagingWeight = productPackaging.Packaging.Weight;
+            productPackaging.TotalWeight = productPackaging.Quantity * productPackaging.PackagingWeight;
+            productWeighing.ProductRecords.Add(productPackaging);
+        }
+        else
+        {
+            productPackaging.PackagingWeight = 0;
+            productPackaging.TotalWeight = 0;
+            productPackaging.Quantity = 0;
+            productPackaging.IsOwnPackaging = false;
+            productWeighing.ProductRecords.Remove(productPackaging);
+        }
+
+        disablePalets = palotRecordPackaging.Packaging != null;
+        disablePalots = boxRecordPackaging.Packaging != null || paletRecordPackaging.Packaging != null;
+        disableBoxes = paletRecordPackaging.Packaging == null;
+
+        UpdateProductWeight();
+    }
+
+    private void UpdateProductPackagingTotalWeight(ProductRecordPackaging productPackaging)
+    {
+        productPackaging.TotalWeight = productPackaging.Quantity * productPackaging.PackagingWeight;
+        UpdateProductWeight();
+    }
+
+    private void UpdateProductWeight()
+    {
+        productWeighing.TareWeight = GetTareWeight();
+        productWeighing.NetWeight = productWeighing.GrossWeight - productWeighing.TareWeight;
+    }
+
+    private double GetTareWeight()
+    {
+        if (palotRecordPackaging?.Packaging != null)
+            return palotRecordPackaging.PackagingWeight * palotRecordPackaging.Quantity;
+
+        if (paletRecordPackaging?.Packaging != null && boxRecordPackaging?.Packaging != null)
+            return paletRecordPackaging.PackagingWeight * paletRecordPackaging.Quantity + boxRecordPackaging.PackagingWeight * boxRecordPackaging.Quantity;
+
+        return 0;
+    }
+
+    private async Task LoadPackagings()
+    {
+        var packagings = await packagingService.GetAllAsync().ConfigureAwait(false);
+        palotPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Palot)).ToList();
+        paletPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Palet)).ToList();
+        boxPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Caja)).ToList();
+    }
+
+    private async Task OnFormCancelled()
+    {
+        await OnCancel.InvokeAsync(null).ConfigureAwait(false);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+}

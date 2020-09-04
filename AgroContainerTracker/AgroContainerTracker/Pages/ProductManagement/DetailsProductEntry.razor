@@ -1,4 +1,5 @@
 ﻿@page "/entradas/{CampaingId:int}/detalles/{ProductEntryNumber:int}"
+@using AgroContainerTracker.Components.ProductManagement
 
 @using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Core.Services
@@ -73,15 +74,15 @@ else
                         </div>
                     </RadzenFieldset>
                     <RadzenFieldset Text="INFORMACIÓN ADICIONAL" class="mt-4 col-lg-5">
-                            <div class="row mt-1">
-                                <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" Disabled="true" /><RadzenLabel Text="Granizo" class="ml-1 bold" />
-                            </div>
-                            <div class="row mt-1">
-                                <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" Disabled="true" /><RadzenLabel Text="Plaga" class="ml-1 bold" />
-                            </div>
-                            <div class="row mt-1">
-                                <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" Disabled="true" /><RadzenLabel Text="Segundos pases" class="ml-1 bold" />
-                            </div>
+                        <div class="row mt-1">
+                            <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" Disabled="true" /><RadzenLabel Text="Granizo" class="ml-1 bold" />
+                        </div>
+                        <div class="row mt-1">
+                            <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" Disabled="true" /><RadzenLabel Text="Plaga" class="ml-1 bold" />
+                        </div>
+                        <div class="row mt-1">
+                            <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" Disabled="true" /><RadzenLabel Text="Segundos pases" class="ml-1 bold" />
+                        </div>
                         <div class="row mt-4">
                             <div class="form-group col-lg-12">
                                 <label class="bold" for="observations">Observaciones:</label>
@@ -94,7 +95,9 @@ else
             </RadzenCard>
         </ChildContent>
     </RadzenPanel>
-   
+
+    <ProductWeighingList ProductEntry="@productEntry"></ProductWeighingList>
+
 }
 
 <div class="row">

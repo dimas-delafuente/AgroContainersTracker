@@ -28,6 +28,7 @@ namespace AgroContainerTracker.Infrastructure
 
             services.AddTransient<ICampaingService, CampaingService>();
             services.AddTransient<IProductEntryService, ProductEntryService>();
+            services.AddTransient<IProductWeighingService, ProductWeighingService>();
 
 
             services.AddSingleton<IReportService<PackagingReport>, PackagingReportService>();

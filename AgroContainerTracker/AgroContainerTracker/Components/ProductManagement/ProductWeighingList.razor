@@ -1,0 +1,104 @@
+﻿@using AgroContainerTracker.Domain.ProductManagement
+@using AgroContainerTracker.Core.Services
+
+@inject IProductWeighingService productWeighingService
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+<RadzenPanel AllowCollapse="true">
+    <HeaderTemplate>
+        <span style="float:left;">
+            <b style="font-size:30px">PESADAS</b>
+        </span>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            <div class="row mt-5">
+                <div class="col-lg-4">
+                    <button @onclick="() => ShowNewWeighingDialog()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva pesada</button>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-lg-12">
+                    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                                AllowSorting="true" Data="@productWeighings" TItem="ProductWeighing" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
+                        <Columns>
+                            <RadzenGridColumn TItem="ProductWeighing" Property="ProductWeighingId" Title="Nº Pesada">
+                                <FooterTemplate>
+                                    Total: <b>@productWeighings.Count()</b>
+                                </FooterTemplate>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="ProductWeighing" Property="ColdRoom.Number" Title="Cámara" />
+                            <RadzenGridColumn TItem="ProductWeighing" Property="Fruit.Name" Title="Fruta" />
+                            <RadzenGridColumn TItem="ProductWeighing" Property="GrossWeight" Title="Peso Bruto" />
+
+
+                            <RadzenGridColumn TItem="ProductWeighing" Property="TareWeight" Title="Destare" />
+                            <RadzenGridColumn TItem="ProductWeighing" Property="NetWeight" Title="Peso Neto" />
+
+                            @*<RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                    <Template Context="data">
+                                        <span class="oi oi-magnifying-glass" @onclick="() => OpenEntryDetails(data.ProductEntryNumber)"></span>
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                    <Template Context="data">
+                                        <span class="oi oi-pencil" @onclick="() => OpenEntryEdit(data.ProductEntryNumber)"></span>
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                    <Template Context="data">
+                                        <span class="oi oi-trash" @onclick="() => ShowRemoveEntryDialog(data)"></span>
+                                    </Template>
+                                </RadzenGridColumn>*@
+                        </Columns>
+                    </RadzenGrid>
+                </div>
+            </div>
+
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
+
+@code {
+
+    [Parameter]
+    public ProductEntry ProductEntry { get; set; }
+
+    private IEnumerable<ProductWeighing> productWeighings = new List<ProductWeighing>();
+    private bool isLoading = true;
+    private int currentCampaing = DateTime.Now.Year;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            productWeighings = await productWeighingService.GetAllAsync(ProductEntry.CampaingId, ProductEntry.ProductEntryNumber);
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+    }
+
+    private async Task ShowNewWeighingDialog()
+    {
+
+        await dialogService.OpenAsync("Nueva Pesada",
+            ds =>@<CreateProductWeighing OnProductWeighingCreated="UpdateTable"
+                                        ProductEntry="@ProductEntry"
+                                        OnCancel="CloseDialog">
+                 </CreateProductWeighing>,
+            new DialogOptions { Width = "60%"});
+    }
+
+    private void UpdateTable()
+    {
+
+    }
+
+    private void CloseDialog()
+    {
+        dialogService.Close();
+    }
+}
