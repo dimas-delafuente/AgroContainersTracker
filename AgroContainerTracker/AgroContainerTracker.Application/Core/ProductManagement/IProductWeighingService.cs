@@ -8,6 +8,6 @@ namespace AgroContainerTracker.Core.Services
     {
         Task<List<ProductWeighing>> GetAllAsync(int campaingId, int entryNumber);
         Task<ProductWeighing> AddAsync(AddProductWeighingRequest productWeighing);
-        //Task<ProductWeighing> GetAsync(int campaingId, int productEntryNumber);
+        Task<ProductWeighing> GetByIdAsync(int productWeighingId);
     }
 }

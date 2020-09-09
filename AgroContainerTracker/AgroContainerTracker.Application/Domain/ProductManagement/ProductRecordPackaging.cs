@@ -1,5 +1,4 @@
-﻿using System;
-using AgroContainerTracker.Domain.Packagings;
+﻿using AgroContainerTracker.Domain.Packagings;
 
 namespace AgroContainerTracker.Domain.ProductManagement
 {

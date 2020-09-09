@@ -4,6 +4,8 @@
     {
         public int ProductRecordId { get; set; }
 
+        public string ReferenceNumber { get; set; }
+
         public int ProductWeighingId { get; set; }
         public virtual ProductWeighingEntity ProductWeighing { get; set; }
 
@@ -19,6 +21,7 @@
         public int? ColdRoomId { get; set; }
         public virtual ColdRoomEntity ColdRoom { get; set; }
 
+        public int Quantity { get; set; }
         public int? PackagingId { get; set; }
         public bool IsOwnPackaging { get; set; }
         public virtual PackagingEntity Packaging { get; set; }

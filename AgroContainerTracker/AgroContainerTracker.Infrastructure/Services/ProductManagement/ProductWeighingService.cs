@@ -35,12 +35,14 @@ namespace AgroContainerTracker.Infrastructure.Services
             {
                 
                 ProductWeighingEntity entity = _mapper.Map<ProductWeighingEntity>(productWeighing);
-
                 var addResponse = await _context.ProductWeighings.AddAsync(entity).ConfigureAwait(false);
 
                 if (addResponse.State.Equals(EntityState.Added))
                 {
                     bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                    if (created)
+                        addResponse.Entity.ProductRecords = (ICollection<ProductRecordEntity>)await AddProductRecords(productWeighing, addResponse.Entity.ProductWeighingId);
+
                     return created ? _mapper.Map<ProductWeighing>(addResponse.Entity) : null;
                 }
             }
@@ -51,8 +53,6 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
 
             return null;
-
-
         }
 
         public async Task<List<ProductWeighing>> GetAllAsync(int campaingId, int productEntryNumber)
@@ -79,6 +79,103 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
 
             return new List<ProductWeighing>();
+        }
+
+        public async Task<ProductWeighing> GetByIdAsync(int productWeighingId)
+        {
+            try
+            {
+                if (productWeighingId < 0)
+                    throw new ArgumentOutOfRangeException();
+
+                ProductWeighingEntity entities = await _context.ProductWeighings
+                    .AsNoTracking()
+                    .Include(x => x.ProductRecords)
+                        .ThenInclude(p => p.Packaging)
+                    .Include(x => x.Buyer)
+                    .Include(x => x.Seller)
+                    .Include(x => x.Fruit)
+                    .Include(x => x.ColdRoom)
+                    .Include(x => x.Rate)
+                    .FirstOrDefaultAsync(x => x.ProductWeighingId.Equals(productWeighingId))
+                    .ConfigureAwait(false);
+
+                return _mapper.Map<ProductWeighing>(entities);
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving Product Weighings. ProductWeighingId:{productWeighingId}.}",
+                                    e.Message, productWeighingId);
+            }
+
+            return null;
+        }
+
+        private async Task<IEnumerable<ProductRecordEntity>> AddProductRecords(AddProductWeighingRequest productWeighing, int productWeighingId)
+        {
+            List<ProductRecordEntity> productRecords = new List<ProductRecordEntity>();
+            try
+            {
+                foreach (var productPkg in productWeighing.ProductRecords)
+                {
+                    double productGrossWeigh = productWeighing.GrossWeight / productPkg.Quantity;
+                    double productTareWeight = productWeighing.TareWeight / productPkg.Quantity;
+                    double productNetWeight = productWeighing.NetWeight / productPkg.Quantity;
+
+                    if (productPkg.Packaging.Type.Equals(Domain.Packagings.PackagingType.Caja))
+                    {
+                        productRecords.Add(new ProductRecordEntity
+                        {
+                            ReferenceNumber = $"C{1:00}000{productWeighingId:0000}",
+                            ProductWeighingId = productWeighingId,
+                            CampaingId = productWeighing.CampaingId,
+                            ProductEntryNumber = productWeighing.ProductEntryNumber,
+                            BuyerId = productWeighing.BuyerId,
+                            SellerId = productWeighing.SellerId,
+                            ColdRoomId = productWeighing.ColdRoomId,
+                            FruitId = productWeighing.FruitId,
+                            PackagingId = productPkg.Packaging.PackagingId,
+                            IsOwnPackaging = productPkg.IsOwnPackaging,
+                            GrossWeight = productGrossWeigh,
+                            TareWeight = productTareWeight,
+                            NetWeight = productNetWeight,
+                            Quantity = productPkg.Quantity
+                        });
+                    }
+                    else
+                        for (int i = 0; i < productPkg.Quantity; i++)
+                        {
+                            productRecords.Add(new ProductRecordEntity
+                            {
+                                ReferenceNumber = $"P{i+1:00}000{productWeighingId:0000}",
+                                ProductWeighingId = productWeighingId,
+                                CampaingId = productWeighing.CampaingId,
+                                ProductEntryNumber = productWeighing.ProductEntryNumber,
+                                BuyerId = productWeighing.BuyerId,
+                                SellerId = productWeighing.SellerId,
+                                ColdRoomId = productWeighing.ColdRoomId,
+                                FruitId = productWeighing.FruitId,
+                                PackagingId = productPkg.Packaging.PackagingId,
+                                IsOwnPackaging = productPkg.IsOwnPackaging,
+                                GrossWeight = productGrossWeigh,
+                                TareWeight = productTareWeight,
+                                NetWeight = productNetWeight,
+                                Quantity = 1
+                            });
+                        }
+
+                }
+
+                await _context.ProductRecords.AddRangeAsync(productRecords).ConfigureAwait(false);
+                _ = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return productRecords;
         }
 
     }

@@ -18,6 +18,7 @@ namespace AgroContainerTracker.Domain.ProductManagement
 
         public  ColdRoom ColdRoom { get; set; }
 
+        public int Quantity { get; set; }
         public bool IsOwnPackaging { get; set; }
         public Packaging Packaging { get; set; }
 
@@ -45,7 +46,7 @@ namespace AgroContainerTracker.Domain.ProductManagement
         public int FruitId { get; set; }
 
         public int ColdRoomId { get; set; }
-
+        public int Quantity { get; set; }
         public int PackagingId { get; set; }
         public bool IsOwnPackaging { get; set; }
 

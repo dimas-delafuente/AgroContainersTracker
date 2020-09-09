@@ -1,0 +1,206 @@
+﻿@using AgroContainerTracker.Domain.ProductManagement
+@using AgroContainerTracker.Core.Services
+@using AgroContainerTracker.Domain.Packagings
+@inject IProductWeighingService productWeighingService
+
+<Loading ShowSpinner="@isLoading"></Loading>
+
+@if (productWeighing != null)
+{
+    <section>
+
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="form-group col-lg-6">
+                    <label for="type">Fruticultor/Vendedor:</label>
+                    <RadzenTextBox name="seller" Value="@productWeighing.Seller?.Name" Disabled="true" class="form-control block" />
+                </div>
+                <div class="form-group col-lg-6">
+                    <label for="buyer">Comprador:</label>
+                    <RadzenTextBox name="buyer" Value="@productWeighing.Buyer?.Name" Disabled="true" class="form-control block" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-4">
+                    <label for="fruit">Variedad de Fruta:</label>
+                    <RadzenTextBox name="fruit" Value="@productWeighing.Fruit?.Name" Disabled="true" class="form-control block" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="coldRoom">Cámara:</label>
+                    <RadzenTextBox name="coldRoom" Value="@productWeighing.ColdRoom?.Number.ToString()" Disabled="true" class="form-control block" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="rate">Tarifa:</label>
+                    <RadzenTextBox name="rate" Value="@productWeighing.Rate?.Name" Disabled="true" class="form-control block" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-4">
+                    <label for="grossweight">Peso Bruto:</label>
+                    <RadzenNumeric TValue="double" @bind-Value="productWeighing.GrossWeight" Disabled="true" class="form-control" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="tareWeight">Destare:</label>
+                    <RadzenNumeric TValue="double" @bind-Value="productWeighing.TareWeight" Disabled="true" class="form-control" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="netWeight">Peso Neto:</label>
+                    <RadzenNumeric TValue="double" @bind-Value="productWeighing.NetWeight" Disabled="true" class="form-control" />
+                </div>
+            </div>
+            <div class="row">
+                <RadzenFieldset Text="Palots" class="mt-2 col-lg-12">
+                    <div class="row">
+                        <div class="form-group col-lg-4">
+                            <label for="palot">Palot:</label>
+                            <RadzenTextBox name="palot" Value="@palotPackaging?.Packaging?.Code" Disabled="true" class="form-control block" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="property">Propiedad:</label>
+                            <RadzenCheckBox @bind-Value="palotPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="true" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="quantity">Cantidad:</label>
+                            <RadzenNumeric TValue="int" @bind-Value="palotPackaging.Quantity" class="form-control" Disabled="true" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="weight">Peso/unidad:</label>
+                            <RadzenNumeric TValue="double" id="weight_palot" @bind-Value="palotPackaging.PackagingWeight" class="form-control" Disabled="true"></RadzenNumeric>
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="weight">Peso Total:</label>
+                            <RadzenNumeric TValue="double" id="weight_palot" @bind-Value="@palotPackaging.TotalWeight" class="form-control" Disabled="true"></RadzenNumeric>
+                        </div>
+                    </div>
+
+                </RadzenFieldset>
+            </div>
+            <div class="row">
+                <RadzenFieldset Text="Palets" class="mt-2 col-lg-12">
+                    <div class="row">
+                        <div class="form-group col-lg-4">
+                            <label for="palet">Palets:</label>
+                            <RadzenTextBox name="palet" Value="@paletPackaging?.Packaging?.Code" Disabled="true" class="form-control block" />
+
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="property">Propiedad:</label>
+                            <RadzenCheckBox @bind-Value="paletPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="true" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="quantity">Cantidad:</label>
+                            <RadzenNumeric TValue="int" @bind-Value="paletPackaging.Quantity" class="form-control" Disabled="true" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="weight">Peso/unidad:</label>
+                            <RadzenNumeric TValue="double" id="weight_palot" @bind-Value="paletPackaging.PackagingWeight" class="form-control" Disabled="true"></RadzenNumeric>
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="weight">Peso Total:</label>
+                            <RadzenNumeric TValue="double" id="weight_palot" @bind-Value="@paletPackaging.TotalWeight" class="form-control" Disabled="true"></RadzenNumeric>
+                        </div>
+                    </div>
+
+                </RadzenFieldset>
+            </div>
+            <div class="row">
+                <RadzenFieldset Text="Cajas" class="mt-2 col-lg-12">
+                    <div class="row">
+                        <div class="form-group col-lg-4">
+                            <label for="box">Cajas:</label>
+                            <RadzenTextBox name="box" Value="@boxPackaging?.Packaging?.Code" Disabled="true" class="form-control block" />
+
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="property">Propiedad:</label>
+                            <RadzenCheckBox @bind-Value="boxPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="true" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="quantity">Cantidad:</label>
+                            <RadzenNumeric TValue="int" @bind-Value="boxPackaging.Quantity" class="form-control" Disabled="true" />
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="weight">Peso/unidad:</label>
+                            <RadzenNumeric TValue="double" id="weight_palot" @bind-Value="boxPackaging.PackagingWeight" class="form-control" Disabled="true"></RadzenNumeric>
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="weight">Peso Total:</label>
+                            <RadzenNumeric TValue="double" id="weight_palot" @bind-Value="@boxPackaging.TotalWeight" class="form-control" Disabled="true"></RadzenNumeric>
+                        </div>
+                    </div>
+                </RadzenFieldset>
+            </div>
+
+            <hr />
+            <div class="row mt-4 mb-4">
+                <div class="col-lg-12">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-outline-dark" @onclick="() => OnFormCancelled()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+
+@code {
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public int ProductWeighingId { get; set; }
+
+    private ProductWeighing productWeighing;
+    private ProductRecordPackaging palotPackaging = new ProductRecordPackaging();
+    private ProductRecordPackaging paletPackaging = new ProductRecordPackaging();
+    private ProductRecordPackaging boxPackaging = new ProductRecordPackaging();
+
+    private bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            productWeighing = await productWeighingService.GetByIdAsync(ProductWeighingId).ConfigureAwait(false);
+            SetPackagings();
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+
+    }
+
+    private void SetPackagings()
+    {
+        paletPackaging = CreateProductRecordPackaging(PackagingType.Palet);
+        palotPackaging = CreateProductRecordPackaging(PackagingType.Palot);
+        boxPackaging = CreateProductRecordPackaging(PackagingType.Caja);
+    }
+
+    private ProductRecordPackaging CreateProductRecordPackaging(PackagingType type)
+    {
+        ProductRecord product = productWeighing.ProductRecords.FirstOrDefault(x => x.Packaging.Type.Equals(type));
+
+        if (product != null)
+        {
+            int quantity = type.Equals(PackagingType.Caja) ? product.Quantity : productWeighing.ProductRecords.Count(x => x.Packaging.Type.Equals(type));
+
+            return new ProductRecordPackaging
+            {
+                IsOwnPackaging = product.IsOwnPackaging,
+                Packaging = product.Packaging,
+                PackagingWeight = product.Packaging.Weight,
+                TotalWeight = product.Packaging.Weight * quantity,
+                Quantity = quantity
+            };
+        }
+
+        return new ProductRecordPackaging();
+    }
+
+    private async Task OnFormCancelled()
+    {
+        await OnCancel.InvokeAsync(null).ConfigureAwait(false);
+    }
+}

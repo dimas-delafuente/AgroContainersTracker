@@ -38,12 +38,12 @@
                             <RadzenGridColumn TItem="ProductWeighing" Property="TareWeight" Title="Destare" />
                             <RadzenGridColumn TItem="ProductWeighing" Property="NetWeight" Title="Peso Neto" />
 
-                            @*<RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
-                                    <Template Context="data">
-                                        <span class="oi oi-magnifying-glass" @onclick="() => OpenEntryDetails(data.ProductEntryNumber)"></span>
-                                    </Template>
-                                </RadzenGridColumn>
-                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                            <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                <Template Context="data">
+                                    <span class="oi oi-magnifying-glass" @onclick="() => OpenWeighingDetails(data.ProductWeighingId)"></span>
+                                </Template>
+                            </RadzenGridColumn>
+                                @*<RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                                     <Template Context="data">
                                         <span class="oi oi-pencil" @onclick="() => OpenEntryEdit(data.ProductEntryNumber)"></span>
                                     </Template>
@@ -89,6 +89,16 @@
                                         ProductEntry="@ProductEntry"
                                         OnCancel="CloseDialog">
                  </CreateProductWeighing>,
+            new DialogOptions { Width = "60%"});
+    }
+
+    private async Task OpenWeighingDetails(int productWeighingId)
+    {
+
+        await dialogService.OpenAsync("Detalles Pesada",
+            ds =>@<DetailsProductWeighing ProductWeighingId="@productWeighingId"
+                        OnCancel="CloseDialog">
+                  </DetailsProductWeighing>,
             new DialogOptions { Width = "60%"});
     }
 

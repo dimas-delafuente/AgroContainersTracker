@@ -9,7 +9,6 @@
 @inject IColdRoomService coldRoomService
 @inject IPackagingService packagingService
 @inject IRateService rateService
-@inject DialogService dialogService
 @inject NotificationService notificationService
 
 <Loading ShowSpinner="@isLoading"></Loading>
@@ -20,7 +19,7 @@
     <div class="col-lg-12">
         <div class="row">
             <div class="form-group col-lg-6">
-                <label for="type">Fruticultor/Vendedor:</label>
+                <label for="seller">Fruticultor/Vendedor:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 Data="@ProductEntry.Sellers" @bind-Value="productWeighing.SellerId"
                                 TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" />
@@ -28,32 +27,32 @@
 
             </div>
             <div class="form-group col-lg-6">
-                <label for="type">Comprador:</label>
-                <RadzenTextBox name="code" Value="@ProductEntry.Buyer?.Name" Disabled="true" class="form-control block" />
+                <label for="buyer">Comprador:</label>
+                <RadzenTextBox name="buyer" Value="@ProductEntry.Buyer?.Name" Disabled="true" class="form-control block" />
                 <ValidationMessage For="@(() => productWeighing.BuyerId)" />
             </div>
         </div>
         <div class="row">
             <div class="form-group col-lg-4">
-                <label for="type">Variedad de Fruta:</label>
+                <label for="fruit">Variedad de Fruta:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 Data="@fruits" @bind-Value="productWeighing.FruitId" ValueProperty="FruitId"
                                 TextProperty="Name" Style="display: block;" />
                 <ValidationMessage For="() => productWeighing.FruitId" />
             </div>
             <div class="form-group col-lg-4">
-                <label for="type">Cámara:</label>
+                <label for="coldRoom">Cámara:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 Data="@coldRooms" @bind-Value="productWeighing.ColdRoomId" ValueProperty="ColdRoomId"
                                 TextProperty="Number" Style="display: block;" />
-                <ValidationMessage For="() => productWeighing.RateId" />
+                <ValidationMessage For="() => productWeighing.ColdRoomId" />
             </div>
             <div class="form-group col-lg-4">
                 <label for="rate">Tarifa:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 Data="@rates" @bind-Value="productWeighing.RateId" ValueProperty="RateId"
                                 TextProperty="Name" Style="display: block;" />
-                <ValidationMessage For="() => productWeighing.ColdRoomId" />
+                <ValidationMessage For="() => productWeighing.RateId" />
             </div>
         </div>
         <div class="row">
@@ -80,7 +79,7 @@
             <RadzenFieldset Text="Palots" class="mt-2 col-lg-12">
                 <div class="row">
                     <div class="form-group col-lg-4">
-                        <label for="type">Palot:</label>
+                        <label for="pkgtype">Palot:</label>
                         <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                         Data="@palotPackagings" @bind-Value="palotRecordPackaging.Packaging" Disabled="@disablePalots"
                                         TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(palotRecordPackaging)" />

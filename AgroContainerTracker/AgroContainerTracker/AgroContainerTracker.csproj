@@ -44,8 +44,6 @@
     <Folder Include="wwwroot\img\icon\" />
     <Folder Include="wwwroot\js\" />
     <Folder Include="Resources\" />
-    <Folder Include="Components\" />
-    <Folder Include="Components\ProductManagement\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgroContainerTracker.Application\AgroContainerTracker.Application.csproj">
