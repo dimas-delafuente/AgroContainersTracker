@@ -42,7 +42,7 @@ else
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
                         AllowSorting="true" Data="@productEntries" TItem="ProductEntry" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="ProductEntry" Property="ProductEntryNumber" Title="Código Entrada">
+                    <RadzenGridColumn TItem="ProductEntry" Property="ProductEntryNumber" Title="Entrada">
                         <Template Context="data">
                             @data.CampaingId@data.ProductEntryNumber.ToString("000")
                         </Template>
@@ -50,8 +50,16 @@ else
                             Total: <b>@productEntries.Count()</b>
                         </FooterTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductEntry" Property="EntryDate.ToString()" Title="Fecha Entrada" />
-                    <RadzenGridColumn TItem="ProductEntry" Property="ExitDate.ToString()" Title="Fecha Salida" />
+                    <RadzenGridColumn TItem="ProductEntry" Property="EntryDate" Title="Fecha Entrada">
+                        <Template Context="data">
+                            @data.EntryDate.ToString("dd/MM/yyyy")
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductEntry" Property="ExitDate" Title="Fecha Salida">
+                        <Template Context="data">
+                            @data.ExitDate?.ToString("dd/MM/yyyy")
+                        </Template>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductEntry" Property="Buyer.Name" Title="Comprador"/>
                     <RadzenGridColumn TItem="ProductEntry" Property="Payer.Name" Title="Pagador"/>
                         
@@ -108,7 +116,7 @@ else
 
     private void OpenEntryEdit(long productEntryNumber)
     {
-        navigationManager.NavigateTo($"/entradas/editar/{productEntryNumber}");
+        navigationManager.NavigateTo($"/entradas/{currentCampaing}/editar/{productEntryNumber}");
     }
 
     private async Task ShowRemoveEntryDialog(ProductEntry productEntry)
@@ -129,7 +137,7 @@ else
     private async Task RemoveEntry(ProductEntry productEntry)
     {
         NotificationMessage message;
-        bool deleted = false; // await packagingService.DeleteAsync(packaging.PackagingId).ConfigureAwait(false);
+        bool deleted = await productEntryService.DeleteAsync(productEntry.CampaingId, productEntry.ProductEntryNumber).ConfigureAwait(false);
         dialogService.Close(true);
 
 

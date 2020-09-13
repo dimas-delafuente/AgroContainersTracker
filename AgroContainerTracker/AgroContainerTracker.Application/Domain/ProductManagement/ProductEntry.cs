@@ -17,8 +17,8 @@ namespace AgroContainerTracker.Domain.ProductManagement
         public bool HasPlague { get; set; }
         public bool HasSecondPasses { get; set; }
 
-        public virtual Customer Buyer { get; set; }
-        public virtual Customer Payer { get; set; }
-        public virtual IEnumerable<Customer> Sellers { get; set; }
+        public Customer Buyer { get; set; }
+        public Customer Payer { get; set; }
+        public IEnumerable<Customer> Sellers { get; set; }
     }
 }

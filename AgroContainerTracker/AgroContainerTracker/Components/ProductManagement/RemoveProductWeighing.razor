@@ -1,0 +1,67 @@
+﻿@using AgroContainerTracker.Core.Services
+@inject IProductWeighingService productWeighingService
+@inject NotificationService notificationService
+
+<div class="text-center" style="padding: 20px;">
+    <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta pesada?</p>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <RadzenButton Text="Cancelar" Click="() => OnRemoveCancel()" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Text="Eliminar" Click="() => RemoveWeighing()" ButtonStyle="ButtonStyle.Danger" />
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int ProductWeighingId { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnProductWeighingRemoved { get; set; }
+
+    private async Task RemoveWeighing()
+    {
+        NotificationMessage message;
+        bool deleted = await productWeighingService.DeleteAsync(ProductWeighingId);
+
+        if (deleted)
+        {
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Pesada eliminada",
+                Detail = "La pesada se ha eliminado correctamente",
+                Duration = 4000
+            };
+            await OnProductWeighingRemoved.InvokeAsync(ProductWeighingId);
+        }
+        else
+        {
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar la pesada.",
+                Duration = 4000
+            };
+        }
+
+        Notify(message);
+    }
+
+    private async Task OnRemoveCancel()
+    {
+        await OnCancel.InvokeAsync(null);
+    }
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+    }
+
+}

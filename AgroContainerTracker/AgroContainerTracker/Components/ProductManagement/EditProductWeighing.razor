@@ -13,7 +13,7 @@
 
 <Loading ShowSpinner="@isLoading"></Loading>
 
-<EditForm Model="@productWeighing" OnValidSubmit="() => AddProductWeighing()">
+<EditForm Model="@productWeighing" OnValidSubmit="() => UpdateProductWeighing()">
     <FluentValidator />
 
     <div class="col-lg-12">
@@ -177,17 +177,22 @@
 </EditForm>
 
 @code {
-
     [Parameter]
-    public EventCallback<ProductWeighing> OnProductWeighingCreated { get; set; }
-
-    [Parameter]
-    public EventCallback OnCancel { get; set; }
+    public int ProductWeighingId { get; set; }
 
     [Parameter]
     public ProductEntry ProductEntry { get; set; }
 
+    [Parameter]
+    public EventCallback<ProductWeighing> OnProductWeighingUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+
     private AddProductWeighingRequest productWeighing = new AddProductWeighingRequest();
+    private ProductWeighing currentProductWeighing = new ProductWeighing();
+
     private ProductRecordPackaging palotRecordPackaging = new ProductRecordPackaging();
     private ProductRecordPackaging paletRecordPackaging = new ProductRecordPackaging();
     private ProductRecordPackaging boxRecordPackaging = new ProductRecordPackaging();
@@ -204,42 +209,61 @@
     private bool disablePalets = false;
     private bool disableBoxes = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        productWeighing = new AddProductWeighingRequest
+        if (firstRender)
         {
-            CampaingId = ProductEntry.CampaingId,
-            ProductEntryNumber = ProductEntry.ProductEntryNumber,
-            BuyerId = ProductEntry.Buyer.CustomerId,
-            ProductRecords = new List<ProductRecordPackaging>()
-        };
+            productWeighing = await GetProductWeighing();
+            SetPackagings();
 
-        fruits = await fruitService.GetAllAsync().ConfigureAwait(false);
-        coldRooms = await coldRoomService.GetAllAsync().ConfigureAwait(false);
-        rates = await rateService.GetAllAsync().ConfigureAwait(false);
-        await LoadPackagings();
+            fruits = await fruitService.GetAllAsync().ConfigureAwait(false);
+            coldRooms = await coldRoomService.GetAllAsync().ConfigureAwait(false);
+            rates = await rateService.GetAllAsync().ConfigureAwait(false);
+            await LoadPackagings();
 
-        isLoading = false;
-        @*await InvokeAsync(() => { StateHasChanged(); });*@
+            isLoading = false;
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+
 
     }
 
-    private async Task AddProductWeighing()
+    private async Task<AddProductWeighingRequest> GetProductWeighing()
+    {
+        currentProductWeighing = await productWeighingService.GetByIdAsync(ProductWeighingId).ConfigureAwait(false);
+
+        return new AddProductWeighingRequest
+        {
+            ProductEntryNumber = currentProductWeighing.ProductEntryNumber,
+            CampaingId = currentProductWeighing.CampaingId,
+            ProductWeighingId = currentProductWeighing.ProductWeighingId,
+            ColdRoomId = currentProductWeighing.ColdRoom.ColdRoomId,
+            FruitId = currentProductWeighing.Fruit.FruitId,
+            BuyerId = currentProductWeighing.Buyer.CustomerId,
+            GrossWeight = currentProductWeighing.GrossWeight,
+            NetWeight = currentProductWeighing.NetWeight,
+            RateId = currentProductWeighing.Rate.RateId,
+            SellerId = currentProductWeighing.Seller.CustomerId,
+            TareWeight = currentProductWeighing.TareWeight,
+            ProductRecords = new List<ProductRecordPackaging>()
+        };
+    }
+
+    private async Task UpdateProductWeighing()
     {
         isLoading = true;
-        ProductWeighing productWeighingCreated = await productWeighingService.AddAsync(this.productWeighing);
+        ProductWeighing productWeighingUpdated = await productWeighingService.UpdateAsync(this.productWeighing);
 
-        if (productWeighingCreated != null)
+        if (productWeighingUpdated != null)
         {
             var message = new NotificationMessage()
             {
                 Severity = NotificationSeverity.Success,
-                Summary = "Pesada añadida",
-                Detail = "La entrada se ha añadido correctamente",
+                Summary = "Pesada actualizada",
+                Detail = "La entrada se ha actualizado correctamente",
                 Duration = 4000
             };
-            await OnProductWeighingCreated.InvokeAsync(productWeighingCreated);
+            await OnProductWeighingUpdated.InvokeAsync(productWeighingUpdated);
             Notify(message);
         }
         else
@@ -248,7 +272,7 @@
             {
                 Severity = NotificationSeverity.Error,
                 Summary = "Error",
-                Detail = "Se ha producido un error al añadir la pesada.",
+                Detail = "Se ha producido un error al actualizar la pesada.",
                 Duration = 4000
             };
             Notify(message);
@@ -287,7 +311,9 @@
         }
         disablePalots = boxRecordPackaging.Packaging != null || paletRecordPackaging.Packaging != null;
 
+
         UpdateProductWeight();
+
     }
 
     private void UpdateProductPackagingTotalWeight(ProductRecordPackaging productPackaging)
@@ -319,6 +345,48 @@
         palotPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Palot)).ToList();
         paletPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Palet)).ToList();
         boxPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Caja)).ToList();
+    }
+
+    private void SetPackagings()
+    {
+        palotRecordPackaging = CreateProductRecordPackaging(PackagingType.Palot);
+
+        if (palotRecordPackaging?.Packaging != null)
+            productWeighing.ProductRecords.Add(palotRecordPackaging);
+
+        paletRecordPackaging = CreateProductRecordPackaging(PackagingType.Palet);
+        if (paletRecordPackaging?.Packaging != null)
+            productWeighing.ProductRecords.Add(paletRecordPackaging);
+
+        boxRecordPackaging = CreateProductRecordPackaging(PackagingType.Caja);
+        if (boxRecordPackaging?.Packaging != null)
+            productWeighing.ProductRecords.Add(boxRecordPackaging);
+
+
+        disablePalets = palotRecordPackaging.Packaging != null;
+        disablePalots = boxRecordPackaging.Packaging != null || paletRecordPackaging.Packaging != null;
+        disableBoxes = paletRecordPackaging.Packaging == null;
+    }
+
+    private ProductRecordPackaging CreateProductRecordPackaging(PackagingType type)
+    {
+        ProductRecord product = currentProductWeighing.ProductRecords.FirstOrDefault(x => x.Packaging.Type.Equals(type));
+
+        if (product != null)
+        {
+            int quantity = type.Equals(PackagingType.Caja) ? product.Quantity : currentProductWeighing.ProductRecords.Count(x => x.Packaging.Type.Equals(type));
+
+            return new ProductRecordPackaging
+            {
+                IsOwnPackaging = product.IsOwnPackaging,
+                Packaging = product.Packaging,
+                PackagingWeight = product.Packaging.Weight,
+                TotalWeight = product.Packaging.Weight * quantity,
+                Quantity = quantity
+            };
+        }
+
+        return new ProductRecordPackaging();
     }
 
     private async Task OnFormCancelled()

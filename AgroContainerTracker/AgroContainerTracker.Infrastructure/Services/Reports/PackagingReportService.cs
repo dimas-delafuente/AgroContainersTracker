@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using AgroContainerTracker.Domain.Reports;
 using AgroContainerTracker.Core.Services.Reports;
 using iTextSharp.text;
@@ -64,7 +63,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             pdfPTable.WidthPercentage = 100;
             pdfPTable.SetWidths(tableSizes);
 
-            #region Table Header
+            #region Table Body
             Font tableRowFont = FontFactory.GetFont(BASE_FONT, 10, Font.NORMAL);
             PdfPCell pdfPCell;
 

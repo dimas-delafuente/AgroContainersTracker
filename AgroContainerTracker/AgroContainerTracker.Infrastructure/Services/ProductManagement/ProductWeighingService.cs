@@ -40,16 +40,51 @@ namespace AgroContainerTracker.Infrastructure.Services
                 if (addResponse.State.Equals(EntityState.Added))
                 {
                     bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
-                    if (created)
-                        addResponse.Entity.ProductRecords = (ICollection<ProductRecordEntity>)await AddProductRecords(productWeighing, addResponse.Entity.ProductWeighingId);
 
-                    return created ? _mapper.Map<ProductWeighing>(addResponse.Entity) : null;
+                    if (created)
+                    {
+                        var productRecords = GetProductRecords(productWeighing, addResponse.Entity.ProductWeighingId);
+                        addResponse.Entity.ProductRecords = (ICollection<ProductRecordEntity>)await AddProductRecords(productRecords);
+                    }
+
+                    return created ? await GetByIdAsync(addResponse.Entity.ProductWeighingId) : null;
                 }
             }
             catch (Exception e)
             {
                 _context.DetachAll();
                 _logger.LogError(e, "Exception: {e} // Internal Error while adding new Product Weighing: {productWeighing}", e.Message, JsonSerializer.Serialize(productWeighing));
+            }
+
+            return null;
+        }
+
+        public async Task<ProductWeighing> UpdateAsync(AddProductWeighingRequest productWeighing)
+        {
+            if (productWeighing == null || !(productWeighing.ProductRecords?.Count > 0))
+                throw new ArgumentNullException();
+
+            try
+            {
+
+                ProductWeighingEntity entity = await _context.ProductWeighings
+                    .Include(x => x.ProductRecords)
+                    .FirstOrDefaultAsync(x => x.ProductWeighingId.Equals(productWeighing.ProductWeighingId))
+                    .ConfigureAwait(false);
+
+                if (entity != null)
+                {
+                    _mapper.Map(productWeighing, entity);
+                    entity.ProductRecords = (ICollection<ProductRecordEntity>)GetProductRecords(productWeighing, entity.ProductWeighingId);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                    return await GetByIdAsync(entity.ProductWeighingId);
+                }
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while updating Product Weighing: {productWeighing}", e.Message, JsonSerializer.Serialize(productWeighing));
             }
 
             return null;
@@ -65,6 +100,9 @@ namespace AgroContainerTracker.Infrastructure.Services
                 IEnumerable<ProductWeighingEntity> entities = await _context.ProductWeighings
                     .AsNoTracking()
                     .Include(x => x.ProductRecords)
+                        .ThenInclude(x => x.Packaging)
+                    .Include(x => x.ColdRoom)
+                    .Include(x => x.Fruit)
                     .Where(x => x.CampaingId.Equals(campaingId) && x.ProductEntryNumber.Equals(productEntryNumber))
                     .ToListAsync()
                     .ConfigureAwait(false);
@@ -112,22 +150,83 @@ namespace AgroContainerTracker.Infrastructure.Services
             return null;
         }
 
-        private async Task<IEnumerable<ProductRecordEntity>> AddProductRecords(AddProductWeighingRequest productWeighing, int productWeighingId)
+        public async Task<bool> DeleteAsync(int productWeighingId)
         {
-            List<ProductRecordEntity> productRecords = new List<ProductRecordEntity>();
             try
             {
-                foreach (var productPkg in productWeighing.ProductRecords)
-                {
-                    double productGrossWeigh = productWeighing.GrossWeight / productPkg.Quantity;
-                    double productTareWeight = productWeighing.TareWeight / productPkg.Quantity;
-                    double productNetWeight = productWeighing.NetWeight / productPkg.Quantity;
+                ProductWeighingEntity productWeighing = await _context.ProductWeighings.FindAsync(productWeighingId).ConfigureAwait(false);
 
-                    if (productPkg.Packaging.Type.Equals(Domain.Packagings.PackagingType.Caja))
+                if (productWeighing != null)
+                {
+                    var removedEntity = _context.ProductWeighings.Remove(productWeighing);
+                    if (removedEntity?.Entity != null && removedEntity.State.Equals(EntityState.Deleted))
+                    {
+                        int deleted = await _context.SaveChangesAsync().ConfigureAwait(false);
+                        return deleted > 0;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while deleting ProductWeighing: {productWeighingId}", e.Message, productWeighingId);
+            }
+
+            return false;
+        }
+
+        private async Task<IEnumerable<ProductRecordEntity>> AddProductRecords(IEnumerable<ProductRecordEntity> productRecords)
+        {
+            try
+            {
+                await _context.ProductRecords.AddRangeAsync(productRecords).ConfigureAwait(false);
+                _ = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return productRecords;
+        }
+
+        private IEnumerable<ProductRecordEntity> GetProductRecords(AddProductWeighingRequest productWeighing, int productWeighingId)
+        {
+            List<ProductRecordEntity> productRecords = new List<ProductRecordEntity>();
+
+            foreach (var productPkg in productWeighing.ProductRecords)
+            {
+                double productGrossWeigh = productWeighing.GrossWeight / productPkg.Quantity;
+                double productTareWeight = productWeighing.TareWeight / productPkg.Quantity;
+                double productNetWeight = productWeighing.NetWeight / productPkg.Quantity;
+
+                if (productPkg.Packaging.Type.Equals(Domain.Packagings.PackagingType.Caja))
+                {
+                    productRecords.Add(new ProductRecordEntity
+                    {
+                        ReferenceNumber = $"C{1:00}{productWeighingId:0000}",
+                        ProductWeighingId = productWeighingId,
+                        CampaingId = productWeighing.CampaingId,
+                        ProductEntryNumber = productWeighing.ProductEntryNumber,
+                        BuyerId = productWeighing.BuyerId,
+                        SellerId = productWeighing.SellerId,
+                        ColdRoomId = productWeighing.ColdRoomId,
+                        FruitId = productWeighing.FruitId,
+                        PackagingId = productPkg.Packaging.PackagingId,
+                        IsOwnPackaging = productPkg.IsOwnPackaging,
+                        GrossWeight = productGrossWeigh,
+                        TareWeight = productTareWeight,
+                        NetWeight = productNetWeight,
+                        Quantity = productPkg.Quantity
+                    });
+                }
+                else
+                {
+                    for (int i = 0; i < productPkg.Quantity; i++)
                     {
                         productRecords.Add(new ProductRecordEntity
                         {
-                            ReferenceNumber = $"C{1:00}000{productWeighingId:0000}",
+                            ReferenceNumber = $"P{i + 1:00}{productWeighingId:0000}",
                             ProductWeighingId = productWeighingId,
                             CampaingId = productWeighing.CampaingId,
                             ProductEntryNumber = productWeighing.ProductEntryNumber,
@@ -140,39 +239,11 @@ namespace AgroContainerTracker.Infrastructure.Services
                             GrossWeight = productGrossWeigh,
                             TareWeight = productTareWeight,
                             NetWeight = productNetWeight,
-                            Quantity = productPkg.Quantity
+                            Quantity = 1
                         });
                     }
-                    else
-                        for (int i = 0; i < productPkg.Quantity; i++)
-                        {
-                            productRecords.Add(new ProductRecordEntity
-                            {
-                                ReferenceNumber = $"P{i+1:00}000{productWeighingId:0000}",
-                                ProductWeighingId = productWeighingId,
-                                CampaingId = productWeighing.CampaingId,
-                                ProductEntryNumber = productWeighing.ProductEntryNumber,
-                                BuyerId = productWeighing.BuyerId,
-                                SellerId = productWeighing.SellerId,
-                                ColdRoomId = productWeighing.ColdRoomId,
-                                FruitId = productWeighing.FruitId,
-                                PackagingId = productPkg.Packaging.PackagingId,
-                                IsOwnPackaging = productPkg.IsOwnPackaging,
-                                GrossWeight = productGrossWeigh,
-                                TareWeight = productTareWeight,
-                                NetWeight = productNetWeight,
-                                Quantity = 1
-                            });
-                        }
-
                 }
 
-                await _context.ProductRecords.AddRangeAsync(productRecords).ConfigureAwait(false);
-                _ = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
-            }
-            catch (Exception)
-            {
-                throw;
             }
 
             return productRecords;

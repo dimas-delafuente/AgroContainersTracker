@@ -26,32 +26,6 @@ namespace AgroContainerTracker.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task<ProductEntry> AddAsync(ProductEntry productEntry)
-        {
-            try
-            {
-                if (productEntry == null)
-                    throw new ArgumentNullException();
-
-                ProductEntryEntity entity = _mapper.Map<ProductEntryEntity>(productEntry);
-                var addResponse = await _context.ProductEntries.AddAsync(entity).ConfigureAwait(false);
-
-                if (addResponse.State.Equals(EntityState.Added))
-                {
-                    bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
-                    return created ? _mapper.Map<ProductEntry>(addResponse.Entity) : null;
-                }
-
-            }
-            catch (Exception e)
-            {
-                _context.DetachAll();
-                _logger.LogError(e, "Exception: {e} // Internal Error while adding new Product Entry: {productEntry}", e.Message, JsonSerializer.Serialize(productEntry));
-            }
-
-            return null;
-        }
-
         public async Task<ProductEntry> GetAsync(int campaingId, int productEntryNumber)
         {
             try
@@ -107,6 +81,113 @@ namespace AgroContainerTracker.Infrastructure.Services
             }
 
             return new List<ProductEntry>();
+        }
+
+        public async Task<bool> ExistsAsync(int campaingId, int productEntryNumber)
+        {
+            try
+            {
+                if (campaingId < 0 || productEntryNumber < 0)
+                    throw new ArgumentOutOfRangeException();
+
+                ProductEntryEntity entity = await _context.ProductEntries
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.CampaingId.Equals(campaingId) && x.ProductEntryNumber.Equals(productEntryNumber))
+                    .ConfigureAwait(false);
+
+                return entity != null;
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving ProductEntry. CampaingId:{campaingId} - ProductEntryNumber: {productEntryNumber}",
+                    e.Message, campaingId, productEntryNumber);
+            }
+
+            return true;
+        }
+
+        public async Task<ProductEntry> AddAsync(ProductEntry productEntry)
+        {
+            try
+            {
+                if (productEntry == null)
+                    throw new ArgumentNullException();
+
+                ProductEntryEntity entity = _mapper.Map<ProductEntryEntity>(productEntry);
+                var addResponse = await _context.ProductEntries.AddAsync(entity).ConfigureAwait(false);
+
+                if (addResponse.State.Equals(EntityState.Added))
+                {
+                    bool created = await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                    return created ? _mapper.Map<ProductEntry>(addResponse.Entity) : null;
+                }
+
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while adding new Product Entry: {productEntry}", e.Message, JsonSerializer.Serialize(productEntry));
+            }
+
+            return null;
+        }
+
+        public async Task<bool> UpdateAsync(ProductEntry productEntry)
+        {
+            try
+            {
+                if (productEntry == null)
+                    throw new ArgumentNullException();
+
+                ProductEntryEntity entity = await _context.ProductEntries
+                    .Include(x => x.Sellers)
+                    .FirstOrDefaultAsync(x => x.CampaingId.Equals(productEntry.CampaingId) && x.ProductEntryNumber.Equals(productEntry.ProductEntryNumber))
+                    .ConfigureAwait(false);
+
+                if (entity != null)
+                {
+                    _mapper.Map(productEntry, entity);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+                    return true;
+                }
+
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while updating Product Entry: {productEntry}", e.Message, JsonSerializer.Serialize(productEntry));
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteAsync(int campaingId, int productEntryNumber)
+        {
+            if (campaingId <= 0 || productEntryNumber <= 0)
+                throw new ArgumentOutOfRangeException();
+
+            try
+            {
+                ProductEntryEntity productEntry = await _context.ProductEntries.FindAsync(campaingId, productEntryNumber).ConfigureAwait(false);
+
+                if (productEntry != null)
+                {
+                    var removedEntity = _context.ProductEntries.Remove(productEntry);
+                    if (removedEntity?.Entity != null && removedEntity.State.Equals(EntityState.Deleted))
+                    {
+                        int deleted = await _context.SaveChangesAsync().ConfigureAwait(false);
+                        return deleted > 0;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception: {e} // Internal Error while removing ProductEntry. CampaingId:{campaingId}, ProductEntryNumber:{productEntryNumber}",
+                                    e.Message, campaingId, productEntryNumber);
+            }
+
+            return false;
         }
     }
 }

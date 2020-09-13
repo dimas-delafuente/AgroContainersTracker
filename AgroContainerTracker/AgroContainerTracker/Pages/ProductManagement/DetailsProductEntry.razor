@@ -1,6 +1,5 @@
 ﻿@page "/entradas/{CampaingId:int}/detalles/{ProductEntryNumber:int}"
 @using AgroContainerTracker.Components.ProductManagement
-
 @using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Core.Services
 @inject IProductEntryService productEntryService
@@ -21,83 +20,84 @@
 }
 else
 {
-    <RadzenPanel AllowCollapse="true">
-        <HeaderTemplate>
-            <span style="float:left;">
-                <i class="oi oi-box details-icon"></i>
-                <b style="font-size:30px">DETALLES ENTRADA @productEntry.CampaingId@productEntry.ProductEntryNumber.ToString("000")</b>
-            </span>
-        </HeaderTemplate>
-        <ChildContent>
-            <RadzenCard>
-                <div class="row">
+    <div>
+        <RadzenPanel AllowCollapse="true">
+            <HeaderTemplate>
+                <span style="float:left;">
+                    <i class="oi oi-box details-icon"></i>
+                    <b style="font-size:30px">DETALLES ENTRADA @productEntry.CampaingId@productEntry.ProductEntryNumber.ToString("000")</b>
+                </span>
+            </HeaderTemplate>
+            <ChildContent>
+                <RadzenCard>
+                    <div class="row">
 
-                    <RadzenFieldset Text="INFORMACIÓN" class="mt-4 col-lg-7">
-                        <div class="row">
-                            <div class="form-group col-lg-2">
-                                <label class="bold" for="campaing">Campaña:</label>
-                                <p class="ml-1">@productEntry.CampaingId</p>
+                        <RadzenFieldset Text="INFORMACIÓN" class="mt-4 col-lg-7">
+                            <div class="row">
+                                <div class="form-group col-lg-2">
+                                    <label class="bold" for="campaing">Campaña:</label>
+                                    <p class="ml-1">@productEntry.CampaingId</p>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                    <label class="bold" for="number">Nº Entrada:</label>
+                                    <p class="ml-1">@productEntry.ProductEntryNumber</p>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="bold" for="entryDate">Fecha Entrada:</label>
+                                    <p class="ml-1">@productEntry.EntryDate.ToString("dd/MM/yyyy")</p>
+                                </div>
+                                <div class="form-group col-lg-3">
+                                    <label class="bold" for="exitDate">Fecha Salida:</label>
+                                    <p class="ml-1">@productEntry.ExitDate?.ToString("dd/MM/yyyy")</p>
+                                </div>
                             </div>
-                            <div class="form-group col-lg-3">
-                                <label class="bold" for="number">Nº Entrada:</label>
-                                <p class="ml-1">@productEntry.ProductEntryNumber</p>
+                            <div class="row">
+                                <div class="form-group col-lg-12">
+                                    <label class="bold" for="seller">Fruticultores/Vendedores:</label>
+                                    @foreach (var seller in productEntry.Sellers)
+                                    {
+                                        <p class="ml-1">@seller.Name</p>
+                                    }
+                                </div>
                             </div>
-                            <div class="form-group col-lg-4">
-                                <label class="bold" for="entryDate">Fecha Entrada:</label>
-                                <p class="ml-1">@productEntry.EntryDate.ToString("dd/MM/yyyy")</p>
+                            <div class="row">
+                                <div class="form-group col-lg-12">
+                                    <label class="bold" for="buyer">Comprador:</label>
+                                    <p class="ml-1">@productEntry.Buyer?.Name</p>
+                                </div>
                             </div>
-                            <div class="form-group col-lg-3">
-                                <label class="bold" for="exitDate">Fecha Salida:</label>
-                                <p class="ml-1">@productEntry.ExitDate?.ToString("dd/MM/yyyy")</p>
+                            <div class="row">
+                                <div class="form-group col-lg-12">
+                                    <label class="bold" for="payer">Pagador:</label>
+                                    <p class="ml-1">@productEntry.Payer?.Name</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-lg-12">
-                                <label class="bold" for="seller">Fruticultores/Vendedores:</label>
-                                @foreach (var seller in productEntry.Sellers)
-                                {
-                                    <p class="ml-1">@seller.Name</p>
-                                }
+                        </RadzenFieldset>
+                        <RadzenFieldset Text="INFORMACIÓN ADICIONAL" class="mt-4 col-lg-5">
+                            <div class="row mt-1">
+                                <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" Disabled="true" /><RadzenLabel Text="Granizo" class="ml-1 bold" />
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-lg-12">
-                                <label class="bold" for="buyer">Comprador:</label>
-                                <p class="ml-1">@productEntry.Buyer?.Name</p>
+                            <div class="row mt-1">
+                                <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" Disabled="true" /><RadzenLabel Text="Plaga" class="ml-1 bold" />
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-lg-12">
-                                <label class="bold" for="payer">Pagador:</label>
-                                <p class="ml-1">@productEntry.Payer?.Name</p>
+                            <div class="row mt-1">
+                                <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" Disabled="true" /><RadzenLabel Text="Segundos pases" class="ml-1 bold" />
                             </div>
-                        </div>
-                    </RadzenFieldset>
-                    <RadzenFieldset Text="INFORMACIÓN ADICIONAL" class="mt-4 col-lg-5">
-                        <div class="row mt-1">
-                            <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" Disabled="true" /><RadzenLabel Text="Granizo" class="ml-1 bold" />
-                        </div>
-                        <div class="row mt-1">
-                            <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" Disabled="true" /><RadzenLabel Text="Plaga" class="ml-1 bold" />
-                        </div>
-                        <div class="row mt-1">
-                            <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" Disabled="true" /><RadzenLabel Text="Segundos pases" class="ml-1 bold" />
-                        </div>
-                        <div class="row mt-4">
-                            <div class="form-group col-lg-12">
-                                <label class="bold" for="observations">Observaciones:</label>
-                                <p class="ml-1">@productEntry.Observations</p>
+                            <div class="row mt-4">
+                                <div class="form-group col-lg-12">
+                                    <label class="bold" for="observations">Observaciones:</label>
+                                    <p class="ml-1">@productEntry.Observations</p>
+                                </div>
                             </div>
-                        </div>
-                    </RadzenFieldset>
-                </div>
+                        </RadzenFieldset>
+                    </div>
 
-            </RadzenCard>
-        </ChildContent>
-    </RadzenPanel>
+                </RadzenCard>
+            </ChildContent>
+        </RadzenPanel>
+    </div>
 
     <ProductWeighingList ProductEntry="@productEntry"></ProductWeighingList>
-
 }
 
 <div class="row">

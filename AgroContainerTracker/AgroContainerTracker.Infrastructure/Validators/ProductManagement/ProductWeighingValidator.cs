@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Domain.Packagings;
 using AgroContainerTracker.Domain.ProductManagement;
 using FluentValidation;
@@ -8,7 +7,6 @@ namespace AgroContainerTracker.Infrastructure.Validators
 {
     public class ProductWeighingValidator : AbstractValidator<AddProductWeighingRequest>
     {
-        private const string DATE_OUTSIDE_CAMPAING_MESSAGE = "La fecha introducida no corresponde a la campaña asignada.";
         private const string POSITIVE_VALUE_MESSAGE = "Debe ser un valor positivo mayor que 0.";
         private const string QUANTITY_GREATER_THAN_ZERO_MESSAGE = "La cantidad de envases no puede ser 0.";
         private const string ONLY_PALOTS_MESSAGE = "Los palots no pueden ser mezclados con otros tipos de envases.";
