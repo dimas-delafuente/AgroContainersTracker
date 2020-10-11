@@ -82,6 +82,7 @@ namespace AgroContainerTracker.Infrastructure.Services
                     .AsNoTracking()
                     .Include(x => x.Country)
                     .Include(x => x.Vehicles)
+                    .Include(x => x.Carriages)
                     .Include(x => x.Drivers)
                     .FirstOrDefaultAsync(x => x.CarrierId.Equals(carrierId))
                     .ConfigureAwait(false);
@@ -130,6 +131,7 @@ namespace AgroContainerTracker.Infrastructure.Services
                     throw new ArgumentNullException();
 
                 CarrierEntity entity = await _context.Carriers
+                    .Include(x => x.Carriages)
                     .Include(x => x.Vehicles)
                     .Include(x => x.Drivers)
                     .FirstOrDefaultAsync(x => x.CarrierId.Equals(carrier.CarrierId))

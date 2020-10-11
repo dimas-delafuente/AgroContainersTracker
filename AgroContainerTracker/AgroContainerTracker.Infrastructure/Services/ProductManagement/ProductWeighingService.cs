@@ -17,11 +17,13 @@ namespace AgroContainerTracker.Infrastructure.Services
     {
         private readonly ILogger<ProductWeighingService> _logger;
         private readonly ApplicationContext _context;
+        private readonly ICampaingService _campaingService;
         private readonly IMapper _mapper;
 
-        public ProductWeighingService(ApplicationContext context, IMapper mapper, ILogger<ProductWeighingService> logger)
+        public ProductWeighingService(ApplicationContext context, ICampaingService campaingService, IMapper mapper, ILogger<ProductWeighingService> logger)
         {
             _context = context;
+            _campaingService = campaingService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -35,6 +37,8 @@ namespace AgroContainerTracker.Infrastructure.Services
             {
                 
                 ProductWeighingEntity entity = _mapper.Map<ProductWeighingEntity>(productWeighing);
+                entity.ProductWeighingId = await GetCampaingNextProductWeighingId(entity.CampaingId);
+
                 var addResponse = await _context.ProductWeighings.AddAsync(entity).ConfigureAwait(false);
 
                 if (addResponse.State.Equals(EntityState.Added))
@@ -99,10 +103,13 @@ namespace AgroContainerTracker.Infrastructure.Services
 
                 IEnumerable<ProductWeighingEntity> entities = await _context.ProductWeighings
                     .AsNoTracking()
+                    .Include(x => x.ProductEntry)
                     .Include(x => x.ProductRecords)
                         .ThenInclude(x => x.Packaging)
                     .Include(x => x.ColdRoom)
                     .Include(x => x.Fruit)
+                    .Include(x => x.Buyer)
+                    .Include(x => x.Seller)
                     .Where(x => x.CampaingId.Equals(campaingId) && x.ProductEntryNumber.Equals(productEntryNumber))
                     .ToListAsync()
                     .ConfigureAwait(false);
@@ -204,7 +211,6 @@ namespace AgroContainerTracker.Infrastructure.Services
                 {
                     productRecords.Add(new ProductRecordEntity
                     {
-                        ReferenceNumber = $"C{1:00}{productWeighingId:0000}",
                         ProductWeighingId = productWeighingId,
                         CampaingId = productWeighing.CampaingId,
                         ProductEntryNumber = productWeighing.ProductEntryNumber,
@@ -222,11 +228,12 @@ namespace AgroContainerTracker.Infrastructure.Services
                 }
                 else
                 {
+                    char packagingTypeLabel = (char) productPkg.Packaging.Type;
                     for (int i = 0; i < productPkg.Quantity; i++)
                     {
                         productRecords.Add(new ProductRecordEntity
                         {
-                            ReferenceNumber = $"P{i + 1:00}{productWeighingId:0000}",
+                            ReferenceNumber = $"{packagingTypeLabel}{i + 1:00}{productWeighingId:0000}",
                             ProductWeighingId = productWeighingId,
                             CampaingId = productWeighing.CampaingId,
                             ProductEntryNumber = productWeighing.ProductEntryNumber,
@@ -249,5 +256,9 @@ namespace AgroContainerTracker.Infrastructure.Services
             return productRecords;
         }
 
+        private async Task<int> GetCampaingNextProductWeighingId(int campaingId)
+        {
+            return await _campaingService.GetCampaingNextWeighingId(campaingId).ConfigureAwait(false);
+        }
     }
 }

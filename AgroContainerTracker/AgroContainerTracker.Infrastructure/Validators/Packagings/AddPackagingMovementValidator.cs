@@ -1,5 +1,4 @@
-﻿using System;
-using AgroContainerTracker.Core.Services;
+﻿using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Domain.Packagings;
 using FluentValidation;
 

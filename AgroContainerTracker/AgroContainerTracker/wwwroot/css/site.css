@@ -29,9 +29,14 @@ app {
   flex-direction: column;
 }
 
-.container {
-    max-width: 95%;
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1600px;
+    }
 }
+/*.container {
+    max-width: 95%;
+}*/
 
 .container h1 {
   color: var(--primary-color);
@@ -232,6 +237,7 @@ app {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
 .valid.modified:not([type="checkbox"]) {
@@ -444,3 +450,11 @@ div.row.box-header > div > a::hover {
     display: block !important;
 }
 /* -PRODUCT WEIGHINGS*/
+
+/* PRODUCT ENTRIES*/
+
+.entries-header {
+    justify-content: space-between;
+    align-items: flex-end;
+}
+/* -PRODUCT ENTRIES*/

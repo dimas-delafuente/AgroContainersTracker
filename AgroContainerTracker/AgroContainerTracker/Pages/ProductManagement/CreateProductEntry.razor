@@ -135,7 +135,7 @@
             CampaingId = currentCampaing,
             ProductEntryNumber = nextEntryNumber,
             EntryDate = DateTime.Now,
-            ExitDate = null
+            Closed = false
         };
 
         customers = await customerService.GetAllAsync().ConfigureAwait(false);

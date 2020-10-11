@@ -55,6 +55,84 @@
                 <ValidationMessage For="() => productWeighing.RateId" />
             </div>
         </div>
+        <hr />
+        <div class="row">
+            <div class="form-group col-lg-4">
+                <label for="pkgtype">Palot:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@palotPackagings" @bind-Value="palotRecordPackaging.Packaging" Disabled="@disablePalots"
+                                TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(palotRecordPackaging)" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="property">Propiedad:</label>
+                <RadzenCheckBox @bind-Value="palotRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disablePalots" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="quantity">Cantidad:</label>
+                <RadzenNumeric TValue="int" @bind-Value="palotRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(palotRecordPackaging))" class="form-control" Disabled="@disablePalots" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="weight">Peso/unidad:</label>
+                <InputNumber id="weight_palot" @bind-Value="palotRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="weight">Peso Total:</label>
+                <InputNumber id="weight_palot" @bind-Value="@palotRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4">
+                <label for="type">Palets:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@paletPackagings" @bind-Value="paletRecordPackaging.Packaging" Disabled="@disablePalets"
+                                TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(paletRecordPackaging)" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="property">Propiedad:</label>
+                <RadzenCheckBox @bind-Value="paletRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disablePalets" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="quantity">Cantidad:</label>
+                <RadzenNumeric TValue="int" @bind-Value="paletRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(paletRecordPackaging))" class="form-control" Disabled="@disablePalets" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="weight">Peso/unidad:</label>
+                <InputNumber id="weight_palot" @bind-Value="paletRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="weight">Peso Total:</label>
+                <InputNumber id="weight_palot" @bind-Value="paletRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4">
+                <label for="type">Cajas:</label>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data="@boxPackagings" @bind-Value="boxRecordPackaging.Packaging" Disabled="@disableBoxes"
+                                TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(boxRecordPackaging)" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="property">Propiedad:</label>
+                <RadzenCheckBox @bind-Value="boxRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disableBoxes" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="quantity">Cantidad:</label>
+                <RadzenNumeric TValue="int" @bind-Value="boxRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(boxRecordPackaging))" class="form-control" Disabled="@disableBoxes" />
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="weight">Peso/unidad:</label>
+                <InputNumber id="weight_palot" @bind-Value="boxRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="weight">Peso Total:</label>
+                <InputNumber id="weight_palot" @bind-Value="boxRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
+            </div>
+
+        </div>
+        <ValidationMessage For="@(() => productWeighing.ProductRecords)" />
+        <hr />
         <div class="row">
             <div class="form-group col-lg-4">
                 <label for="grossweight">Peso Bruto:</label>
@@ -75,95 +153,6 @@
 
             </div>
         </div>
-        <div class="row">
-            <RadzenFieldset Text="Palots" class="mt-2 col-lg-12">
-                <div class="row">
-                    <div class="form-group col-lg-4">
-                        <label for="pkgtype">Palot:</label>
-                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        Data="@palotPackagings" @bind-Value="palotRecordPackaging.Packaging" Disabled="@disablePalots"
-                                        TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(palotRecordPackaging)" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="property">Propiedad:</label>
-                        <RadzenCheckBox @bind-Value="palotRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disablePalots" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="quantity">Cantidad:</label>
-                        <RadzenNumeric TValue="int" @bind-Value="palotRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(palotRecordPackaging))" class="form-control" Disabled="@disablePalots" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="weight">Peso/unidad:</label>
-                        <InputNumber id="weight_palot" @bind-Value="palotRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="weight">Peso Total:</label>
-                        <InputNumber id="weight_palot" @bind-Value="@palotRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
-                    </div>
-                </div>
-
-            </RadzenFieldset>
-        </div>
-        <div class="row">
-            <RadzenFieldset Text="Palets" class="mt-2 col-lg-12">
-                <div class="row">
-                    <div class="form-group col-lg-4">
-                        <label for="type">Palets:</label>
-                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        Data="@paletPackagings" @bind-Value="paletRecordPackaging.Packaging" Disabled="@disablePalets"
-                                        TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(paletRecordPackaging)" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="property">Propiedad:</label>
-                        <RadzenCheckBox @bind-Value="paletRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disablePalets" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="quantity">Cantidad:</label>
-                        <RadzenNumeric TValue="int" @bind-Value="paletRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(paletRecordPackaging))" class="form-control" Disabled="@disablePalets" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="weight">Peso/unidad:</label>
-                        <InputNumber id="weight_palot" @bind-Value="paletRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="weight">Peso Total:</label>
-                        <InputNumber id="weight_palot" @bind-Value="paletRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
-                    </div>
-                </div>
-
-            </RadzenFieldset>
-        </div>
-        <div class="row">
-            <RadzenFieldset Text="Cajas" class="mt-2 col-lg-12">
-                <div class="row">
-                    <div class="form-group col-lg-4">
-                        <label for="type">Cajas:</label>
-                        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        Data="@boxPackagings" @bind-Value="boxRecordPackaging.Packaging" Disabled="@disableBoxes"
-                                        TextProperty="Code" Style="display: block;" Change="() => SelectPackaging(boxRecordPackaging)" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="property">Propiedad:</label>
-                        <RadzenCheckBox @bind-Value="boxRecordPackaging.IsOwnPackaging" TValue="bool" class="mt-2 property-block" Disabled="@disableBoxes" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="quantity">Cantidad:</label>
-                        <RadzenNumeric TValue="int" @bind-Value="boxRecordPackaging.Quantity" Change="@(_ => UpdateProductPackagingTotalWeight(boxRecordPackaging))" class="form-control" Disabled="@disableBoxes" />
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="weight">Peso/unidad:</label>
-                        <InputNumber id="weight_palot" @bind-Value="boxRecordPackaging.PackagingWeight" class="form-control" disabled></InputNumber>
-                    </div>
-                    <div class="form-group col-lg-2">
-                        <label for="weight">Peso Total:</label>
-                        <InputNumber id="weight_palot" @bind-Value="boxRecordPackaging.TotalWeight" class="form-control" disabled></InputNumber>
-                    </div>
-                </div>
-
-            </RadzenFieldset>
-        </div>
-        <ValidationMessage For="@(() => productWeighing.ProductRecords)" />
-
         <hr />
         <div class="row mt-4 mb-4">
             <div class="col-lg-12">

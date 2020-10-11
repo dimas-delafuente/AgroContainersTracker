@@ -111,19 +111,26 @@ else
     </HeaderTemplate>
     <ChildContent>
         <RadzenCard>
-            @foreach (var vehicle in carrier.Vehicles)
-            {
-                <div class="row">
-                    <div class="form-group col-lg-6">
-                        <label for="license">Matrícula:</label>
-                        <RadzenTextBox Value="@vehicle.RegistrationNumber" Disabled="true" class="form-control" />
-                    </div>
-                    <div class="form-group col-lg-6">
-                        <label for="carriage">Remolque:</label>
-                        <RadzenTextBox Value="@vehicle.CarriageRegistrationNumber" Disabled="true" class="form-control" />
-                    </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <label for="license">Matrículas:</label>
+                    @foreach (var vehicle in carrier.Vehicles)
+                    {
+                        <div class="form-group">
+                            <RadzenTextBox Value="@vehicle.RegistrationNumber" Disabled="true" class="form-control" />
+                        </div>
+                    }
                 </div>
-            }
+                <div class="col-lg-6">
+                    <label for="license">Remolques:</label>
+                    @foreach (var carriage in carrier.Carriages)
+                    {
+                        <div class="form-group">
+                            <RadzenTextBox Value="@carriage.CarriageRegistrationNumber" Disabled="true" class="form-control" />
+                        </div>
+                    }
+                </div>
+            </div>
         </RadzenCard>
     </ChildContent>
 </RadzenPanel>

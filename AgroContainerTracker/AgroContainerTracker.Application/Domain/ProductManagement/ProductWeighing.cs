@@ -13,6 +13,7 @@ namespace AgroContainerTracker.Domain.ProductManagement
         public int CampaingId { get; set; }
 
         public int ProductEntryNumber { get; set; }
+        public ProductEntry ProductEntry { get; set; }
 
         public Fruit Fruit { get; set; }
 

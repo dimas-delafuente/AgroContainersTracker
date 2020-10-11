@@ -342,7 +342,7 @@ else
     private async Task GenerateReport(PackagingReport report)
     {
         report.ReportTitle = $"MOVIMIENTO DE ENVASES ({report.InitDate.ToString("dd/MM/yyyy")} - {report.EndDate.ToString("dd/MM/yyyy")})";
-        byte[] reportPDFData = reportService.BuildReport(report);
+        byte[] reportPDFData = await reportService.BuildReport(report);
 
         if (reportPDFData == null) {
             var message = new NotificationMessage()

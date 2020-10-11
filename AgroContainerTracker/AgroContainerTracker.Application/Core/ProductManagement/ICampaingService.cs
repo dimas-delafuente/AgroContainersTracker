@@ -8,5 +8,6 @@ namespace AgroContainerTracker.Core.Services
     {
         Task<IEnumerable<Campaing>> GetAllAsync();
         Task<int> GetCampaingNextEntryId(int campaingId);
+        Task<int> GetCampaingNextWeighingId(int campaingId);
     }
 }

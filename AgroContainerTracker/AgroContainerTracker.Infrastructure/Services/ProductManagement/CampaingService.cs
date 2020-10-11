@@ -64,5 +64,26 @@ namespace AgroContainerTracker.Infrastructure.Services
 
             return maxEntryNumber + 1;
         }
+
+        public async Task<int> GetCampaingNextWeighingId(int campaingId)
+        {
+            int maxWeighingNumber = 0;
+
+            try
+            {
+                maxWeighingNumber = await _context.ProductWeighings
+                    .AsNoTracking()
+                    .Where(x => x.CampaingId.Equals(campaingId))
+                    .MaxAsync(x => x.ProductWeighingId)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving next campaing weighing number.", e.Message);
+            }
+
+            return maxWeighingNumber + 1;
+        }
     }
 }

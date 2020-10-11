@@ -27,7 +27,10 @@
     </div>
 }
 
-
+@if (productEntry.HasProductExit)
+{
+    <h3>Esta entrada ya ha sido cerrada y no puede modificarse</h3>
+} else { 
 <EditForm Model="@productEntry" OnValidSubmit="UpdateProductEntry">
     <FluentValidator />
 
@@ -108,6 +111,7 @@
         </div>
     </div>
 </EditForm>
+}
 
 
 @code {

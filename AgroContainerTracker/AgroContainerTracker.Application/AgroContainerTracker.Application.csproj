@@ -5,9 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Core\" />
-    <Folder Include="Mocks\" />
-    <Folder Include="Core\Reports\" />
-    <Folder Include="Domain\Reports\" />
+    <Compile Remove="Mocks\**" />
+    <EmbeddedResource Remove="Mocks\**" />
+    <None Remove="Mocks\**" />
   </ItemGroup>
 </Project>

@@ -10,19 +10,20 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("ProductWeighings");
 
-            entityBuilder.HasKey(e => e.ProductWeighingId);
+            entityBuilder.HasKey(e => new { e.CampaingId, e.ProductWeighingId });
 
             entityBuilder.Property(e => e.ProductWeighingId)
                 .IsRequired()
                 .HasColumnType("int(11)");
             
-
             entityBuilder.Property(e => e.ProductEntryNumber)
                 .IsRequired()
                 .HasColumnType("int(11)");
+
             entityBuilder.Property(e => e.CampaingId)
                 .IsRequired()
                 .HasColumnType("int(11)");
+
             entityBuilder.HasOne(d => d.ProductEntry)
                 .WithMany(p => p.ProductWeighings)
                 .HasForeignKey(d => new { d.CampaingId, d.ProductEntryNumber })

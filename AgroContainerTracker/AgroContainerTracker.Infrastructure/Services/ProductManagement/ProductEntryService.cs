@@ -189,5 +189,34 @@ namespace AgroContainerTracker.Infrastructure.Services
 
             return false;
         }
+
+        public async Task<bool> CloseEntryAsync(int campaingId, int productEntryNumber)
+        {
+            if (campaingId <= 0 || productEntryNumber <= 0)
+                throw new ArgumentOutOfRangeException();
+
+            try
+            {
+
+                ProductEntryEntity entity = await _context.ProductEntries
+                        .Include(x => x.Sellers)
+                        .FirstOrDefaultAsync(x => x.CampaingId.Equals(campaingId) && x.ProductEntryNumber.Equals(productEntryNumber))
+                        .ConfigureAwait(false);
+                if (entity != null)
+                {
+                    entity.Closed = true;
+                    entity.EntryDate = DateTime.Now;
+                    return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                }
+
+            }
+            catch (Exception e)
+            {
+                _context.DetachAll();
+                _logger.LogError(e, "Exception: {e} // Internal Error while closing Product Entry. CampaingId:{campaingId} - ProductEntryNumber: {productEntryNumber}", campaingId, productEntryNumber);
+            }
+
+            return false;
+        }
     }
 }

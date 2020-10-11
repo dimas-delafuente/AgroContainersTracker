@@ -1,15 +1,19 @@
-﻿using System.IO;
+﻿using AgroContainerTracker.Core.Services.Reports;
+using AgroContainerTracker.Domain.Companies;
+using AgroContainerTracker.Domain.Packagings;
 using AgroContainerTracker.Domain.Reports;
-using AgroContainerTracker.Core.Services.Reports;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.Extensions.Options;
-using AgroContainerTracker.Domain.Packagings;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Infrastructure.Services.Reports
 {
     public class PackagingReportService : ReportBase, IReportService<PackagingReport>
     {
+        private readonly string[] headers = new string[] { "Envase", "Tipo", "Material", "Peso", "Color", "Fecha", "Client", "Cantidad", "Total" };
         private const int MAX_COLUMN = 9;
         private readonly float[] tableSizes = new float[MAX_COLUMN] { 70, 70, 80, 50, 70, 100, 250, 70, 70 };
 
@@ -22,7 +26,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
         }
 
 
-        public byte[] BuildReport(PackagingReport reportData)
+        public async Task<byte[]> BuildReport(PackagingReport reportData)
         {
             this.pkgReportData = reportData;
 
@@ -35,7 +39,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
 
                 document.Open();
 
-                ReportBody(document, pkgReportData);
+                await Task.Run(() => ReportBody(document, pkgReportData));
 
                 document.Close();
 
@@ -45,10 +49,51 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
 
         public override void OnStartPage(PdfWriter writer, Document document)
         {
-            base.AddPageHeader(writer, document, pkgReportData.Customer);
+            AddPageHeader(writer, document, pkgReportData.Customer);
             document.Add(new Paragraph());
             AddReportTitle(document, pkgReportData.ReportTitle);
             AddTableHeader(document);
+        }
+
+        public override void OnEndPage(PdfWriter writer, Document document)
+        {
+            this.AddPageNumber(writer);
+        }
+
+        private void AddPageHeader(PdfWriter writer, Document document, Customer customer)
+        {
+
+            AddLogo(writer, 200, 350, 750);
+
+            // Add Header for Company information
+            PdfPTable table = new PdfPTable(2);
+            table.WidthPercentage = TABLE_WIDTH;
+            table.DefaultCell.Border = Rectangle.NO_BORDER;
+
+            PdfPCell workplaceCell = WorkplaceCell();
+            table.AddCell(workplaceCell);
+            table.CompleteRow();
+
+            PdfPCell companyAddressCell = CompanyAddresCell();
+            table.AddCell(companyAddressCell);
+
+            PdfPCell customerDetailsCell = new PdfPCell();
+            customerDetailsCell.UseBorderPadding = true;
+            customerDetailsCell.BackgroundColor = reportBaseColor;
+            customerDetailsCell.PaddingLeft = 10;
+            customerDetailsCell.PaddingBottom = 10;
+
+            Font customerFont = FontFactory.GetFont(SECONDARY_FONT, 12, Font.BOLD);
+            customerDetailsCell.AddElement(Paragraph(customer.Name, customerFont));
+            customerDetailsCell.AddElement(Paragraph($"C.I.F. {customer.CompanyCode}", companyDetailsFont, 14));
+            customerDetailsCell.AddElement(Paragraph(customer.Address, companyDetailsFont, 10));
+            customerDetailsCell.AddElement(Paragraph($"{customer.PostalCode}   {customer.Locality}", companyDetailsFont, 10));
+            customerDetailsCell.AddElement(Paragraph(customer.State, companyDetailsFont, 10));
+
+            table.AddCell(customerDetailsCell);
+            table.CompleteRow();
+
+            document.Add(table);
         }
 
         private void AddReportTitle(Document document, string title)
@@ -76,7 +121,6 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
                 pdfPCell = new PdfPCell(new Phrase(p.Packaging.Type.ToString(), tableRowFont));
                 pdfPCell.Padding = 5;
                 pdfPTable.AddCell(pdfPCell);
-
 
                 pdfPCell = new PdfPCell(new Phrase(p.Packaging.Material.ToString(), tableRowFont));
                 pdfPCell.Padding = 5;
@@ -126,61 +170,28 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             pdfPTableHeader.SpacingBefore = 10;
             pdfPTableHeader.SetWidths(tableSizes);
 
-            #region Table Header
-            Font tableHeaderFont = FontFactory.GetFont(BASE_FONT, 10, Font.BOLD);
 
-            var pdfPCell = new PdfPCell(new Phrase("Envase", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Tipo", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-
-            pdfPCell = new PdfPCell(new Phrase("Material", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Peso", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Color", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Fecha", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Cliente", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Cantidad", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
-
-            pdfPCell = new PdfPCell(new Phrase("Total", tableHeaderFont));
-            pdfPCell.Padding = 5;
-            pdfPCell.BackgroundColor = reportBaseColor;
-            pdfPTableHeader.AddCell(pdfPCell);
+            foreach (PdfPCell headerCell in GetHeaderCells(headers))
+            {
+                pdfPTableHeader.AddCell(headerCell);
+            }
 
             pdfPTableHeader.CompleteRow();
-
-            #endregion
-
             document.Add(pdfPTableHeader);
 
+        }
+
+        private IEnumerable<PdfPCell> GetHeaderCells(params string[] headers)
+        {
+            Font tableHeaderFont = FontFactory.GetFont(BASE_FONT, 10, Font.BOLD);
+
+            foreach (string header in headers)
+            {
+                var pdfPCell = new PdfPCell(new Phrase(header, tableHeaderFont));
+                pdfPCell.Padding = 5;
+                pdfPCell.BackgroundColor = reportBaseColor;
+                yield return pdfPCell;
+            }
         }
 
     }

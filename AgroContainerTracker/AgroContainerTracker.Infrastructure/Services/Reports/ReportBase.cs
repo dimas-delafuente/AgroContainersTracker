@@ -1,21 +1,20 @@
-﻿using System;
-using System.IO;
-using AgroContainerTracker.Domain.Companies;
-using AgroContainerTracker.Domain.Reports;
+﻿using AgroContainerTracker.Domain.Reports;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.Extensions.Options;
+using System.IO;
 
 namespace AgroContainerTracker.Infrastructure.Services.Reports
 {
     public class ReportBase : PdfPageEventHelper
     {
-        private const int TOP_MARGIN = 800;
-        private const int LEFT_MARGIN = 40;
         private const float DEFAULT_MULTIPLIED_LEADING = 0;
         private readonly BaseFont pageNumberFormat = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
         private readonly BaseFont footerFont;
 
+        protected const int TABLE_WIDTH = 100;
+        protected const int BOX_BORDER = 15;
+        protected const float DEFAULT_LEADING = 15;
         protected const string DATE_FORMAT = "dd/MM/yyyy";
         protected const int FONT_UNDERLINE_BOLD = 5;
         protected const string BASE_FONT = "Base Font";
@@ -23,6 +22,9 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
 
         protected readonly BaseColor reportTitleColor = new BaseColor(70, 124, 194);
         protected readonly BaseColor reportBaseColor = new BaseColor(208, 221, 240);
+        protected readonly Font companyFont;
+        protected readonly Font companyDetailsFont;
+        protected readonly Font companyDetailsFontUnderlined;
         protected readonly ReportsConfig reportsConfig;
 
         public ReportBase(IOptions<ReportsConfig> reportsConfig)
@@ -33,33 +35,21 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
                 FontFactory.Register(Path.Combine(Directory.GetCurrentDirectory(), this.reportsConfig.ReportSecondaryFontPath), SECONDARY_FONT);
                 FontFactory.Register(Path.Combine(Directory.GetCurrentDirectory(), this.reportsConfig.ReportBaseFontPath), BASE_FONT);
                 footerFont = BaseFont.CreateFont(Path.Combine(Directory.GetCurrentDirectory(), this.reportsConfig.ReportBaseFontPath), BaseFont.CP1252, false);
+
+                this.companyFont = FontFactory.GetFont(SECONDARY_FONT, 15, Font.BOLD);
+                this.companyDetailsFont = FontFactory.GetFont(BASE_FONT, 10, Font.NORMAL);
+                this.companyDetailsFontUnderlined = FontFactory.GetFont(BASE_FONT, 9, FONT_UNDERLINE_BOLD);
             }
             catch
             {
                 FontFactory.Register(BaseFont.HELVETICA, SECONDARY_FONT);
                 FontFactory.Register("Calibri", BASE_FONT);
-                footerFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+                this.footerFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
             }
         }
 
-        public override void OnEndPage(PdfWriter writer, Document document)
+        protected PdfPCell WorkplaceCell()
         {
-            this.AddPageNumber(writer, document);
-        }
-
-        public void AddPageHeader(PdfWriter writer, Document document, Customer customer)
-        {
-            Font companyFont = FontFactory.GetFont(SECONDARY_FONT, 15, Font.BOLD);
-            Font companyDetailsFont = FontFactory.GetFont(BASE_FONT, 10, Font.NORMAL);
-            Font companyDetailsFontUnderlined = FontFactory.GetFont(BASE_FONT, 9, FONT_UNDERLINE_BOLD);
-
-            AddLogo(writer);
-
-            // Add Header for Company information
-            PdfPTable table = new PdfPTable(2);
-            table.WidthPercentage = 100;
-            table.DefaultCell.Border = Rectangle.NO_BORDER;
-
             PdfPCell workplaceCell = new PdfPCell();
             workplaceCell.Border = 0;
             workplaceCell.AddElement(Paragraph(reportsConfig.CompanyName, companyFont));
@@ -70,10 +60,11 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             workplaceCell.AddElement(Paragraph("BADAJOZ", companyDetailsFont, 10));
             workplaceCell.AddElement(Paragraph("+34 606 562 657", companyDetailsFont, 10));
 
-            table.AddCell(workplaceCell);
+            return workplaceCell;
+        }
 
-            table.CompleteRow();
-
+        protected PdfPCell CompanyAddresCell()
+        {
             PdfPCell companyAddressCell = new PdfPCell();
             companyAddressCell.Border = 0;
             companyAddressCell.AddElement(new Paragraph());
@@ -82,25 +73,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             companyAddressCell.AddElement(Paragraph("C/ LA CRUZ, 12 - 06480 MONTIJO (Badajoz)", companyDetailsFont, 10));
             companyAddressCell.AddElement(Paragraph("pinuelaagrofruit@gmail.com", companyDetailsFont, 10));
 
-            table.AddCell(companyAddressCell);
-
-            PdfPCell customerDetailsCell = new PdfPCell();
-            customerDetailsCell.UseBorderPadding = true;
-            customerDetailsCell.BackgroundColor = reportBaseColor;
-            customerDetailsCell.PaddingLeft = 10;
-            customerDetailsCell.PaddingBottom = 10;
-
-            Font customerFont = FontFactory.GetFont(SECONDARY_FONT, 12, Font.BOLD);
-            customerDetailsCell.AddElement(Paragraph(customer.Name, customerFont));
-            customerDetailsCell.AddElement(Paragraph($"C.I.F. {customer.CompanyCode}", companyDetailsFont, 14));
-            customerDetailsCell.AddElement(Paragraph(customer.Address, companyDetailsFont, 10));
-            customerDetailsCell.AddElement(Paragraph($"{customer.PostalCode}   {customer.Locality}", companyDetailsFont, 10));
-            customerDetailsCell.AddElement(Paragraph(customer.State, companyDetailsFont, 10));
-
-            table.AddCell(customerDetailsCell);
-            table.CompleteRow();
-
-            document.Add(table);
+            return companyAddressCell;
         }
 
         protected Paragraph Paragraph(string text, Font font, float? fixedLeading = null, float? multipliedLeading = null)
@@ -113,7 +86,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             return paragraph;
         }
 
-        private void AddLogo(PdfWriter writer)
+        protected void AddLogo(PdfWriter writer, float size, float x, float y)
         {
             PdfContentByte cb = writer.DirectContent;
 
@@ -121,9 +94,8 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             try
             {
                 Image png = Image.GetInstance(Path.Combine(Directory.GetCurrentDirectory(), this.reportsConfig.CompanyLogoPath));
-                // Add a logo to the invoice
-                png.ScaleToFit(200, 200);
-                png.SetAbsolutePosition(350, 750);
+                png.ScaleToFit(size, size);
+                png.SetAbsolutePosition(x, y);
                 cb.AddImage(png);
             }
             catch
@@ -132,7 +104,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             }
         }
 
-        private void AddPageNumber(PdfWriter writer, Document document)
+        protected void AddPageNumber(PdfWriter writer)
         {
             PdfContentByte cb = writer.DirectContent;
             PdfTemplate tmpFooter = cb.CreateTemplate(580, 70);

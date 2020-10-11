@@ -9,7 +9,8 @@ namespace AgroContainerTracker.Data.Entities
         public int ProductEntryNumber { get; set; }
 
         public DateTime EntryDate { get; set; }
-        public DateTime? ExitDate { get; set; }
+        public bool Closed { get; set; }
+        public bool HasProductExit { get; set; }
 
         public int? BuyerId { get; set; }
         public int? PayerId { get; set; }

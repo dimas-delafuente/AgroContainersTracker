@@ -12,8 +12,8 @@ namespace AgroContainerTracker.Domain.Packagings
 
     public enum PackagingType
     {
-        Palot,
-        Palet,
+        Palot = 'P',
+        Palet = 'C',
         Caja
     }
 

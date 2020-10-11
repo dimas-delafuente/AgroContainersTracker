@@ -32,7 +32,7 @@ namespace AgroContainerTracker.Data.Configurations
                 .HasColumnType("int(11)");
             entityBuilder.HasOne(d => d.ProductWeighing)
                 .WithMany(p => p.ProductRecords)
-                .HasForeignKey(d => d.ProductWeighingId)
+                .HasForeignKey(d => new { d.CampaingId, d.ProductWeighingId })
                 .OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder.Property(e => e.FruitId)

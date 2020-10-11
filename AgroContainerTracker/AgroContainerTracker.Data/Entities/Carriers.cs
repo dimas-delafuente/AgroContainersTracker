@@ -31,5 +31,6 @@ namespace AgroContainerTracker.Data.Entities
         public virtual CountryEntity Country { get; set; }
         public virtual ICollection<DriverEntity> Drivers { get; set; }
         public virtual ICollection<VehicleEntity> Vehicles { get; set; }
+        public virtual ICollection<CarriageEntity> Carriages { get; set; }
     }
 }

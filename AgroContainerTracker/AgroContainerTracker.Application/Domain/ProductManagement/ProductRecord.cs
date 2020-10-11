@@ -7,6 +7,7 @@ namespace AgroContainerTracker.Domain.ProductManagement
     public class ProductRecord
     {
         public int ProductRecordId { get; set; }
+        public string ReferenceNumber { get; set; }
 
         public ProductWeighing ProductWeighing { get; set; }
 

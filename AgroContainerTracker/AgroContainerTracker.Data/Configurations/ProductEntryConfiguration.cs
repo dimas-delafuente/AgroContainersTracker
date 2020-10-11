@@ -18,9 +18,13 @@ namespace AgroContainerTracker.Data.Configurations
             entityBuilder.Property(e => e.EntryDate)
                 .HasColumnType("datetime");
 
-            entityBuilder.Property(e => e.ExitDate)
-                .IsRequired(false)
-                .HasColumnType("datetime");
+            entityBuilder.Property(e => e.Closed)
+                .HasDefaultValue(0)
+                .HasColumnType("bit");
+
+            entityBuilder.Property(e => e.HasProductExit)
+                .HasDefaultValue(0)
+                .HasColumnType("bit");
 
             entityBuilder.Property(e => e.Observations)
                 .IsRequired(false)

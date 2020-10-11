@@ -6,11 +6,9 @@
 
   <ItemGroup>
     <Folder Include="Profiles\" />
-    <Folder Include="Services\" />
     <Folder Include="Validators\" />
     <Folder Include="Validators\Rates\" />
     <Folder Include="Validators\Packagings\" />
-    <Folder Include="Services\Reports\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgroContainerTracker.Application\AgroContainerTracker.Application.csproj" />

@@ -117,26 +117,47 @@
     </RadzenFieldset>
 
     <RadzenFieldset Text="MATRÍCULAS" class="mt-2">
-        @foreach (var vehicle in carrier.Vehicles)
-        {
-            <div class="row">
-                <div class="form-group col-lg-5">
-                    <label for="license">Matrícula:</label>
-                    <InputText name="license" @bind-Value="vehicle.RegistrationNumber" class="form-control" />
-                </div>
-                <div class="form-group col-lg-5">
-                    <label for="carriage">Remolque:</label>
-                    <InputText name="carriage" @bind-Value="vehicle.CarriageRegistrationNumber" class="form-control" />
-                </div>
-                <div class="col-lg-1 form-button">
-                    <span class="oi oi-trash" @onclick="() => RemoveVehicle(vehicle)"></span>
-                </div>
-            </div>
-        }
+        <div class="row">
+            <div class="col-lg-5">
+                <label for="license">Matrícula:</label>
+                @foreach (var vehicle in carrier.Vehicles)
+                {
+                    <div class="row">
+                        <div class="form-group col-10">
+                            <InputText name="license" @bind-Value="vehicle.RegistrationNumber" class="form-control" required/>
+                        </div>
 
-        <div class="text-center">
-            <button type="button" class="btn btn-outline-primary" @onclick="AddVehicle">Añadir matrícula</button>
+                        <div class="form-button col-2">
+                            <span class="oi oi-trash" @onclick="() => RemoveVehicle(vehicle)"></span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-5">
+                <label for="carriage">Remolque:</label>
+                @foreach (var carriage in carrier.Carriages)
+                {
+                    <div class="row">
+                        <div class="form-group col-10">
+                            <InputText name="carriage" @bind-Value="carriage.CarriageRegistrationNumber" class="form-control" required/>
+                        </div>
+
+                        <div class="form-button col-2">
+                            <span class="oi oi-trash" @onclick="() => RemoveCarriage(carriage)"></span>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
+        <div class="row">
+            <div class="text-center col-lg-5">
+                <button type="button" class="btn btn-outline-primary" @onclick="AddVehicle">Añadir matrícula</button>
+            </div>
+            <div class="text-center col-lg-5">
+                <button type="button" class="btn btn-outline-primary" @onclick="AddCarriage">Añadir remolque</button>
+            </div>
+        </div>
+        
     </RadzenFieldset>
 
     <RadzenFieldset Text="CONDUCTORES" class="mt-2">
@@ -219,6 +240,11 @@
     {
         carrier.Vehicles.Add(new Vehicle());
     }
+    
+    public void AddCarriage()
+    {
+        carrier.Carriages.Add(new Carriage());
+    }
 
     public void AddDriver()
     {
@@ -228,6 +254,11 @@
     public void RemoveVehicle(Vehicle vehicle)
     {
         carrier.Vehicles.Remove(vehicle);
+    }
+
+    public void RemoveCarriage(Carriage carriage)
+    {
+        carrier.Carriages.Remove(carriage);
     }
 
     public void RemoveDriver(Driver driver)

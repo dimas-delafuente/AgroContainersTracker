@@ -11,6 +11,7 @@ namespace AgroContainerTracker.Infrastructure.Profiles
         {
             CreateMap<AddCarrierRequest, CarrierEntity>()
                 .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.Vehicles))
+                .ForMember(dest => dest.Carriages, opt => opt.MapFrom(src => src.Carriages))
                 .ForMember(dest => dest.Drivers, opt => opt.MapFrom(src => src.Drivers));
 
             CreateMap<CarrierEntity, Carrier>();
@@ -39,6 +40,14 @@ namespace AgroContainerTracker.Infrastructure.Profiles
         public DriverProfile()
         {
             CreateMap<DriverEntity, Driver>().ReverseMap();
+        }
+    }
+
+    public class CarriageProfile : Profile
+    {
+        public CarriageProfile()
+        {
+            CreateMap<CarriageEntity, Carriage>().ReverseMap();
         }
     }
 }

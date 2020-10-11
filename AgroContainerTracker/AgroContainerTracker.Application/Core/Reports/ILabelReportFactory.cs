@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Core.Services.Reports
 {
-    public interface IReportService<T> where T : ReportData
+    public interface ILabelReportFactory
     {
-        Task<byte[]> BuildReport(T reportData);
+        Task<byte[]> BuildReport(LabelReport labelReport, LabelType labelType);
     }
 }

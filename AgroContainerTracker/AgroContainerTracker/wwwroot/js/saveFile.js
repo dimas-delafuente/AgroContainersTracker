@@ -6,3 +6,7 @@
   link.click();
   document.body.removeChild(link);
 }
+
+function printFile(byteBase64) {
+    printJS({ printable: byteBase64, type: 'pdf', base64: true });
+}

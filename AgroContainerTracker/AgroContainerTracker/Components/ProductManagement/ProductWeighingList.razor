@@ -1,11 +1,14 @@
 ﻿@using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Domain.Packagings
-
+@using AgroContainerTracker.Domain.Reports
 @using AgroContainerTracker.Core.Services
+@using AgroContainerTracker.Core.Services.Reports
 
 @inject IProductWeighingService productWeighingService
+@inject ILabelReportFactory labelReportFactory
 @inject DialogService dialogService
 @inject NotificationService notificationService
+@inject IJSRuntime jsRuntime
 
 <Loading ShowSpinner="@isLoading"></Loading>
 
@@ -17,24 +20,27 @@
     </HeaderTemplate>
     <ChildContent>
         <RadzenCard>
-            <div class="row mt-5">
-                <div class="col-lg-4">
-                    <button @onclick="() => ShowNewWeighingDialog()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva pesada</button>
+            @if (!ProductEntry.HasProductExit)
+            {
+                <div class="row mt-5">
+                    <div class="col-lg-4">
+                        <button @onclick="() => ShowNewWeighingDialog()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva pesada</button>
+                    </div>
                 </div>
-            </div>
+            }
             <div class="row mt-5">
                 <div class="col-lg-12">
                     <RadzenGrid FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
                                 AllowSorting="true" Data="@productWeighings" TItem="ProductWeighing" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
                         <Columns>
-                            <RadzenGridColumn TItem="ProductWeighing" Property="ProductWeighingId" Title="Nº Pesada" TextAlign="TextAlign.Right">
+                            <RadzenGridColumn TItem="ProductWeighing" Property="ProductWeighingId" Width="80px" Title="Nº" TextAlign="TextAlign.Right">
                                 <FooterTemplate>
                                     Total: <b>@productWeighings.Count()</b>
                                 </FooterTemplate>
                             </RadzenGridColumn>
                             <RadzenGridColumn TItem="ProductWeighing" Property="ColdRoom.Number" Title="Cámara" />
                             <RadzenGridColumn TItem="ProductWeighing" Property="Fruit.Name" Title="Fruta" />
-                            <RadzenGridColumn TItem="ProductWeighing" TextAlign="TextAlign.Right"  Title="Palots">
+                            <RadzenGridColumn TItem="ProductWeighing" TextAlign="TextAlign.Right" Title="Palots">
                                 <Template Context="data">
                                     @GetProductQuantity(data, PackagingType.Palot)
                                 </Template>
@@ -52,22 +58,29 @@
                             <RadzenGridColumn TItem="ProductWeighing" Property="GrossWeight" Title="Peso Bruto" TextAlign="TextAlign.Right" />
                             <RadzenGridColumn TItem="ProductWeighing" Property="TareWeight" Title="Destare" TextAlign="TextAlign.Right" />
                             <RadzenGridColumn TItem="ProductWeighing" Property="NetWeight" Title="Peso Neto" TextAlign="TextAlign.Right" />
-
-                            <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
-                                <Template Context="data">
-                                    <span class="oi oi-magnifying-glass" @onclick="() => OpenWeighingDetails(data.ProductWeighingId)"></span>
-                                </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                            @if (!ProductEntry.HasProductExit)
+                            {
+                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                    <Template Context="data">
+                                        <span class="oi oi-print" @onclick="() => PrintProductWeighing(data)"></span>
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                    <Template Context="data">
+                                        <span class="oi oi-magnifying-glass" @onclick="() => OpenWeighingDetails(data.ProductWeighingId)"></span>
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                                     <Template Context="data">
                                         <span class="oi oi-pencil" @onclick="() => OpenWeighingEdit(data.ProductWeighingId)"></span>
                                     </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
-                                <Template Context="data">
-                                    <span class="oi oi-trash" @onclick="() => ShowRemoveWeighingDialog(data.ProductWeighingId)"></span>
-                                </Template>
-                            </RadzenGridColumn>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                    <Template Context="data">
+                                        <span class="oi oi-trash" @onclick="() => ShowRemoveWeighingDialog(data.ProductWeighingId)"></span>
+                                    </Template>
+                                </RadzenGridColumn>
+                            }
                         </Columns>
                     </RadzenGrid>
                 </div>
@@ -144,41 +157,64 @@
                                   OnCancel="CloseDialog">
             </EditProductWeighing>,
         new DialogOptions { Width = "60%" });
+        }
+
+        private async Task AddProductWeighing(ProductWeighing productWeighing)
+        {
+            CloseDialog();
+            productWeighings.Add(productWeighing);
+
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+
+        private async Task UpdateProductWeighing(ProductWeighing productWeighing)
+        {
+            CloseDialog();
+            var currentProductWeighingIndex = productWeighings.FindIndex(x => x.ProductWeighingId.Equals(productWeighing.ProductWeighingId));
+
+            productWeighings[currentProductWeighingIndex] = productWeighing;
+
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+
+        private async Task RemoveProductWeighing(int productWeighingId)
+        {
+            CloseDialog();
+            productWeighings.Remove(productWeighings.FirstOrDefault(x => x.ProductWeighingId.Equals(productWeighingId)));
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+
+        private int GetProductQuantity(ProductWeighing productWeighing, PackagingType type)
+        {
+            var productRecords = productWeighing.ProductRecords.Where(x => x.Packaging.Type.Equals(type));
+            return productRecords?.Count() > 0 ? productRecords.Sum(x => x.Quantity) : 0;
+        }
+
+        private async Task PrintProductWeighing(ProductWeighing productWeighing)
+        {
+            var report = new LabelReport { 
+                ProductWeighing = productWeighing
+            };
+            byte[] reportPDFData = await labelReportFactory.BuildReport(report, LabelType.A5);
+
+            if (reportPDFData == null)
+            {
+                var message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = $"Se ha producido un error al generar el documento.",
+                    Duration = 4000
+                };
+
+            }
+            else
+                await jsRuntime.InvokeVoidAsync("printFile", Convert.ToBase64String(reportPDFData));
+            isLoading = false;
+        }
+
+        private void CloseDialog()
+        {
+            dialogService.Close();
+        }
     }
-
-    private async Task AddProductWeighing(ProductWeighing productWeighing)
-    {
-        CloseDialog();
-        productWeighings.Add(productWeighing);
-
-        await InvokeAsync(() => { StateHasChanged(); });
-    }
-
-    private async Task UpdateProductWeighing(ProductWeighing productWeighing)
-    {
-        CloseDialog();
-        var currentProductWeighingIndex = productWeighings.FindIndex(x => x.ProductWeighingId.Equals(productWeighing.ProductWeighingId));
-
-        productWeighings[currentProductWeighingIndex] = productWeighing;
-
-        await InvokeAsync(() => { StateHasChanged(); });
-    }
-
-    private async Task RemoveProductWeighing(int productWeighingId)
-    {
-        CloseDialog();
-        productWeighings.Remove(productWeighings.FirstOrDefault(x => x.ProductWeighingId.Equals(productWeighingId)));
-        await InvokeAsync(() => { StateHasChanged(); });
-    }
-
-    private int GetProductQuantity(ProductWeighing productWeighing, PackagingType type)
-    {
-        var productRecords = productWeighing.ProductRecords.Where(x => x.Packaging.Type.Equals(type));
-        return productRecords?.Count() > 0 ? productRecords.Sum(x => x.Quantity) : 0;
-    }
-
-    private void CloseDialog()
-    {
-        dialogService.Close();
-    }
-}

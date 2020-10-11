@@ -3,6 +3,7 @@
 @using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Core.Services
 @inject IProductEntryService productEntryService
+@inject NotificationService notificationService
 
 <Loading ShowSpinner="@isLoading"></Loading>
 
@@ -47,8 +48,13 @@ else
                                     <p class="ml-1">@productEntry.EntryDate.ToString("dd/MM/yyyy")</p>
                                 </div>
                                 <div class="form-group col-lg-3">
-                                    <label class="bold" for="exitDate">Fecha Salida:</label>
-                                    <p class="ml-1">@productEntry.ExitDate?.ToString("dd/MM/yyyy")</p>
+                                    <label class="bold" for="exitDate">Estado:</label>
+                                    @if (productEntry.Closed)
+                                    {<p class="ml-1">Cerrada</p> }
+                                    else
+                                    {
+                                        <button @onclick="() => CloseProductEntry()" class="btn btn-outline-danger">Cerrar</button>
+                                    }
                                 </div>
                             </div>
                             <div class="row">
@@ -121,9 +127,41 @@ else
     {
         if (firstRender)
         {
-            productEntry = await productEntryService.GetAsync(CampaingId, ProductEntryNumber).ConfigureAwait(false);
-            isLoading = false;
-            await InvokeAsync(() => { StateHasChanged(); });
+            await LoadProductEntry();
         }
+    }
+
+    protected async Task CloseProductEntry()
+    {
+        bool closed = await productEntryService.CloseEntryAsync(CampaingId, ProductEntryNumber);
+
+        if (closed)
+        {
+            await LoadProductEntry();
+        }
+        else
+        {
+            var message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al actualizar la entrada.",
+                Duration = 4000
+            };
+            Notify(message);
+        }
+    }
+
+    private async Task LoadProductEntry()
+    {
+        productEntry = await productEntryService.GetAsync(CampaingId, ProductEntryNumber).ConfigureAwait(false);
+        isLoading = false;
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+
+    private void Notify(NotificationMessage message)
+    {
+        notificationService.Notify(message);
     }
 }

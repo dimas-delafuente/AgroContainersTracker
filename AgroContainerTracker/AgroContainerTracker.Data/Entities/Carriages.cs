@@ -1,9 +1,9 @@
 ﻿namespace AgroContainerTracker.Data.Entities
 {
-    public partial class VehicleEntity
+    public class CarriageEntity
     {
-        public int VehicleId { get; set; }
-        public string RegistrationNumber { get; set; }
+        public int CarriageId { get; set; }
+        public string CarriageRegistrationNumber { get; set; }
         public int CarrierId { get; set; }
 
         public virtual CarrierEntity CarrierCompany { get; set; }

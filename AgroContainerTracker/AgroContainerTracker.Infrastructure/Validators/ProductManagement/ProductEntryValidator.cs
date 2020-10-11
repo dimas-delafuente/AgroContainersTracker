@@ -1,5 +1,4 @@
-﻿using AgroContainerTracker.Core.Services;
-using AgroContainerTracker.Domain.ProductManagement;
+﻿using AgroContainerTracker.Domain.ProductManagement;
 using FluentValidation;
 
 namespace AgroContainerTracker.Infrastructure.Validators

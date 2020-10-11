@@ -9,7 +9,8 @@ namespace AgroContainerTracker.Domain.ProductManagement
         public int ProductEntryNumber { get; set; }
         public int CampaingId { get; set; }
         public DateTime EntryDate { get; set; }
-        public DateTime? ExitDate { get; set; }
+        public bool Closed { get; set; }
+        public bool HasProductExit { get; set; }
 
 
         public string Observations { get; set; }
