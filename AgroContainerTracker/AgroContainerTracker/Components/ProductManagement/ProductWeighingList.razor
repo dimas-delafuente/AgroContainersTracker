@@ -195,7 +195,7 @@
             var report = new LabelReport { 
                 ProductWeighing = productWeighing
             };
-            byte[] reportPDFData = await labelReportFactory.BuildReport(report, LabelType.A5);
+            byte[] reportPDFData = await labelReportFactory.BuildReport(report, LabelType.CUSTOM);
 
             if (reportPDFData == null)
             {

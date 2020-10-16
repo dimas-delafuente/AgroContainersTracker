@@ -26,6 +26,10 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
                     labelReportService = this.labelReportServices.FirstOrDefault(x => x.GetType().Equals(typeof(A5LabelReportService)));
                     break;
 
+                case LabelType.CUSTOM:
+                    labelReportService = this.labelReportServices.FirstOrDefault(x => x.GetType().Equals(typeof(StickerLabelReportService)));
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"The label type {labelType} is not a valid type.");
             }

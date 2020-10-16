@@ -43,6 +43,11 @@ namespace AgroContainerTracker.Infrastructure
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/gif"));
             });
 
+            services.AddHttpClient<ILabelReportService, StickerLabelReportService>(client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/gif"));
+            });
+
             return services;
         }
     }
