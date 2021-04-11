@@ -12,23 +12,19 @@ namespace AgroContainerTracker.Data.Configurations
 
 
             entityBuilder.HasKey(e => e.DriverId)
-                    .HasName("PRIMARY");
+                    .HasName("Drivers_PK");
 
             entityBuilder.HasIndex(e => e.CarrierId);
 
-            entityBuilder.Property(e => e.DriverId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.DriverId).HasColumnType("int");
 
-            entityBuilder.Property(e => e.CarrierId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.CarrierId).HasColumnType("int");
 
             entityBuilder.Property(e => e.IdentificationNumber)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(15)");
 
             entityBuilder.Property(e => e.Name)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(100)");
 
             entityBuilder.HasOne(d => d.CarrierCompany)
                 .WithMany(p => p.Drivers)

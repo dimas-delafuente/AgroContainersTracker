@@ -10,7 +10,6 @@
         public virtual ProductWeighingEntity ProductWeighing { get; set; }
 
         public int CampaingId { get; set; }
-        public virtual CampaingEntity Campaing { get; set; }
 
         public int ProductEntryNumber { get; set; }
         public virtual ProductEntryEntity ProductEntry { get; set; }

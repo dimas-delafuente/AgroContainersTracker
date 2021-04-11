@@ -10,10 +10,15 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("ProductEntries");
 
-            entityBuilder.HasKey(e => new { e.CampaingId, e.ProductEntryNumber });
+            entityBuilder.HasKey(e => new { e.CampaingId, e.ProductEntryNumber }).HasName("ProductEntries_PK");
 
-            entityBuilder.Property(e => e.ProductEntryNumber).HasColumnType("int(11)");
-            entityBuilder.Property(e => e.CampaingId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.ProductEntryNumber).HasColumnType("int");
+
+            entityBuilder.Property(e => e.CampaingId).HasColumnType("int");
+            entityBuilder.HasOne(d => d.Campaing)
+                .WithMany(p => p.ProductEntries)
+                .HasForeignKey(d => d.CampaingId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder.Property(e => e.EntryDate)
                 .HasColumnType("datetime");
@@ -28,9 +33,7 @@ namespace AgroContainerTracker.Data.Configurations
 
             entityBuilder.Property(e => e.Observations)
                 .IsRequired(false)
-                .HasColumnType("varchar(250)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(250)");
 
             entityBuilder.Property(e => e.HasHail)
                 .HasColumnType("bit");
@@ -41,21 +44,26 @@ namespace AgroContainerTracker.Data.Configurations
 
             entityBuilder.Property(e => e.BuyerId)
                 .IsRequired(false)
-                .HasColumnType("int(11)");
+                .HasColumnType("int");
 
             entityBuilder.Property(e => e.PayerId)
                 .IsRequired(false)
-                .HasColumnType("int(11)");
+                .HasColumnType("int");
 
             entityBuilder.HasOne(d => d.Buyer)
                 .WithMany(p => p.BuyerProductEntries)
                 .HasForeignKey(d => d.BuyerId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
             entityBuilder.HasOne(d => d.Payer)
                 .WithMany(p => p.PayerProductEntries)
                 .HasForeignKey(d => d.PayerId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entityBuilder.HasMany(d => d.Sellers)
+                .WithOne(p => p.ProductEntry)
+                .HasForeignKey(d => new { d.CampaingId, d.ProductEntryNumber })
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

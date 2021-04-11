@@ -10,19 +10,14 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("Carriages");
 
-            entityBuilder.HasKey(e => e.CarriageId)
-                    .HasName("PRIMARY");
+            entityBuilder.HasKey(e => e.CarriageId).HasName("Carriages_PK");
 
-            entityBuilder.HasIndex(e => e.CarrierId);
+            entityBuilder.Property(e => e.CarriageId).HasColumnType("int");
 
-            entityBuilder.Property(e => e.CarriageId).HasColumnType("int(11)");
-
-            entityBuilder.Property(e => e.CarrierId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.CarrierId).HasColumnType("int");
 
             entityBuilder.Property(e => e.CarriageRegistrationNumber)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(10)");
 
             entityBuilder.HasOne(d => d.CarrierCompany)
                 .WithMany(p => p.Carriages)

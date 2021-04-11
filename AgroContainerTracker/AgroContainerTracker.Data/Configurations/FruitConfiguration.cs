@@ -11,24 +11,18 @@ namespace AgroContainerTracker.Data.Configurations
             entityBuilder.ToTable("Fruits");
 
             entityBuilder.HasKey(e => e.FruitId)
-                    .HasName("PRIMARY");
+                    .HasName("Fruits_PK");
 
-            entityBuilder.Property(e => e.FruitId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.FruitId).HasColumnType("int");
 
             entityBuilder.Property(e => e.Name)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(50)");
 
             entityBuilder.Property(e => e.Code)
-                .HasColumnType("varchar(5)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(5)");
 
             entityBuilder.Property(e => e.Description)
-                .HasColumnType("varchar(100)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(100)");
         }
     }
 }

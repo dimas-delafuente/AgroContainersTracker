@@ -10,11 +10,11 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("Campaings");
 
-            entityBuilder.HasKey(e => e.CampaingId);
+            entityBuilder.HasKey(e => e.CampaingId).HasName("Campaings_PK");
 
             entityBuilder.Property(e => e.CampaingId)
                 .IsRequired()
-                .HasColumnType("int(11)");
+                .HasColumnType("int");
 
         }
     }

@@ -12,15 +12,13 @@ namespace AgroContainerTracker.Data.Configurations
 
 
             entityBuilder.HasKey(e => e.RateId)
-                    .HasName("PRIMARY");
+                    .HasName("Rates_PK");
 
-            entityBuilder.Property(e => e.RateId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.RateId).HasColumnType("int");
 
             entityBuilder.Property(e => e.Name)
                 .IsRequired()
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(25)");
 
             entityBuilder.Property(e => e.Value)
                 .HasColumnType("decimal(7,5)")
@@ -31,9 +29,7 @@ namespace AgroContainerTracker.Data.Configurations
                 .HasDefaultValue(0.00);
 
             entityBuilder.Property(e => e.Description)
-                .HasColumnType("varchar(300)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(100)");
 
         }
     }

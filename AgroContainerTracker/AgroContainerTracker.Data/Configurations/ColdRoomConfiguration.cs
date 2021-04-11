@@ -10,24 +10,21 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("ColdRooms");
 
-            entityBuilder.HasKey(e => e.ColdRoomId)
-                    .HasName("PRIMARY");
+            entityBuilder.HasKey(e => e.ColdRoomId).HasName("ColdRooms_PK");
 
-            entityBuilder.Property(e => e.ColdRoomId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.ColdRoomId).HasColumnType("int");
 
-            entityBuilder.Property(e => e.Number).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.Number).HasColumnType("int");
 
             entityBuilder.Property(e => e.Description)
-                            .HasColumnType("varchar(50)")
-                            .HasCharSet("utf8mb4")
-                            .HasCollation("utf8mb4_general_ci");
+                            .HasColumnType("varchar(100)");
 
-            entityBuilder.Property(e => e.Surface).HasColumnType("double");
+            entityBuilder.Property(e => e.Surface).HasColumnType("float");
 
-            entityBuilder.Property(e => e.Capacity).HasColumnType("double");
+            entityBuilder.Property(e => e.Capacity).HasColumnType("float");
 
-            entityBuilder.Property(e => e.Temperature).HasColumnType("double");
-            entityBuilder.Property(e => e.Humidity).HasColumnType("double");
+            entityBuilder.Property(e => e.Temperature).HasColumnType("float");
+            entityBuilder.Property(e => e.Humidity).HasColumnType("float");
 
 
         }

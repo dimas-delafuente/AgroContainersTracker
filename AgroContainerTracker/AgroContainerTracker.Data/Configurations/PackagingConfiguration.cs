@@ -11,35 +11,27 @@ namespace AgroContainerTracker.Data.Configurations
             entityBuilder.ToTable("Packagings");
 
             entityBuilder.HasKey(e => e.PackagingId)
-                .HasName("PRIMARY");
+                .HasName("Packagings_PK");
 
-
-            entityBuilder.Property(e => e.PackagingId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.PackagingId).HasColumnType("int");
 
             entityBuilder.Property(e => e.Code)
                 .IsRequired()
-                .HasColumnType("varchar(8)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
-
+                .HasColumnType("varchar(8)");
 
             entityBuilder.Property(e => e.Weight)
                 .IsRequired()
                 .HasColumnType("decimal(6,3)");
 
             entityBuilder.Property(e => e.Description)
-                .HasColumnType("varchar(100)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(100)");
 
             entityBuilder.Property(e => e.Color)
-                .HasColumnType("varchar(25)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(25)");
 
             entityBuilder.Property(e => e.Total)
                 .IsRequired()
-                .HasColumnType("int(11)");
+                .HasColumnType("int");
 
             entityBuilder.Property(e => e.Active)
                 .HasColumnType("bit");
@@ -53,12 +45,17 @@ namespace AgroContainerTracker.Data.Configurations
                 .HasColumnType("tinyint");
 
             entityBuilder.Property(e => e.CustomerId)
-                .HasColumnType("int(11)")
+                .HasColumnType("int")
                 .IsRequired(false);
 
             entityBuilder.HasOne(d => d.Owner)
                 .WithMany(p => p.Packagings)
                 .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entityBuilder.HasMany(d => d.PackagingMovements)
+                .WithOne(p => p.Packaging)
+                .HasForeignKey(d => d.PackagingId)
                 .OnDelete(DeleteBehavior.Cascade);
 
         }

@@ -187,7 +187,7 @@ namespace AgroContainerTracker.Infrastructure.Services
             if (string.IsNullOrEmpty(packagingCode))
                 return false;
 
-            return await _context.Packagings.AnyAsync(x => x.Code.Equals(packagingCode, StringComparison.InvariantCultureIgnoreCase));
+            return await _context.Packagings.AnyAsync(x => x.Code.Equals(packagingCode));
         }
 
         public async Task<Packaging> AddPackagingMovementAsync(AddPackagingMovementRequest packagingMovement)

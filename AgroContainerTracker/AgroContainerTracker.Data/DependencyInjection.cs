@@ -12,7 +12,7 @@ namespace AgroContainerTracker.Data
             //Then: cd AgroContainerTracker -> dotnet ef database update
 
             services.AddDbContext<ApplicationContext>(options => options
-                .UseMySql(
+                .UseSqlServer(
                     connectionString,
                     b => b.MigrationsAssembly(typeof(ApplicationContext).Assembly.FullName))
             );

@@ -20,6 +20,7 @@ namespace AgroContainerTracker.Data.Entities
         public bool HasPlague { get; set; }
         public bool HasSecondPasses { get; set; }
 
+        public virtual CampaingEntity Campaing { get; set; }
         public virtual CustomerEntity Buyer { get; set; }
         public virtual CustomerEntity Payer { get; set; }
         public virtual ICollection<ProductEntrySellerEntity> Sellers { get; set; }

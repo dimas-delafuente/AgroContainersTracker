@@ -17,7 +17,7 @@ namespace AgroContainerTracker.Data.Entities
         public string Name { get; set; }
         public string ContactName { get; set; }
         public string Email { get; set; }
-        public long Phone { get; set; }
+        public int Phone { get; set; }
         public string Mobile { get; set; }
         public string Address { get; set; }
         public string Locality { get; set; }

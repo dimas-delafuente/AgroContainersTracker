@@ -29,9 +29,6 @@ namespace AgroContainerTracker.Infrastructure.Validators
 
             RuleFor(v => v.Capacity)
                 .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE);
-
-            RuleFor(v => v.Temperature)
-                .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE);
         }
     }
 }

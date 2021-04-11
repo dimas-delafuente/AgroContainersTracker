@@ -10,81 +10,62 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("Carriers");
 
-            entityBuilder.HasKey(e => e.CarrierId)
-                    .HasName("PRIMARY");
+            entityBuilder.HasKey(e => e.CarrierId).HasName("Carriers_PK");
 
             entityBuilder.HasIndex(e => e.CountryId);
 
-
-            entityBuilder.Property(e => e.CarrierId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.CarrierId).HasColumnType("int");
 
             entityBuilder.Property(e => e.Address)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(150)");
 
             entityBuilder.Property(e => e.CompanyCode)
                 .IsRequired()
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(15)");
 
-            entityBuilder.Property(e => e.CarrierNumber).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.CarrierNumber).HasColumnType("int");
 
             entityBuilder.Property(e => e.ContactName)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(100)");
 
-            entityBuilder.Property(e => e.CountryId).HasColumnType("int(11)");
+            entityBuilder.Property(e => e.CountryId).HasColumnType("int");
 
             entityBuilder.Property(e => e.Description)
-                .HasColumnType("varchar(300)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(300)");
 
             entityBuilder.Property(e => e.Email)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(50)");
 
             entityBuilder.Property(e => e.Locality)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(75)");
 
             entityBuilder.Property(e => e.Mobile)
-                .HasColumnType("varchar(9)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(9)");
 
             entityBuilder.Property(e => e.Name)
                 .IsRequired()
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("nvarchar(150)");
 
-            entityBuilder.Property(e => e.Phone).HasColumnType("bigint(20)");
+            entityBuilder.Property(e => e.Phone).HasColumnType("int");
 
             entityBuilder.Property(e => e.PostalCode)
-                .HasColumnType("varchar(5)")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(5)");
 
             entityBuilder.Property(e => e.SanitaryRegistrationNumber)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(15)");
 
             entityBuilder.Property(e => e.State)
-                .HasColumnType("longtext")
-                .HasCharSet("utf8mb4")
-                .HasCollation("utf8mb4_general_ci");
+                .HasColumnType("varchar(50)");
 
             entityBuilder.HasOne(d => d.Country)
                 .WithMany(p => p.Carriers)
                 .HasForeignKey(d => d.CountryId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            entityBuilder.HasMany(d => d.Carriages)
+                .WithOne(p => p.CarrierCompany)
+                .HasForeignKey(k => k.CarrierId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

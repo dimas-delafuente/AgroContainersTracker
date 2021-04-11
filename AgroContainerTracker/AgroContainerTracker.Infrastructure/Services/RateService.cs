@@ -190,7 +190,7 @@ namespace AgroContainerTracker.Infrastructure.Services
                 return false;
 
             return await _context.Rates
-                .AnyAsync(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                .AnyAsync(x => x.Name.Equals(name))
                 .ConfigureAwait(false);
         }
     }
