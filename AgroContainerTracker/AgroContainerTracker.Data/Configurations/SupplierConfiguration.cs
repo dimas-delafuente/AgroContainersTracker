@@ -13,8 +13,7 @@ namespace AgroContainerTracker.Data.Configurations
             entityBuilder.HasKey(e => e.SupplierId)
                     .HasName("Suppliers_PK");
 
-            entityBuilder.HasIndex(e => e.CountryId)
-                .HasName("FK_Suppliers_Countries_CountryId_idx");
+            entityBuilder.HasIndex(e => e.CountryId);
 
             entityBuilder.Property(e => e.SupplierId).HasColumnType("int");
 
