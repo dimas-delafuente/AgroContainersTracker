@@ -1,12 +1,12 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class PackagingConfiguration : IEntityTypeConfiguration<PackagingEntity>
+    public class PackagingConfiguration : IEntityTypeConfiguration<Packaging>
     {
-        public void Configure(EntityTypeBuilder<PackagingEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Packaging> entityBuilder)
         {
             entityBuilder.ToTable("Packagings");
 
@@ -48,10 +48,10 @@ namespace AgroContainerTracker.Data.Configurations
                 .HasColumnType("int")
                 .IsRequired(false);
 
-            entityBuilder.HasOne(d => d.Owner)
-                .WithMany(p => p.Packagings)
-                .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //entityBuilder.HasOne(d => d.Owner)
+            //    .WithMany(p => p.Packagings)
+            //    .HasForeignKey(d => d.CustomerId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             entityBuilder.HasMany(d => d.PackagingMovements)
                 .WithOne(p => p.Packaging)

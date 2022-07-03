@@ -1,10 +1,6 @@
 ﻿@page "/tarifas"
 @attribute [Authorize]
 
-@using AgroContainerTracker.Domain.Rates
-@using AgroContainerTracker.Core.Services
-
-@inject IRateService rateService
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
 @inject NotificationService notificationService
@@ -77,7 +73,7 @@ else
     {
         if (firstRender)
         {
-            rates = await rateService.GetAllAsync().ConfigureAwait(false);
+            rates = (await Mediator.Send(new GetAllRatesQuery()).ConfigureAwait(false)).ToList();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
@@ -110,7 +106,7 @@ else
 
 private async Task RemoveRate(Rate rate)
 {
-    bool deleted = await rateService.DeleteAsync(rate.RateId).ConfigureAwait(false);
+    bool deleted = await Mediator.Send(new DeleteRateCommand(rate.RateId)).ConfigureAwait(false);
     dialogService.Close(true);
     NotificationMessage message;
 

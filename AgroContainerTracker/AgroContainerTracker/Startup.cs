@@ -1,20 +1,23 @@
 
+using AgroContainerTracker.Areas.Identity;
+using AgroContainerTracker.Core.Services;
+using AgroContainerTracker.Data;
+using AgroContainerTracker.Data.Contexts;
+using AgroContainerTracker.Domain.Reports;
+using AgroContainerTracker.Infrastructure;
+using AgroContainerTracker.Infrastructure.Validators;
+using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ElectronNET.API;
+//using ElectronNET.API;
 using Radzen;
-using AgroContainerTracker.Infrastructure;
-using AgroContainerTracker.Data;
-using FluentValidation.AspNetCore;
-using AgroContainerTracker.Infrastructure.Validators;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using AgroContainerTracker.Areas.Identity;
-using AgroContainerTracker.Data.Contexts;
-using AgroContainerTracker.Domain.Reports;
+using System.Reflection;
 
 namespace AgroContainerTracker
 {
@@ -49,6 +52,8 @@ namespace AgroContainerTracker
             // Radzen Services
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
+
+            services.AddMediatR(Assembly.GetAssembly(typeof(ICampaingService)));
         }
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)

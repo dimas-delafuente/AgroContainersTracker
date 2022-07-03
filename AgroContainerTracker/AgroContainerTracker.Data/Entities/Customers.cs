@@ -27,7 +27,7 @@ namespace AgroContainerTracker.Data.Entities
         public int? RateId { get; set; }
         public string BankAccount { get; set; }
 
-        public virtual CountryEntity Country { get; set; }
+        public virtual Country Country { get; set; }
         public virtual RateEntity Rate { get; set; }
 
         public virtual ICollection<PackagingEntity> Packagings { get; set; }

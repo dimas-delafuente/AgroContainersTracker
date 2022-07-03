@@ -4,12 +4,6 @@ using AgroContainerTracker.Domain.Companies;
 
 namespace AgroContainerTracker.Domain.Packagings
 {
-    public enum Operation
-    {
-        Add,
-        Substract
-    }
-
     public class PackagingMovement
     {
         public int PackagingMovementId { get; set; }

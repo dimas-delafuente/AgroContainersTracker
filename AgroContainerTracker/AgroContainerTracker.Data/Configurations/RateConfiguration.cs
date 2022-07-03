@@ -1,12 +1,12 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class RateConfiguration : IEntityTypeConfiguration<RateEntity>
+    public class RateConfiguration : IEntityTypeConfiguration<Rate>
     {
-        public void Configure(EntityTypeBuilder<RateEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Rate> entityBuilder)
         {
             entityBuilder.ToTable("Rates");
 

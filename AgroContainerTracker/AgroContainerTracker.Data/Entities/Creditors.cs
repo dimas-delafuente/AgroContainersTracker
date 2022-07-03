@@ -21,6 +21,6 @@ namespace AgroContainerTracker.Data.Entities
         public string Description { get; set; }
         public DateTime Created { get; set; }
 
-        public virtual CountryEntity Country { get; set; }
+        public virtual Country Country { get; set; }
     }
 }

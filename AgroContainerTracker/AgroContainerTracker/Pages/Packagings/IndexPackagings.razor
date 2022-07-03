@@ -1,13 +1,11 @@
 ﻿@page "/envases"
 
-@using AgroContainerTracker.Domain.Packagings
 @using AgroContainerTracker.Domain.Companies
 @using AgroContainerTracker.Domain.Reports
 @using AgroContainerTracker.Core.Services
 @using AgroContainerTracker.Core.Services.Reports
 
 @inject IJSRuntime jsRuntime
-@inject IPackagingService packagingService
 @inject ICustomerService customerService
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
@@ -34,8 +32,8 @@
     </div>
     <div class="col-lg-8">
         <div class="float-right">
-            <RadzenButton Text="Nueva entrada" Click="() => ShowNewMovementDialog(Operation.Add)" Icon="assignment_returned" class="btn btn-outline-primary" />
-            <RadzenButton Text="Nueva salida" Click="() => ShowNewMovementDialog(Operation.Substract)" Icon="local_shipping" class="btn btn-outline-primary" />
+            <RadzenButton Text="Nueva entrada" Click="() => ShowNewMovementDialog(PackagMovementOperation.Add)" Icon="assignment_returned" class="btn btn-outline-primary" />
+            <RadzenButton Text="Nueva salida" Click="() => ShowNewMovementDialog(PackagMovementOperation.Substract)" Icon="local_shipping" class="btn btn-outline-primary" />
         </div>
     </div>
 </div>
@@ -96,7 +94,7 @@ else
     {
         if (firstRender)
         {
-            packagings = await packagingService.GetAllAsync();
+            packagings = (await Mediator.Send(new GetAllPackagingsQuery()).ConfigureAwait(false)).ToList();
             customers = await customerService.GetAllAsync().ConfigureAwait(false);
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
@@ -128,10 +126,10 @@ else
             );
     }
 
-    private async Task ShowNewMovementDialog(Operation operation)
+    private async Task ShowNewMovementDialog(PackagMovementOperation operation)
     {
-        string dialogTitle = operation.Equals(Operation.Add) ? "Nueva entrada" : "Nueva salida";
-        AddPackagingMovementRequest packagingMovement = new AddPackagingMovementRequest
+        string dialogTitle = operation.Equals(PackagMovementOperation.Add) ? "Nueva entrada" : "Nueva salida";
+        CreatePackagingMovementCommand packagingMovement = new CreatePackagingMovementCommand
         {
             Operation = operation,
             Created = DateTime.Now
@@ -181,31 +179,33 @@ else
                         </div>
                     </div>
                 </div>
-            </EditForm>
+    </EditForm>
 
-        );
+    );
     }
 
-    private async Task AddPackagingMovement(AddPackagingMovementRequest packagingMovement)
+    private async Task AddPackagingMovement(CreatePackagingMovementCommand packagingMovement)
     {
         if (packagingMovement != null)
         {
-            string operation = packagingMovement.Operation.Equals(Operation.Add) ? "entrada" : "salida";
-            Packaging updatedPackaging = await packagingService.AddPackagingMovementAsync(packagingMovement);
+            string operation = packagingMovement.Operation.Equals(PackagMovementOperation.Add) ? "entrada" : "salida";
+            var updatedPackaging = await Mediator.Send(packagingMovement);
             NotificationMessage message;
 
             if (updatedPackaging != null)
             {
                 dialogService.Close(true);
 
-                packagings.FirstOrDefault(x => x.Code.Equals(updatedPackaging.Code)).Total = updatedPackaging.Total;
+                var packaging = packagings.FirstOrDefault(x => x.PackagingId.Equals(updatedPackaging.PackagingId));
+                packaging.Total = updatedPackaging.Total;
+
                 await InvokeAsync(() => { StateHasChanged(); });
 
                 message = new NotificationMessage()
                 {
                     Severity = NotificationSeverity.Success,
                     Summary = "Gestión completada",
-                    Detail = $"La {operation} para el envase {updatedPackaging.Code} se ha guardado correctamente.",
+                    Detail = $"La {operation} para el envase {packaging.Code} se ha guardado correctamente.",
                     Duration = 4000
                 };
             }
@@ -227,7 +227,7 @@ else
     private async Task RemovePackaging(Packaging packaging)
     {
         NotificationMessage message;
-        bool deleted = await packagingService.DeleteAsync(packaging.PackagingId).ConfigureAwait(false);
+        bool deleted = await Mediator.Send(new DeletePackagingCommand(packaging.PackagingId)).ConfigureAwait(false);
         dialogService.Close(true);
 
 
@@ -316,8 +316,7 @@ else
         NotificationMessage message;
         isLoading = true;
 
-        IEnumerable<PackagingMovement> customerPkgs = await packagingService
-            .GetCustomerPackagingMovementsAsync(report.Customer.CustomerId, report.InitDate, report.EndDate.AddDays(1)).ConfigureAwait(false);
+        IEnumerable<PackagingMovement> customerPkgs = await Mediator.Send(new GetCustomerPackagingsQuery(report.Customer.CustomerId, report.InitDate, report.EndDate.AddDays(1)));
 
         if (customerPkgs?.Count() > 0)
         {

@@ -1,10 +1,6 @@
 ﻿@page "/tarifas/detalles/{Id:int}"
 
-@using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Domain.Companies
-
-@using AgroContainerTracker.Core.Services
-@inject IRateService rateService
 @inject NavigationManager navigationManager
 
 <Loading ShowSpinner="@isLoading"></Loading>
@@ -97,14 +93,14 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private RateDetails rate;
+    private Rate rate;
     private bool isLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            rate = await rateService.GetDetailsByIdAsync(Id).ConfigureAwait(false);
+            rate = await Mediator.Send(new GetRateByIdQuery(Id)).ConfigureAwait(false);
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }

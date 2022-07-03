@@ -1,6 +1,5 @@
 ﻿using AgroContainerTracker.Core.Services.Reports;
 using AgroContainerTracker.Domain.Companies;
-using AgroContainerTracker.Domain.Packagings;
 using AgroContainerTracker.Domain.Reports;
 using iTextSharp.text;
 using iTextSharp.text.pdf;

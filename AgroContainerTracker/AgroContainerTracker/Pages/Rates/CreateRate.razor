@@ -1,9 +1,5 @@
 ﻿@page "/tarifas/crear"
 
-@using AgroContainerTracker.Domain.Rates
-@using AgroContainerTracker.Core.Services
-
-@inject IRateService rateService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -69,12 +65,12 @@
 
 
 @code {
-    private AddRateRequest rate = new AddRateRequest();
+    private CreateRateCommand rate = new CreateRateCommand();
     public string errorMessage;
 
     public async Task AddRate()
     {
-        Rate newRate = await rateService.AddAsync(rate).ConfigureAwait(false);
+        Rate newRate = await Mediator.Send(rate).ConfigureAwait(false);
 
         if (newRate != null)
         {

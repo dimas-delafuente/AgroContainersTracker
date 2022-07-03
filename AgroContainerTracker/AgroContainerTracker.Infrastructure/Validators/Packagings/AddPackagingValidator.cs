@@ -1,23 +1,22 @@
-﻿using AgroContainerTracker.Core.Services;
-using AgroContainerTracker.Domain.Packagings;
+﻿using AgroContainerTracker.Application.Features;
 using FluentValidation;
+using MediatR;
 
 namespace AgroContainerTracker.Infrastructure.Validators
 {
 
-    public class AddPackagingValidator : AbstractValidator<AddPackagingRequest>
+    public class AddPackagingValidator : AbstractValidator<CreatePackagingCommand>
     {
         private const string NAME_EXISTS_MESSAGE = "Ya existe un envase con este nombre.";
 
-
-        public AddPackagingValidator(IPackagingService packagingService)
+        public AddPackagingValidator(IMediator mediator)
         {
             RuleFor(v => v.Code)
                 .NotEmpty().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE)
                 .MaximumLength(8).WithMessage(ValidationMessages.MAX_LENGTH_MESSAGE)
                 .MustAsync(async (code, cancellation) =>
                 {
-                    return !await packagingService.ExistsAsync(code);
+                    return !await mediator.Send(new ExistsPackagingCodeQuery(code)).ConfigureAwait(false);
 
                 }).WithMessage(NAME_EXISTS_MESSAGE);
 

@@ -1,14 +1,10 @@
 ﻿@page "/clientes/editar/{Id:int}"
 
 @using AgroContainerTracker.Domain.Companies
-@using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Domain
-
 @using AgroContainerTracker.Core.Services
 
 @inject ICustomerService customerService
-@inject ICountryService countryService
-@inject IRateService rateService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -170,8 +166,8 @@ else
         if (firstRender)
         {
             customer = await customerService.GetByIdAsync(Id).ConfigureAwait(false);
-            countries = await countryService.GetAll().ConfigureAwait(false);
-            rates = await rateService.GetAllAsync().ConfigureAwait(false);
+            countries = await Mediator.Send(new GetAllCountriesQuery()).ConfigureAwait(false);
+            rates = (await Mediator.Send(new GetAllRatesQuery()).ConfigureAwait(false)).ToList();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }

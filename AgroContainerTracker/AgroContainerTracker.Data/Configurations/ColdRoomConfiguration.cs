@@ -1,12 +1,12 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class ContainerConfiguration : IEntityTypeConfiguration<ColdRoomEntity>
+    public class ContainerConfiguration : IEntityTypeConfiguration<ColdRoom>
     {
-        public void Configure(EntityTypeBuilder<ColdRoomEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<ColdRoom> entityBuilder)
         {
             entityBuilder.ToTable("ColdRooms");
 
@@ -25,8 +25,6 @@ namespace AgroContainerTracker.Data.Configurations
 
             entityBuilder.Property(e => e.Temperature).HasColumnType("float");
             entityBuilder.Property(e => e.Humidity).HasColumnType("float");
-
-
         }
     }
 }

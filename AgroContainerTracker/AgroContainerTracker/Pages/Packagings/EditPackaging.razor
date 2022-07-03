@@ -1,11 +1,8 @@
 ﻿@page "/envases/editar/{Id:int}"
 
-@using AgroContainerTracker.Domain.Packagings
 @using AgroContainerTracker.Domain.Companies
-
 @using AgroContainerTracker.Core.Services
 
-@inject IPackagingService packagingService
 @inject ICustomerService customerService
 
 @inject NavigationManager NavigationManager
@@ -72,9 +69,9 @@ else
                 <div class="form-group col-lg-6">
                     <label for="owner">Propietario:</label>
                     <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    Data="@customers" @bind-Value="packaging.Owner"
-                                    TextProperty="Name" TValue="Customer" Style="display: block;" Required />
-                    <ValidationMessage For="@(() => packaging.Owner)" />
+                                    Data="@customers" @bind-Value="packaging.CustomerId"
+                                    TextProperty="Name" @*TValue="Customer"*@ Style="display: block;" Required />
+                    <ValidationMessage For="@(() => packaging.CustomerId)" />
                 </div>
                 <div class="form-group col-lg-6">
                     <label for="description">Descripción:</label>
@@ -115,8 +112,8 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private Packaging packaging = new Packaging();
-    private List<Customer> customers = new List<Customer>();
+    private UpdatePackagingCommand packaging = new UpdatePackagingCommand();
+    private Dictionary<string, int> customers = new Dictionary<string, int>();
     private string errorMessage;
     private bool isLoading = true;
 
@@ -124,8 +121,8 @@ else
     {
         if (firstRender)
         {
-            packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
-            customers = await customerService.GetAllAsync().ConfigureAwait(false);
+            packaging = (await Mediator.Send(new GetPackagingByIdQuery(Id)).ConfigureAwait(false)).ToCommand();
+            customers = (await customerService.GetAllAsync().ConfigureAwait(false)).ToDictionary(k => k.Name, v => v.CustomerId);
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
@@ -133,7 +130,7 @@ else
 
     public async Task UpdatePackaging()
     {
-        bool updated = await packagingService.UpdateAsync(packaging).ConfigureAwait(false);
+        bool updated = await Mediator.Send(packaging).ConfigureAwait(false);
 
         if (updated)
         {

@@ -11,9 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AgroContainerTracker.Domain\AgroContainerTracker.Domain.csproj" />
+    <ProjectReference Include="..\AgroContainerTracker.Shared\AgroContainerTracker.Shared.csproj" />
   </ItemGroup>
 </Project>

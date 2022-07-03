@@ -1,9 +1,7 @@
 ﻿@page "/frutas"
 @using Microsoft.AspNetCore.Components.Web
-@using AgroContainerTracker.Domain.Fruits
 @using AgroContainerTracker.Core.Services
 
-@inject IFruitService fruitService
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
 @inject NotificationService notificationService
@@ -63,7 +61,7 @@ else
     {
         if (firstRender)
         {
-            fruits = await fruitService.GetAllAsync().ConfigureAwait(false);
+            fruits = (await Mediator.Send(new GetAllFruitsQuery()).ConfigureAwait(false))?.ToList();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
@@ -71,7 +69,7 @@ else
 
     private async Task OpenAddFruit()
     {
-        AddFruitRequest fruit = new AddFruitRequest();
+        CreateFruitCommand fruit = new CreateFruitCommand();
 
         await dialogService.OpenAsync("Añadir fruta", ds =>
             @<EditForm Model="@fruit" OnValidSubmit="() => AddFruit(fruit)">
@@ -115,7 +113,7 @@ else
 
     private async Task OpenFruitEdit(Fruit fruitOld)
     {
-        Fruit fruit = new Fruit {
+        UpdateFruitCommand updateFruitCommand = new UpdateFruitCommand {
             FruitId = fruitOld.FruitId,
             Code = fruitOld.Code,
             Name = fruitOld.Name,
@@ -123,24 +121,24 @@ else
         };
 
         await dialogService.OpenAsync("Editar fruta", ds =>
-            @<EditForm Model="@fruit" OnValidSubmit="() => EditFruit(fruit)">
+            @<EditForm Model="@updateFruitCommand" OnValidSubmit="() => EditFruit(updateFruitCommand)">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div>
                     <div class="row">
                         <div class="form-group col-lg-6">
                             <label for="code">Código:</label>
-                            <InputText id="code" @bind-Value="fruit.Code" class="form-control" />
+                            <InputText id="code" @bind-Value="updateFruitCommand.Code" class="form-control" />
                         </div>
                         <div class="form-group col-lg-6">
                             <label for="name">Variedad:</label>
-                            <InputText id="name" @bind-Value="fruit.Name" class="form-control" />
+                            <InputText id="name" @bind-Value="updateFruitCommand.Name" class="form-control" />
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-12">
                             <label for="description">Descripción:</label>
-                            <InputTextArea id="description" @bind-Value="fruit.Description" class="form-control" />
+                            <InputTextArea id="description" @bind-Value="updateFruitCommand.Description" class="form-control" />
                         </div>
                     </div>
 
@@ -179,10 +177,10 @@ else
         );
     }
 
-    private async Task AddFruit(AddFruitRequest fruit)
+    private async Task AddFruit(CreateFruitCommand createFruitCommand)
     {
         NotificationMessage message;
-        Fruit fruitCreated = await fruitService.AddAsync(fruit).ConfigureAwait(false);
+        Fruit fruitCreated = await Mediator.Send(createFruitCommand).ConfigureAwait(false);
 
         if (fruitCreated != null)
         {
@@ -214,15 +212,15 @@ else
         Notify(message);
     }
 
-    private async Task EditFruit(Fruit fruit)
+    private async Task EditFruit(UpdateFruitCommand updateFruitCommand)
     {
         NotificationMessage message;
-        bool fruitUpdated = await fruitService.UpdateAsync(fruit).ConfigureAwait(false);
+        bool fruitUpdated = await Mediator.Send(updateFruitCommand).ConfigureAwait(false);
 
         if (fruitUpdated)
         {
-            int fruitToUpdate = fruits.FindIndex(x => x.FruitId.Equals(fruit.FruitId));
-            fruits[fruitToUpdate] = fruit;
+            int fruitToUpdate = fruits.FindIndex(x => x.FruitId.Equals(updateFruitCommand.FruitId));
+            fruits[fruitToUpdate] = updateFruitCommand.ToDomain();
 
             dialogService.Close(true);
             await InvokeAsync(() => { StateHasChanged(); });
@@ -253,7 +251,7 @@ else
 
     private async Task RemoveFruit(Fruit fruit)
     {
-        bool deleted = await fruitService.DeleteAsync(fruit.FruitId).ConfigureAwait(false);
+        bool deleted = await Mediator.Send(new DeleteFruitCommand(fruit.FruitId)).ConfigureAwait(false);
         dialogService.Close(true);
         NotificationMessage message;
 

@@ -1,16 +1,17 @@
-﻿using AgroContainerTracker.Core.Services;
-using AgroContainerTracker.Domain.Packagings;
+﻿using AgroContainerTracker.Application.Features;
+using AgroContainerTracker.Domain.Entities;
 using FluentValidation;
+using MediatR;
 
 namespace AgroContainerTracker.Infrastructure.Validators.Packagings
 {
 
-    public class AddPackagingMovementValidator : AbstractValidator<AddPackagingMovementRequest>
+    public class AddPackagingMovementValidator : AbstractValidator<CreatePackagingMovementCommand>
     {
         private const string INVALID_AMOUNT_MESSAGE = "No es posible registrar una salida con una cantidad mayor a la existente.";
 
 
-        public AddPackagingMovementValidator(IPackagingService packagingService)
+        public AddPackagingMovementValidator(IMediator mediator)
         {
             RuleFor(v => v.PackagingId)
                 .NotNull().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE);
@@ -28,7 +29,7 @@ namespace AgroContainerTracker.Infrastructure.Validators.Packagings
                     if (pkgMovement.PackagingId is null)
                         return false;
 
-                    Packaging packaging = await packagingService.FindAsync(pkgMovement.PackagingId).ConfigureAwait(false);
+                    Packaging packaging = await mediator.Send(new GetPackagingByIdQuery(pkgMovement.PackagingId.Value)).ConfigureAwait(false);
                     return IsValidAmount(packaging.Total, pkgMovement);
 
                 }).WithMessage(INVALID_AMOUNT_MESSAGE);
@@ -37,9 +38,9 @@ namespace AgroContainerTracker.Infrastructure.Validators.Packagings
                 .NotNull().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE); ;
         }
 
-        private bool IsValidAmount(int currentTotal, AddPackagingMovementRequest packagingMovement)
+        private bool IsValidAmount(int currentTotal, CreatePackagingMovementCommand packagingMovement)
         {
-            return packagingMovement.Operation.Equals(Operation.Substract) ?
+            return packagingMovement.Operation.Equals(PackagMovementOperation.Substract) ?
                 (currentTotal - packagingMovement.Amount) >= 0 :
                 packagingMovement.Amount >= 0;
         }

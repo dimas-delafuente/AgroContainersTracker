@@ -1,14 +1,9 @@
 ﻿@using AgroContainerTracker.Domain.ProductManagement
-@using AgroContainerTracker.Domain.Fruits
 @using AgroContainerTracker.Domain.Packagings
-@using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Domain
 @using AgroContainerTracker.Core.Services
+
 @inject IProductWeighingService productWeighingService
-@inject IFruitService fruitService
-@inject IColdRoomService coldRoomService
-@inject IPackagingService packagingService
-@inject IRateService rateService
 @inject NotificationService notificationService
 
 <Loading ShowSpinner="@isLoading"></Loading>
@@ -204,9 +199,9 @@
             ProductRecords = new List<ProductRecordPackaging>()
         };
 
-        fruits = await fruitService.GetAllAsync().ConfigureAwait(false);
-        coldRooms = await coldRoomService.GetAllAsync().ConfigureAwait(false);
-        rates = await rateService.GetAllAsync().ConfigureAwait(false);
+        fruits = (await Mediator.Send(new GetAllFruitsQuery()).ConfigureAwait(false))?.ToList();
+        coldRooms = (await Mediator.Send(new GetColdAllRoomsQuery()).ConfigureAwait(false)).ToList();
+        rates = (await Mediator.Send(new GetAllRatesQuery()).ConfigureAwait(false)).ToList();
         await LoadPackagings();
 
         isLoading = false;
@@ -304,7 +299,7 @@
 
     private async Task LoadPackagings()
     {
-        var packagings = await packagingService.GetAllAsync().ConfigureAwait(false);
+        var packagings = (await Mediator.Send(new GetAllPackagingsQuery()).ConfigureAwait(false)).ToArray();
         palotPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Palot)).ToList();
         paletPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Palet)).ToList();
         boxPackagings = packagings.Where(x => x.Type.Equals(PackagingType.Caja)).ToList();

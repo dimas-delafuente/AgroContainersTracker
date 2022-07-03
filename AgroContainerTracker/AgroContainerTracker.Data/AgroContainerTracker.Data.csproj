@@ -15,6 +15,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AgroContainerTracker.Domain\AgroContainerTracker.Domain.csproj" />
+    <ProjectReference Include="..\AgroContainerTracker.Shared\AgroContainerTracker.Shared.csproj" />
+  </ItemGroup>
     
     <PropertyGroup>
         <OutputPath>..\AgroContainerTracker\bin\$(Configuration)\</OutputPath>

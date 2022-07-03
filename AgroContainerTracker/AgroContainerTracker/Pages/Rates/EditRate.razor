@@ -1,9 +1,5 @@
 ﻿@page "/tarifas/editar/{Id:int}"
 
-@using AgroContainerTracker.Domain.Rates
-@using AgroContainerTracker.Core.Services
-
-@inject IRateService rateService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -27,39 +23,39 @@
     </div>
 }
 
-@if (rate == null)
+@if (updateRateCommand == null)
 {
     <p><em>No se ha encontrado la tarifa @Id</em></p>
 }
 else
 {
 
-    <EditForm Model="@rate" OnValidSubmit="UpdateCreditor">
+    <EditForm Model="@updateRateCommand" OnValidSubmit="UpdateRate">
         <FluentValidator></FluentValidator>
 
         <RadzenFieldset Text="INFORMACIÓN" class="mt-4">
             <div class="row">
                 <div class="form-group col-lg-6">
                     <label for="name">Nombre:</label>
-                    <InputText id="name" @bind-Value="rate.Name" class="form-control" />
-                    <ValidationMessage For="@(() => rate.Name)" />
+                    <InputText id="name" @bind-Value="updateRateCommand.Name" class="form-control" />
+                    <ValidationMessage For="@(() => updateRateCommand.Name)" />
                 </div>
                 <div class="form-group col-lg-6">
                     <label for="description">Descripción:</label>
-                    <InputTextArea id="description" @bind-Value="rate.Description" class="form-control" />
-                    <ValidationMessage For="@(() => rate.Description)" />
+                    <InputTextArea id="description" @bind-Value="updateRateCommand.Description" class="form-control" />
+                    <ValidationMessage For="@(() => updateRateCommand.Description)" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-6">
                     <label for="value">Precio/día:</label>
-                    <InputNumber id="value" name="value" @bind-Value="rate.Value" class="form-control" />
-                    <ValidationMessage For="@(() => rate.Value)" />
+                    <InputNumber id="value" name="value" @bind-Value="updateRateCommand.Value" class="form-control" />
+                    <ValidationMessage For="@(() => updateRateCommand.Value)" />
                 </div>
                 <div class="form-group col-lg-6">
                     <label for="value2">Precio/día adicional:</label>
-                    <InputNumber id="value2" name="value2" @bind-Value="rate.SecondaryValue" class="form-control" />
-                    <ValidationMessage For="@(() => rate.SecondaryValue)" />
+                    <InputNumber id="value2" name="value2" @bind-Value="updateRateCommand.SecondaryValue" class="form-control" />
+                    <ValidationMessage For="@(() => updateRateCommand.SecondaryValue)" />
                 </div>
 
             </div>
@@ -81,7 +77,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private Rate rate = new Rate();
+    private UpdateRateCommand updateRateCommand = new UpdateRateCommand();
     private string errorMessage;
     private bool isLoading = true;
 
@@ -89,15 +85,15 @@ else
     {
         if (firstRender)
         {
-            rate = await rateService.GetByIdAsync(Id).ConfigureAwait(false);
+            updateRateCommand = (await Mediator.Send(new GetRateByIdQuery(Id)).ConfigureAwait(false))?.ToCommand();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
     }
 
-    public async Task UpdateCreditor()
+    public async Task UpdateRate()
     {
-        bool updated = await rateService.UpdateAsync(rate).ConfigureAwait(false);
+        bool updated = await Mediator.Send(updateRateCommand).ConfigureAwait(false);
 
         if (updated)
         {

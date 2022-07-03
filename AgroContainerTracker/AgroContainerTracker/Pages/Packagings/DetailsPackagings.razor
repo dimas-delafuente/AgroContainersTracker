@@ -1,9 +1,5 @@
 ﻿@page "/envases/detalles/{Id:int}"
 
-@using AgroContainerTracker.Domain.Packagings
-@using AgroContainerTracker.Core.Services
-@inject IPackagingService packagingService
-
 <Loading ShowSpinner="@isLoading"></Loading>
 
 <div class="row">
@@ -101,7 +97,7 @@ else
                                 </RadzenGridColumn>
                                 <RadzenGridColumn TItem="PackagingMovement" Property="Amount" Title="Cantidad" Type="integer" TextAlign="TextAlign.Right">
                                     <Template Context="pkg">
-                                        @if (pkg.Operation.Equals(Operation.Add))
+                                        @if (pkg.Operation.Equals(PackagMovementOperation.Add))
                                         {
                                             <span style="color: #01a050"><i class="oi oi-arrow-top"></i> @pkg.Amount</span>
                                         }
@@ -142,7 +138,7 @@ else
     {
         if (firstRender)
         {
-            packaging = await packagingService.GetByIdAsync(Id).ConfigureAwait(false);
+            packaging = await Mediator.Send(new GetPackagingByIdQuery(Id)).ConfigureAwait(false);
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }

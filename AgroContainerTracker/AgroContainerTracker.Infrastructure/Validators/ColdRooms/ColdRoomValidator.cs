@@ -1,7 +1,7 @@
-using System;
-using AgroContainerTracker.Core.Services;
-using AgroContainerTracker.Domain;
+using AgroContainerTracker.Application.Features;
+using AgroContainerTracker.Domain.Entities;
 using FluentValidation;
+using MediatR;
 
 namespace AgroContainerTracker.Infrastructure.Validators
 {
@@ -9,15 +9,14 @@ namespace AgroContainerTracker.Infrastructure.Validators
     {
         private const string ID_EXISTS_MESSAGE = "Ya existe una cámara con este número.";
 
-        public ColdRoomValidator(IColdRoomService coldRoomService)
+        public ColdRoomValidator(IMediator mediator)
         {
             RuleFor(v => v.Number)
                 .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE)
                 .MustAsync(async (currentColdRoom, number, cancellation) =>
                 {
-                    ColdRoom coldRoom = await coldRoomService.GetByIdAsync(currentColdRoom.ColdRoomId).ConfigureAwait(false);
-
-                    return coldRoom != null && NumberHasChanged(coldRoom.Number, number) ? !await coldRoomService.ExistsAsync(number) : true;
+                    ColdRoom coldRoom = await mediator.Send(new GetColdRoomQuery(currentColdRoom.ColdRoomId)).ConfigureAwait(false);
+                    return coldRoom != null && NumberHasChanged(coldRoom.Number, number) ? !await mediator.Send(new ExistsColdRoomNumberQuery(currentColdRoom.Number)) : true;
 
                 }).WithMessage(ID_EXISTS_MESSAGE);
 

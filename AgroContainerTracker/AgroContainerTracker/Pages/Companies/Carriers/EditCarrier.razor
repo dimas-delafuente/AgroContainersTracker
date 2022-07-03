@@ -6,7 +6,6 @@
 @using AgroContainerTracker.Core.Services
 
 @inject ICarrierService carrierService
-@inject ICountryService countryService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -216,7 +215,7 @@ else
         if (firstRender)
         {
             carrier = await carrierService.GetByIdAsync(Id).ConfigureAwait(false);
-            countries = await countryService.GetAll().ConfigureAwait(false);
+            countries = await Mediator.Send(new GetAllCountriesQuery()).ConfigureAwait(false);
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }

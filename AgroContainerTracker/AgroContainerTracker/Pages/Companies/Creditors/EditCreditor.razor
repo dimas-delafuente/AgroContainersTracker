@@ -6,7 +6,6 @@
 @using AgroContainerTracker.Core.Services
 
 @inject ICreditorService creditorService
-@inject ICountryService countryService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -151,7 +150,7 @@ else
         if (firstRender)
         {
             creditor = await creditorService.GetByIdAsync(Id).ConfigureAwait(false);
-            countries = await countryService.GetAll().ConfigureAwait(false);
+            countries = await Mediator.Send(new GetAllCountriesQuery()).ConfigureAwait(false);
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }

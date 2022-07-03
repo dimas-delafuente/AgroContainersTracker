@@ -1,12 +1,12 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class FruitConfiguration : IEntityTypeConfiguration<FruitEntity>
+    public class FruitConfiguration : IEntityTypeConfiguration<Fruit>
     {
-        public void Configure(EntityTypeBuilder<FruitEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Fruit> entityBuilder)
         {
             entityBuilder.ToTable("Fruits");
 

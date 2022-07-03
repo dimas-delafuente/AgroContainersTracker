@@ -6,7 +6,6 @@
 @using AgroContainerTracker.Core.Services
 
 @inject ICreditorService creditorService
-@inject ICountryService countryService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -136,7 +135,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        countries = await countryService.GetAll().ConfigureAwait(false);
+        countries = await Mediator.Send(new GetAllCountriesQuery()).ConfigureAwait(false);
     }
 
     public async Task AddCreditor()

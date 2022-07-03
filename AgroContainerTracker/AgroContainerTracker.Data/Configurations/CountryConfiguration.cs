@@ -1,12 +1,12 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class CountryConfiguration : IEntityTypeConfiguration<CountryEntity>
+    public class CountryConfiguration : IEntityTypeConfiguration<Country>
     {
-        public void Configure(EntityTypeBuilder<CountryEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Country> entityBuilder)
         {
             entityBuilder.ToTable("Countries");
 

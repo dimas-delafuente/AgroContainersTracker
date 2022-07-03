@@ -1,9 +1,10 @@
-﻿using System;
-using AgroContainerTracker.Data.Entities;
-using System.Reflection;
-using System.Linq;
+﻿using AgroContainerTracker.Data.Entities;
+using AgroContainerTracker.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace AgroContainerTracker.Data.Contexts
 {
@@ -11,17 +12,17 @@ namespace AgroContainerTracker.Data.Contexts
     {
 
         public virtual DbSet<CarrierEntity> Carriers { get; set; }
-        public virtual DbSet<ColdRoomEntity> ColdRooms { get; set; }
-        public virtual DbSet<CountryEntity> Countries { get; set; }
+        public virtual DbSet<ColdRoom> ColdRooms { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<CreditorEntity> Creditors { get; set; }
         public virtual DbSet<CustomerEntity> Customers { get; set; }
         public virtual DbSet<DriverEntity> Drivers { get; set; }
-        public virtual DbSet<FruitEntity> Fruits { get; set; }
-        public virtual DbSet<RateEntity> Rates { get; set; }
+        public virtual DbSet<Fruit> Fruits { get; set; }
+        public virtual DbSet<Rate> Rates { get; set; }
         public virtual DbSet<SupplierEntity> Suppliers { get; set; }
         public virtual DbSet<VehicleEntity> Vehicles { get; set; }
-        public virtual DbSet<PackagingEntity> Packagings { get; set; }
-        public virtual DbSet<PackagingMovementEntity> PackagingMovements { get; set; }
+        public virtual DbSet<Packaging> Packagings { get; set; }
+        public virtual DbSet<PackagingMovement> PackagingMovements { get; set; }
         public virtual DbSet<CampaingEntity> Campaings { get; set; }
         public virtual DbSet<ProductEntryEntity> ProductEntries { get; set; }
         public virtual DbSet<ProductEntrySellerEntity> ProductEntrySellers { get; set; }

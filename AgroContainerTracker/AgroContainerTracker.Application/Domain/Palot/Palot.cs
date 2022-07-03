@@ -1,6 +1,5 @@
-﻿using System;
-using AgroContainerTracker.Domain.Companies;
-using AgroContainerTracker.Domain.Fruits;
+﻿using AgroContainerTracker.Domain.Companies;
+using System;
 
 namespace AgroContainerTracker.Domain
 {

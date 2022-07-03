@@ -28,7 +28,7 @@ namespace AgroContainerTracker.Data.Entities
         public DateTime Created { get; set; }
         public string SanitaryRegistrationNumber { get; set; }
 
-        public virtual CountryEntity Country { get; set; }
+        public virtual Country Country { get; set; }
         public virtual ICollection<DriverEntity> Drivers { get; set; }
         public virtual ICollection<VehicleEntity> Vehicles { get; set; }
         public virtual ICollection<CarriageEntity> Carriages { get; set; }

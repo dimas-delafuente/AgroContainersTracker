@@ -1,11 +1,8 @@
 ﻿@page "/envases/crear"
 
-@using AgroContainerTracker.Domain.Packagings
 @using AgroContainerTracker.Domain.Companies
-
 @using AgroContainerTracker.Core.Services
 
-@inject IPackagingService packagingService
 @inject ICustomerService customerService
 
 @inject NavigationManager NavigationManager
@@ -103,7 +100,7 @@
 
 
 @code {
-    private AddPackagingRequest packaging = new AddPackagingRequest();
+    private CreatePackagingCommand packaging = new CreatePackagingCommand();
     private List<Customer> customers = new List<Customer>();
 
     public string errorMessage;
@@ -115,7 +112,7 @@
 
     public async Task AddPackaging()
     {
-        Packaging packagingCreated = await packagingService.AddAsync(packaging).ConfigureAwait(false);
+        Packaging packagingCreated = await Mediator.Send(packaging).ConfigureAwait(false);
         if (packagingCreated != null)
         {
             var message = new NotificationMessage()

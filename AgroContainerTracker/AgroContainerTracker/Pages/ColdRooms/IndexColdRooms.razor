@@ -3,12 +3,9 @@
 @using AgroContainerTracker.Domain
 @using AgroContainerTracker.Core.Services
 
-@inject IColdRoomService coldRoomService
-
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
 @inject NotificationService notificationService
-
 
 <Loading ShowSpinner="@isLoading"></Loading>
 
@@ -32,7 +29,7 @@ else
             <div class="col-lg-3">
                 <div class="box">
                     <div>
-                        <div class="row box-header" >
+                        <div class="row box-header">
                             <h3 class="mb-xs ml-2"><strong>Cámara @coldRoom.Number</strong></h3>
                             <div class="mr-2">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -40,15 +37,15 @@ else
                                 </a>
                                 <ul class="dropdown-menu dropdown-user">
                                     <li @onclick="() => OpenColdRoomEdit(coldRoom)">
-                                        <a><span class="oi oi-pencil" ></span> Editar </a>
-                                        
+                                        <a><span class="oi oi-pencil"></span> Editar </a>
+
                                     </li>
                                     <li @onclick="() => ShowRemoveColdRoomDialog(coldRoom)">
                                         <a><span class="oi oi-trash"></span> Eliminar</a>
                                     </li>
                                 </ul>
                                 @* <span class="oi oi-pencil" @onclick="() => OpenColdRoomEdit(coldRoom)"></span>
-                                <span class="oi oi-trash" @onclick="() => ShowRemoveColdRoomDialog(coldRoom)"></span> *@
+                                    <span class="oi oi-trash" @onclick="() => ShowRemoveColdRoomDialog(coldRoom)"></span> *@
                             </div>
 
                         </div>
@@ -68,33 +65,35 @@ else
                             <a href=""  class="btn btn-xs btn-white"><i class="fa fa-phone"></i> Call </a>
                             <a href=""  class="btn btn-xs btn-white"><i class="fa fa-envelope"></i> Email</a>
                             <a href=""  class="btn btn-xs btn-white"><i class="fa fa-user-plus"></i> Follow</a>
-                        </div> *@
+                            </div> *@
                     </div>
 
                 </div>
             </div>
         }
-            
+
     </div>
 }
 
 @code {
+
     private List<ColdRoom> coldRooms = new List<ColdRoom>();
     private bool isLoading = true;
     private string errorMessage;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            coldRooms = await coldRoomService.GetAllAsync().ConfigureAwait(false);
+            coldRooms = (await Mediator.Send(new GetColdAllRoomsQuery()).ConfigureAwait(false))?.ToList();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
     }
 
-    private async Task OpenAddColdRoom() 
+    private async Task OpenAddColdRoom()
     {
-        AddColdRoomRequest coldRoom = new AddColdRoomRequest();
+        CreateColdRoomCommand coldRoom = new CreateColdRoomCommand();
         await dialogService.OpenAsync("Añadir cámara", ds =>
             @<EditForm Model="@coldRoom" OnValidSubmit="() => AddColdRoom(coldRoom)">
                 <FluentValidator></FluentValidator>
@@ -142,13 +141,13 @@ else
                 </div>
             </EditForm>
 
-            );
+        );
     }
 
-    private async Task AddColdRoom(AddColdRoomRequest coldRoom) 
+    private async Task AddColdRoom(CreateColdRoomCommand coldRoom)
     {
         NotificationMessage message;
-        ColdRoom coldRoomCreated = await coldRoomService.AddAsync(coldRoom).ConfigureAwait(false);
+        ColdRoom coldRoomCreated = await Mediator.Send(coldRoom).ConfigureAwait(false);
 
         if (coldRoomCreated != null)
         {
@@ -157,61 +156,170 @@ else
             await InvokeAsync(() => { StateHasChanged(); });
 
             message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Cámara añadida",
-                Detail = "La cámara se ha añadido correctamente",
-                Duration = 4000
-            };
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Cámara añadida",
+                    Detail = "La cámara se ha añadido correctamente",
+                    Duration = 4000
+                };
             errorMessage = string.Empty;
         }
         else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Se ha producido un error al añadir la cámara.",
-                Duration = 4000
-            };
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Se ha producido un error al añadir la cámara.",
+                    Duration = 4000
+                };
         }
 
         Notify(message);
     }
 
-    private async Task EditColdRoom(ColdRoom coldRoom) 
+    private async Task EditColdRoom(UpdateColdRoomCommand coldRoom)
     {
         NotificationMessage message;
-        bool coldRoomCreated = await coldRoomService.UpdateAsync(coldRoom).ConfigureAwait(false);
+        bool coldRoomCreated = await Mediator.Send(coldRoom).ConfigureAwait(false);
 
         if (coldRoomCreated)
         {
             int coldRoomToUpdate = coldRooms.FindIndex(x => x.ColdRoomId.Equals(coldRoom.ColdRoomId));
-            coldRooms[coldRoomToUpdate] = coldRoom;
+            coldRooms[coldRoomToUpdate] = coldRoom.ToDomain();
 
             dialogService.Close(true);
             await InvokeAsync(() => { StateHasChanged(); });
 
             message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Cámara actualizada",
-                Detail = "La cámara se ha actualizado correctamente",
-                Duration = 4000
-            };
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Cámara actualizada",
+                    Detail = "La cámara se ha actualizado correctamente",
+                    Duration = 4000
+                };
             errorMessage = string.Empty;
         }
         else
         {
             errorMessage = "Se ha producido un error. Inténtelo de nuevo.";
             message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Se ha producido un error al actualizar la cámara.",
+                    Duration = 4000
+                };
+        }
+
+        Notify(message);
+    }
+
+    private async Task OpenColdRoomEdit(ColdRoom oldColdRoom)
+    {
+        UpdateColdRoomCommand coldRoom = new UpdateColdRoomCommand
             {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Se ha producido un error al actualizar la cámara.",
-                Duration = 4000
+                ColdRoomId = oldColdRoom.ColdRoomId,
+                Number = oldColdRoom.Number,
+                Description = oldColdRoom.Description,
+                Surface = oldColdRoom.Surface,
+                Capacity = oldColdRoom.Capacity,
+                Temperature = oldColdRoom.Temperature
             };
+
+        await dialogService.OpenAsync("Editar cámara", ds =>
+    @<EditForm Model="@coldRoom" OnValidSubmit="() => EditColdRoom(coldRoom)">
+        <FluentValidator></FluentValidator>
+        <div>
+            <div class="row">
+                <div class="form-group col-lg-3">
+                    <label for="code">Nº Cámara:</label>
+                    <InputNumber id="code" @bind-Value="coldRoom.Number" class="form-control" />
+                    <ValidationMessage For="() => coldRoom.Number" />
+                </div>
+                <div class="form-group col-lg-9">
+                    <label for="name">Descripción:</label>
+                    <InputText id="name" @bind-Value="coldRoom.Description" class="form-control" />
+                    <ValidationMessage For="() => coldRoom.Description" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-4">
+                    <label for="surface">Superficie (m2):</label>
+                    <InputNumber id="surface" @bind-Value="coldRoom.Surface" class="form-control" />
+                    <ValidationMessage For="() => coldRoom.Surface" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="capacity">Capacidad (kg):</label>
+                    <InputNumber id="capacity" @bind-Value="coldRoom.Capacity" class="form-control" />
+                    <ValidationMessage For="() => coldRoom.Capacity" />
+                </div>
+                <div class="form-group col-lg-4">
+                    <label for="temperature">Temperatura (ºC):</label>
+                    <InputNumber id="temperature" @bind-Value="coldRoom.Temperature" class="form-control" />
+                    <ValidationMessage For="() => coldRoom.Temperature" />
+                </div>
+            </div>
+
+            <hr />
+            <div class="row mt-4 mb-4">
+                <div class="col-lg-12">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
+                        <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Actualizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+
+        );
+    }
+
+    private async Task ShowRemoveColdRoomDialog(ColdRoom coldRoom)
+    {
+        await dialogService.OpenAsync("Eliminar cámara", ds =>
+    @<div class="text-center" style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta cámara?</p>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveColdRoom(coldRoom)" ButtonStyle="ButtonStyle.Danger" />
+            </div>
+        </div>
+    </div>
+    );
+    }
+
+    private async Task RemoveColdRoom(ColdRoom coldRoom)
+    {
+        bool deleted = await Mediator.Send(new DeleteColdRoomCommand(coldRoom.ColdRoomId)).ConfigureAwait(false);
+        dialogService.Close(true);
+        NotificationMessage message;
+
+        if (deleted)
+        {
+            coldRooms.Remove(coldRoom);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Cámara eliminada",
+                    Detail = "La cámara se ha eliminado correctamente",
+                    Duration = 4000
+                };
+        }
+        else
+        {
+            message = new NotificationMessage()
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Se ha producido un error al borrar la cámara.",
+                    Duration = 4000
+                };
         }
 
         Notify(message);
@@ -222,113 +330,6 @@ else
         navigationManager.NavigateTo($"/coldRooms/details/{coldRoomId}");
     }
 
-    private async Task OpenColdRoomEdit(ColdRoom oldColdRoom)
-    {
-        ColdRoom coldRoom = new ColdRoom {
-            ColdRoomId = oldColdRoom.ColdRoomId,
-            Number = oldColdRoom.Number,
-            Description = oldColdRoom.Description,
-            Surface = oldColdRoom.Surface,
-            Capacity = oldColdRoom.Capacity,
-            Temperature = oldColdRoom.Temperature
-        };
-
-        await dialogService.OpenAsync("Editar cámara", ds =>
-            @<EditForm Model="@coldRoom" OnValidSubmit="() => EditColdRoom(coldRoom)">
-                <FluentValidator></FluentValidator>
-                <div>
-                    <div class="row">
-                        <div class="form-group col-lg-3">
-                            <label for="code">Nº Cámara:</label>
-                            <InputNumber id="code" @bind-Value="coldRoom.Number" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Number" />
-                        </div>
-                        <div class="form-group col-lg-9">
-                            <label for="name">Descripción:</label>
-                            <InputText id="name" @bind-Value="coldRoom.Description" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Description" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-lg-4">
-                            <label for="surface">Superficie (m2):</label>
-                            <InputNumber id="surface" @bind-Value="coldRoom.Surface" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Surface" />
-                        </div>
-                        <div class="form-group col-lg-4">
-                            <label for="capacity">Capacidad (kg):</label>
-                            <InputNumber id="capacity" @bind-Value="coldRoom.Capacity" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Capacity" />
-                        </div>
-                        <div class="form-group col-lg-4">
-                            <label for="temperature">Temperatura (ºC):</label>
-                            <InputNumber id="temperature" @bind-Value="coldRoom.Temperature" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Temperature" />
-                        </div>
-                    </div>
-
-                    <hr />
-                    <div class="row mt-4 mb-4">
-                        <div class="col-lg-12">
-                            <div class="float-right">
-                                <button type="button" class="btn btn-outline-dark" @onclick="() => ds.Close(false)">Cancelar</button>
-                                <button type="submit" class="btn btn-success"><span class="oi oi-check"></span> Actualizar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </EditForm>
-
-            );
-    }
-
-    private async Task ShowRemoveColdRoomDialog(ColdRoom coldRoom)
-    {
-        await dialogService.OpenAsync("Eliminar cámara", ds =>
-            @<div class="text-center" style="padding: 20px;">
-                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar esta cámara?</p>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                        <RadzenButton Text="Eliminar" Click="() => RemoveColdRoom(coldRoom)" ButtonStyle="ButtonStyle.Danger" />
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    private async Task RemoveColdRoom(ColdRoom coldRoom)
-    {
-        bool deleted = await coldRoomService.DeleteAsync(coldRoom.ColdRoomId).ConfigureAwait(false);
-        dialogService.Close(true);
-        NotificationMessage message;
-
-        if (deleted)
-        {
-            coldRooms.Remove(coldRoom);
-            await InvokeAsync(() => { StateHasChanged(); });
-
-            message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Cámara eliminada",
-                Detail = "La cámara se ha eliminado correctamente",
-                Duration = 4000
-            };
-        }
-        else
-        {
-            message = new NotificationMessage()
-            {
-                Severity = NotificationSeverity.Error,
-                Summary = "Error",
-                Detail = "Se ha producido un error al borrar la cámara.",
-                Duration = 4000
-            };
-        }
-
-        Notify(message);
-    }
 
     private void Notify(NotificationMessage message)
     {

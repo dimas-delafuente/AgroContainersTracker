@@ -1,14 +1,11 @@
 ﻿    @page "/clientes/crear"
 
 @using AgroContainerTracker.Domain.Companies
-@using AgroContainerTracker.Domain.Rates
 @using AgroContainerTracker.Domain
 
 @using AgroContainerTracker.Core.Services
 
 @inject ICustomerService customerService
-@inject ICountryService countryService
-@inject  IRateService rateService
 @inject NavigationManager NavigationManager
 @inject NotificationService notificationService
 
@@ -161,8 +158,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        countries = await countryService.GetAll().ConfigureAwait(false);
-        rates = await rateService.GetAllAsync().ConfigureAwait(false);
+        countries = await Mediator.Send(new GetAllCountriesQuery()).ConfigureAwait(false);
+        rates = (await Mediator.Send(new GetAllRatesQuery()).ConfigureAwait(false)).ToList();
     }
 
     public async Task AddCustomer()
