@@ -1,8 +1,8 @@
-﻿namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public enum PackagMovementOperation
+    public enum PackagingMovementOperation
     {
         Add,
-        Substract
+        Subtract
     }
 }

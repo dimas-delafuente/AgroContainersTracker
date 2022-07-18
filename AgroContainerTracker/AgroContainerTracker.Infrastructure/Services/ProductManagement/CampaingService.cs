@@ -1,89 +1,67 @@
 ﻿using AgroContainerTracker.Core.Services;
 using AgroContainerTracker.Data.Contexts;
-using AgroContainerTracker.Data.Entities;
-using AgroContainerTracker.Domain.ProductManagement;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Infrastructure.Services
 {
-    public class CampaingService : ICampaingService
+    public class CampaignService : ICampaignService
     {
-        private readonly ILogger<CampaingService> _logger;
+        private readonly ILogger<CampaignService> _logger;
         private readonly ApplicationContext _context;
         private readonly IMapper _mapper;
 
-        public CampaingService(ApplicationContext context, IMapper mapper, ILogger<CampaingService> logger)
+        public CampaignService(ApplicationContext context, IMapper mapper, ILogger<CampaignService> logger)
         {
             _context = context;
             _mapper = mapper;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Campaing>> GetAllAsync()
-        {
-            try
-            {
-                IEnumerable<CampaingEntity> entities = await _context.Campaings
-                    .AsNoTracking()
-                    .ToListAsync().ConfigureAwait(false);
-
-                return _mapper.Map<List<Campaing>>(entities);
-            }
-            catch (Exception e)
-            {
-                _context.DetachAll();
-                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving all campaings.", e.Message);
-            }
-
-            return new List<Campaing>();
-        }
-
-        public async Task<int> GetCampaingNextEntryId(int campaingId)
+        public async Task<int> GetCampaignNextEntryId(int CampaignId)
         {
             int maxEntryNumber = 0;
 
             try
             {
-                maxEntryNumber = await _context.ProductEntries
+                maxEntryNumber = await _context.Inputs
                     .AsNoTracking()
-                    .Where(x => x.CampaingId.Equals(campaingId))
-                    .MaxAsync(x => x.ProductEntryNumber)
+                    .Where(x => x.CampaignId.Equals(CampaignId))
+                    .MaxAsync(x => x.Id)
                     .ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 _context.DetachAll();
-                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving next campaing entry number.", e.Message);
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving next Campaign entry number.", e.Message);
             }
 
             return maxEntryNumber + 1;
         }
 
-        public async Task<int> GetCampaingNextWeighingId(int campaingId)
+        public async Task<int> GetCampaignNextWeightingId(int CampaignId)
         {
-            int maxWeighingNumber = 0;
+            int maxWeightingNumber = 0;
 
             try
             {
-                maxWeighingNumber = await _context.ProductWeighings
+                maxWeightingNumber = await _context.Weighings
                     .AsNoTracking()
-                    .Where(x => x.CampaingId.Equals(campaingId))
-                    .MaxAsync(x => x.ProductWeighingId)
+                    .Where(x => x.CampaignId.Equals(CampaignId))
+                    .MaxAsync(x => x.WeighingId)
                     .ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 _context.DetachAll();
-                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving next campaing weighing number.", e.Message);
+                _logger.LogError(e, "Exception: {e} // Internal Error while retrieving next Campaign Weighting number.", e.Message);
             }
 
-            return maxWeighingNumber + 1;
+            return maxWeightingNumber + 1;
         }
     }
 }

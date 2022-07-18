@@ -1,5 +1,5 @@
 ﻿using AgroContainerTracker.Data.Contexts;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace AgroContainerTracker.Data.Repositories
         {
             try
             {
-                var packaging = await _context.Packagings.FindAsync(packagingId, cancellationToken).ConfigureAwait(false);
+                var packaging = await _context.Packagings.FindAsync(new object[] { packagingId }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 if (packaging != null)
                 {
@@ -69,7 +69,7 @@ namespace AgroContainerTracker.Data.Repositories
 
         public async Task<bool> ExistsPackagingCodeAsync(string packagingCode, CancellationToken cancellationToken)
         {
-            Ensure.NotEmpty(packagingCode, nameof(packagingCode));
+            Ensure.NotNullOrEmpty(packagingCode, nameof(packagingCode));
             return await _context.Packagings.AnyAsync(x => x.Code.Equals(packagingCode), cancellationToken).ConfigureAwait(false);
         }
 
@@ -87,11 +87,9 @@ namespace AgroContainerTracker.Data.Repositories
         {
             Ensure.Positive(packagingId, nameof(packagingId));
             return await _context.Packagings
-                .AsNoTracking()
-                .Include(x => x.Owner)
-                .Include(x => x.PackagingMovements)
-                    .ThenInclude(pm => pm.Customer)
-               .FirstOrDefaultAsync(x => x.PackagingId.Equals(packagingId), cancellationToken)
+               .AsNoTracking()
+               .Include(x => x.Owner)
+               .FirstOrDefaultAsync(x => x.Id.Equals(packagingId), cancellationToken)
                .ConfigureAwait(false);
         }
 
@@ -103,7 +101,7 @@ namespace AgroContainerTracker.Data.Repositories
             try
             {
                 var entity = await _context.Packagings
-                    .FirstOrDefaultAsync(x => x.PackagingId.Equals(packagingId), cancellationToken)
+                    .FirstOrDefaultAsync(x => x.Id.Equals(packagingId), cancellationToken)
                     .ConfigureAwait(false);
 
                 if (entity != null)
@@ -116,11 +114,10 @@ namespace AgroContainerTracker.Data.Repositories
                     entity.Type = packaging.Type;
                     entity.Material = packaging.Material;
                     entity.Weight = packaging.Weight;
-                    entity.CustomerId = packaging.CustomerId;
+                    entity.Owner = packaging.Owner;
                     await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                     return true;
                 }
-
             }
             catch
             {

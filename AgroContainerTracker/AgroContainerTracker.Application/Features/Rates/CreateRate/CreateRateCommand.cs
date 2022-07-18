@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 
 namespace AgroContainerTracker.Application.Features
@@ -17,8 +17,8 @@ namespace AgroContainerTracker.Application.Features
             new Rate
             {
                 Name = command.Name,
-                Value = command.Value,
-                SecondaryValue = command.SecondaryValue,
+                MainPrice = command.Value,
+                SecondaryPrice = command.SecondaryValue,
                 Description = command.Description
             };
     }

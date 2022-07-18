@@ -32,8 +32,8 @@
     </div>
     <div class="col-lg-8">
         <div class="float-right">
-            <RadzenButton Text="Nueva entrada" Click="() => ShowNewMovementDialog(PackagMovementOperation.Add)" Icon="assignment_returned" class="btn btn-outline-primary" />
-            <RadzenButton Text="Nueva salida" Click="() => ShowNewMovementDialog(PackagMovementOperation.Substract)" Icon="local_shipping" class="btn btn-outline-primary" />
+            <RadzenButton Text="Nueva entrada" Click="() => ShowNewMovementDialog(PackagingMovementOperation.Add)" Icon="assignment_returned" class="btn btn-outline-primary" />
+            <RadzenButton Text="Nueva salida" Click="() => ShowNewMovementDialog(PackagingMovementOperation.Subtract)" Icon="local_shipping" class="btn btn-outline-primary" />
         </div>
     </div>
 </div>
@@ -126,9 +126,9 @@ else
             );
     }
 
-    private async Task ShowNewMovementDialog(PackagMovementOperation operation)
+    private async Task ShowNewMovementDialog(PackagingMovementOperation operation)
     {
-        string dialogTitle = operation.Equals(PackagMovementOperation.Add) ? "Nueva entrada" : "Nueva salida";
+        string dialogTitle = operation.Equals(PackagingMovementOperation.Add) ? "Nueva entrada" : "Nueva salida";
         CreatePackagingMovementCommand packagingMovement = new CreatePackagingMovementCommand
         {
             Operation = operation,
@@ -188,7 +188,7 @@ else
     {
         if (packagingMovement != null)
         {
-            string operation = packagingMovement.Operation.Equals(PackagMovementOperation.Add) ? "entrada" : "salida";
+            string operation = packagingMovement.Operation.Equals(PackagingMovementOperation.Add) ? "entrada" : "salida";
             var updatedPackaging = await Mediator.Send(packagingMovement);
             NotificationMessage message;
 

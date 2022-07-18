@@ -1,8 +1,6 @@
-﻿@page "/entradas/{CampaingId:int}/detalles/{ProductEntryNumber:int}"
+﻿@page "/entradas/{CampaignId:int}/detalles/{InputNumber:int}"
+
 @using AgroContainerTracker.Components.ProductManagement
-@using AgroContainerTracker.Domain.ProductManagement
-@using AgroContainerTracker.Core.Services
-@inject IProductEntryService productEntryService
 @inject NotificationService notificationService
 
 <Loading ShowSpinner="@isLoading"></Loading>
@@ -15,9 +13,9 @@
     </div>
 </div>
 
-@if (productEntry == null)
+@if (Input == null)
 {
-    <p><em>No se ha encontrado la Entrada @ProductEntryNumber de la Campaña @CampaingId</em></p>
+    <p><em>No se ha encontrado la Entrada @InputNumber de la Campaña @CampaignId</em></p>
 }
 else
 {
@@ -26,7 +24,7 @@ else
             <HeaderTemplate>
                 <span style="float:left;">
                     <i class="oi oi-box details-icon"></i>
-                    <b style="font-size:30px">DETALLES ENTRADA @productEntry.CampaingId@productEntry.ProductEntryNumber.ToString("000")</b>
+                    <b style="font-size:30px">DETALLES ENTRADA @Input.CampaignId@Input.Id.ToString("000")</b>
                 </span>
             </HeaderTemplate>
             <ChildContent>
@@ -36,31 +34,31 @@ else
                         <RadzenFieldset Text="INFORMACIÓN" class="mt-4 col-lg-7">
                             <div class="row">
                                 <div class="form-group col-lg-2">
-                                    <label class="bold" for="campaing">Campaña:</label>
-                                    <p class="ml-1">@productEntry.CampaingId</p>
+                                    <label class="bold" for="Campaign">Campaña:</label>
+                                    <p class="ml-1">@Input.CampaignId</p>
                                 </div>
                                 <div class="form-group col-lg-3">
                                     <label class="bold" for="number">Nº Entrada:</label>
-                                    <p class="ml-1">@productEntry.ProductEntryNumber</p>
+                                    <p class="ml-1">@Input.Id</p>
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="bold" for="entryDate">Fecha Entrada:</label>
-                                    <p class="ml-1">@productEntry.EntryDate.ToString("dd/MM/yyyy")</p>
+                                    <p class="ml-1">@Input.CreatedDate.ToString("dd/MM/yyyy")</p>
                                 </div>
                                 <div class="form-group col-lg-3">
                                     <label class="bold" for="exitDate">Estado:</label>
-                                    @if (productEntry.Closed)
+                                    @if (Input.Closed)
                                     {<p class="ml-1">Cerrada</p> }
                                     else
                                     {
-                                        <button @onclick="() => CloseProductEntry()" class="btn btn-outline-danger">Cerrar</button>
+                                        <button @onclick="() => CloseInput()" class="btn btn-outline-danger">Cerrar</button>
                                     }
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-lg-12">
                                     <label class="bold" for="seller">Fruticultores/Vendedores:</label>
-                                    @foreach (var seller in productEntry.Sellers)
+                                    @foreach (var seller in Input.Sellers)
                                     {
                                         <p class="ml-1">@seller.Name</p>
                                     }
@@ -69,30 +67,30 @@ else
                             <div class="row">
                                 <div class="form-group col-lg-12">
                                     <label class="bold" for="buyer">Comprador:</label>
-                                    <p class="ml-1">@productEntry.Buyer?.Name</p>
+                                    <p class="ml-1">@Input.Buyer?.Name</p>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-lg-12">
                                     <label class="bold" for="payer">Pagador:</label>
-                                    <p class="ml-1">@productEntry.Payer?.Name</p>
+                                    <p class="ml-1">@Input.Payer?.Name</p>
                                 </div>
                             </div>
                         </RadzenFieldset>
                         <RadzenFieldset Text="INFORMACIÓN ADICIONAL" class="mt-4 col-lg-5">
                             <div class="row mt-1">
-                                <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" Disabled="true" /><RadzenLabel Text="Granizo" class="ml-1 bold" />
+                                <RadzenCheckBox @bind-Value="Input.HasHail" TValue="bool" Disabled="true" /><RadzenLabel Text="Granizo" class="ml-1 bold" />
                             </div>
                             <div class="row mt-1">
-                                <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" Disabled="true" /><RadzenLabel Text="Plaga" class="ml-1 bold" />
+                                <RadzenCheckBox @bind-Value="Input.HasPlague" TValue="bool" Disabled="true" /><RadzenLabel Text="Plaga" class="ml-1 bold" />
                             </div>
                             <div class="row mt-1">
-                                <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" Disabled="true" /><RadzenLabel Text="Segundos pases" class="ml-1 bold" />
+                                <RadzenCheckBox @bind-Value="Input.HasSecondPasses" TValue="bool" Disabled="true" /><RadzenLabel Text="Segundos pases" class="ml-1 bold" />
                             </div>
                             <div class="row mt-4">
                                 <div class="form-group col-lg-12">
                                     <label class="bold" for="observations">Observaciones:</label>
-                                    <p class="ml-1">@productEntry.Observations</p>
+                                    <p class="ml-1">@Input.Observations</p>
                                 </div>
                             </div>
                         </RadzenFieldset>
@@ -103,7 +101,7 @@ else
         </RadzenPanel>
     </div>
 
-    <ProductWeighingList ProductEntry="@productEntry"></ProductWeighingList>
+    <WeighingList Input="@Input"></WeighingList>
 }
 
 <div class="row">
@@ -116,28 +114,29 @@ else
 
 @code {
     [Parameter]
-    public int CampaingId { get; set; }
-    [Parameter]
-    public int ProductEntryNumber { get; set; }
+    public int CampaignId { get; set; }
 
-    private ProductEntry productEntry;
+    [Parameter]
+    public int InputNumber { get; set; }
+
+    private Input Input;
     private bool isLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await LoadProductEntry();
+            await LoadInput();
         }
     }
 
-    protected async Task CloseProductEntry()
+    protected async Task CloseInput()
     {
-        bool closed = await productEntryService.CloseEntryAsync(CampaingId, ProductEntryNumber);
+        bool closed = await Mediator.Send(new CloseInputCommand(CampaignId, InputNumber));
 
         if (closed)
         {
-            await LoadProductEntry();
+            await LoadInput();
         }
         else
         {
@@ -145,16 +144,16 @@ else
             {
                 Severity = NotificationSeverity.Error,
                 Summary = "Error",
-                Detail = "Se ha producido un error al actualizar la entrada.",
+                Detail = "Se ha producido un error al cerrar la entrada.",
                 Duration = 4000
             };
             Notify(message);
         }
     }
 
-    private async Task LoadProductEntry()
+    private async Task LoadInput()
     {
-        productEntry = await productEntryService.GetAsync(CampaingId, ProductEntryNumber).ConfigureAwait(false);
+        Input = await Mediator.Send(new GetInputQuery(CampaignId, InputNumber)).ConfigureAwait(false);
         isLoading = false;
         await InvokeAsync(() => { StateHasChanged(); });
     }

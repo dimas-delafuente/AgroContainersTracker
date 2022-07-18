@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Core.Services
 {
-    public interface IProductWeighingService
+    public interface IWeighingService
     {
-        Task<List<ProductWeighing>> GetAllAsync(int campaingId, int entryNumber);
-        Task<ProductWeighing> AddAsync(AddProductWeighingRequest productWeighing);
-        Task<ProductWeighing> UpdateAsync(AddProductWeighingRequest productWeighing);
-        Task<ProductWeighing> GetByIdAsync(int productWeighingId);
-        Task<bool> DeleteAsync(int productWeighingId);
+        Task<List<Weighing>> GetAllAsync(int CampaignId, int entryNumber);
+        Task<Weighing> AddAsync(AddWeighingRequest Weighing);
+        Task<Weighing> UpdateAsync(AddWeighingRequest Weighing);
+        Task<Weighing> GetByIdAsync(int WeighingId);
+        Task<bool> DeleteAsync(int WeighingId);
     }
 }

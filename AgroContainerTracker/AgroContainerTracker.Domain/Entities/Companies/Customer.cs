@@ -1,24 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public class Customer : CompanyBase
+    public class Customer : IAggregate
     {
-        public Customer()
-        {
-            Country = new Country();
-            Rate = new Rate();
-        }
-
-        public int CustomerId { get; set; }
-
-        [Required]
-        public int CustomerNumber { get; set; }
-
-        [Required]
-        public Rate Rate { get; set; }
-
-        public string BankAccount { get; set; }
-
+        public Company Company { get; private set;} = null!;
+        public Rate Rate { get; private set; } = null!;
+        public BillingInfo BillingInfo { get; private set; } = null!;
     }
 }

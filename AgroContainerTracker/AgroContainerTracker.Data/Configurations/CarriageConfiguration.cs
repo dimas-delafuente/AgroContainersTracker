@@ -1,28 +1,35 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class CarriageConfiguration : IEntityTypeConfiguration<CarriageEntity>
+    public class CarriageConfiguration : IEntityTypeConfiguration<Carriage>
     {
-        public void Configure(EntityTypeBuilder<CarriageEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Carriage> entityBuilder)
         {
             entityBuilder.ToTable("Carriages");
 
-            entityBuilder.HasKey(e => e.CarriageId).HasName("Carriages_PK");
+            entityBuilder.HasKey(e => e.Id);
 
-            entityBuilder.Property(e => e.CarriageId).HasColumnType("int");
+            entityBuilder.HasAlternateKey("LicenseNumber", "CompanyId");
 
-            entityBuilder.Property(e => e.CarrierId).HasColumnType("int");
+            entityBuilder.Property(e => e.Id)
+                .HasColumnName("CarriageId")
+                .HasColumnType("int")
+                .IsRequired();
 
-            entityBuilder.Property(e => e.CarriageRegistrationNumber)
-                .HasColumnType("varchar(10)");
+            entityBuilder.Property<int>("CompanyId")
+                .IsRequired();
 
-            entityBuilder.HasOne(d => d.CarrierCompany)
-                .WithMany(p => p.Carriages)
-                .HasForeignKey(d => d.CarrierId)
-                .OnDelete(DeleteBehavior.Cascade);
+            entityBuilder.Property(e => e.LicenseNumber)
+                .HasColumnType("nvarchar(10)")
+                .IsRequired();
+
+            entityBuilder.HasOne(e => e.Carrier)
+                .WithMany()
+                .HasForeignKey("CompanyId")
+                .IsRequired();
         }
     }
 }

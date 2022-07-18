@@ -1,6 +1,6 @@
-﻿using AgroContainerTracker.Domain.Common;
+﻿using AgroContainerTracker.Domain;
 
-namespace AgroContainerTracker.Domain.Entities
+namespace AgroContainerTracker.Domain
 {
     public interface IPackagingRepository : IRepository<Packaging>
     {

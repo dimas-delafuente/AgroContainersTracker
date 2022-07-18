@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;

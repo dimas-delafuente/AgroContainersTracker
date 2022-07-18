@@ -8,7 +8,7 @@ namespace AgroContainerTracker.Application.Features
         public string PackagingCode { get; set; }
         public ExistsPackagingCodeQuery(string packagingCode)
         {
-            Ensure.NotEmpty(packagingCode, nameof(packagingCode));
+            Ensure.NotNullOrEmpty(packagingCode, nameof(packagingCode));
             PackagingCode = packagingCode;
         }
     }

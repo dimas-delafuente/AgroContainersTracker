@@ -1,5 +1,5 @@
 ﻿using AgroContainerTracker.Data.Contexts;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -48,7 +48,7 @@ namespace AgroContainerTracker.Data.Repositories
 
             try
             {
-                var rate = await _context.Rates.FindAsync(rateId, cancellationToken).ConfigureAwait(false);
+                var rate = await _context.Rates.FindAsync(new object[] { rateId }, cancellationToken: cancellationToken).ConfigureAwait(false);
                 if (rate != null)
                 {
                     var removedEntity = _context.Rates.Remove(rate);
@@ -85,21 +85,7 @@ namespace AgroContainerTracker.Data.Repositories
             Ensure.Positive(rateId, nameof(rateId));
             return await _context.Rates
                .AsNoTracking()
-               .Where(x => x.RateId.Equals(rateId))
-               .Select(x => new Rate
-               {
-                   RateId = x.RateId,
-                   Name = x.Name,
-                   Description = x.Description,
-                   SecondaryValue = x.SecondaryValue,
-                   Value = x.Value,
-                   Customers = x.Customers.Select(c => new Customer
-                   {
-                       Name = c.Name,
-                       CustomerId = c.CustomerId,
-                       CustomerNumber = c.CustomerNumber,
-                   })
-               })
+               .Where(x => x.Id.Equals(rateId))
                .FirstOrDefaultAsync(cancellationToken)
                .ConfigureAwait(false);
         }
@@ -112,20 +98,19 @@ namespace AgroContainerTracker.Data.Repositories
             try
             {
                 var entity = await _context.Rates
-                    .FindAsync(rate.RateId, cancellationToken)
+                    .FindAsync(new object[] { rate.Id }, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
                 if (entity != null)
                 {
-                    entity.Value = rate.Value;
-                    entity.SecondaryValue = rate.SecondaryValue;
+                    entity.MainPrice = rate.MainPrice;
+                    entity.SecondaryPrice = rate.SecondaryPrice;
                     entity.Name = rate.Name;
                     entity.Description = rate.Description;
-                    
+
                     await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                     return true;
                 }
-
             }
             catch
             {

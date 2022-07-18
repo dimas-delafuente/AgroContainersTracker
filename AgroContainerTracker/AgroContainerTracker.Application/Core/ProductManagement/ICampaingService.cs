@@ -1,13 +1,10 @@
-﻿using AgroContainerTracker.Domain.ProductManagement;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Core.Services
 {
-    public interface ICampaingService
+    public interface ICampaignService
     {
-        Task<IEnumerable<Campaing>> GetAllAsync();
-        Task<int> GetCampaingNextEntryId(int campaingId);
-        Task<int> GetCampaingNextWeighingId(int campaingId);
+        Task<int> GetCampaignNextEntryId(int CampaignId);
+        Task<int> GetCampaignNextWeightingId(int CampaignId);
     }
 }

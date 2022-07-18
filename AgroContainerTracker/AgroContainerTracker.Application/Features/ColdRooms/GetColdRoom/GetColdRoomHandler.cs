@@ -1,20 +1,20 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Application.Features
 {
-    internal class GetColdRoomHandler : ColdRoomBaseHandler, IRequestHandler<GetColdRoomQuery, ColdRoom>
+    internal class GetStorageHandler : StorageBaseHandler, IRequestHandler<GetStorageQuery, Storage>
     {
-        public GetColdRoomHandler(IColdRoomRepository coldRoomRepository) : base(coldRoomRepository)
+        public GetStorageHandler(IStorageRepository storageRepository) : base(storageRepository)
         {
 
         }
 
-        public async Task<ColdRoom> Handle(GetColdRoomQuery request, CancellationToken cancellationToken)
+        public async Task<Storage> Handle(GetStorageQuery request, CancellationToken cancellationToken)
         {
-            return await _coldRoomRepository.GetByIdAsync(request.ColdRoomId, cancellationToken).ConfigureAwait(false);
+            return await _storageRepository.GetByIdAsync(request.StorageId, cancellationToken).ConfigureAwait(false);
         }
     }
 }

@@ -97,13 +97,13 @@ else
                                 </RadzenGridColumn>
                                 <RadzenGridColumn TItem="PackagingMovement" Property="Amount" Title="Cantidad" Type="integer" TextAlign="TextAlign.Right">
                                     <Template Context="pkg">
-                                        @if (pkg.Operation.Equals(PackagMovementOperation.Add))
+                                        @if (pkg.Operation.Equals(PackagingMovementOperation.Add))
                                         {
-                                            <span style="color: #01a050"><i class="oi oi-arrow-top"></i> @pkg.Amount</span>
+                                            <span style="color: #01a050"><i class="oi oi-arrow-top"></i> @pkg.Quantity</span>
                                         }
                                         else
                                         {
-                                            <span style="color: red"><i class="oi oi-arrow-bottom"></i> @pkg.Amount</span>
+                                            <span style="color: red"><i class="oi oi-arrow-bottom"></i> @pkg.Quantity</span>
                                         }
 
                                     </Template>

@@ -1,4 +1,4 @@
-﻿namespace AgroContainerTracker.Domain.Common
+﻿namespace AgroContainerTracker.Domain
 {
     public interface IAggregate
     {

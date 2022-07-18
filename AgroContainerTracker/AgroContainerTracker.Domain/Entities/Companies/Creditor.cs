@@ -1,14 +1,7 @@
-﻿namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public class Creditor : CompanyBase
+    public class Creditor : IAggregate
     {
-        public Creditor()
-        {
-            Country = new Country();
-        }
-
-        public int CreditorId { get; set; }
-
-        public int CreditorNumber { get; set; }
+        public Company Company { get; set; } = null!;
     }
 }

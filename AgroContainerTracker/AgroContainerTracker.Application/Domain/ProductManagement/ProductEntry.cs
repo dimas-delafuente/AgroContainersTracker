@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace AgroContainerTracker.Domain.ProductManagement
 {
-    public class ProductEntry
+    public class Input
     {
-        public int ProductEntryNumber { get; set; }
-        public int CampaingId { get; set; }
+        public int InputNumber { get; set; }
+        public int CampaignId { get; set; }
         public DateTime EntryDate { get; set; }
         public bool Closed { get; set; }
         public bool HasProductExit { get; set; }

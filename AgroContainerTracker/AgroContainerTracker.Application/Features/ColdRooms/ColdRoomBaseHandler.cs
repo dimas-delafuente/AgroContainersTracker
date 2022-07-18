@@ -1,16 +1,16 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 
 namespace AgroContainerTracker.Application.Features
 {
-    internal abstract class ColdRoomBaseHandler
+    internal abstract class StorageBaseHandler
     {
-        protected readonly IColdRoomRepository _coldRoomRepository;
+        protected readonly IStorageRepository _storageRepository;
 
-        public ColdRoomBaseHandler(IColdRoomRepository coldRoomRepository)
+        public StorageBaseHandler(IStorageRepository storageRepository)
         {
-            Ensure.NotNull(coldRoomRepository, nameof(coldRoomRepository));
-            _coldRoomRepository = coldRoomRepository;
+            Ensure.NotNull(storageRepository, nameof(storageRepository));
+            _storageRepository = storageRepository;
         }
     }
 }

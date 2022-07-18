@@ -4,17 +4,17 @@ using MediatR;
 
 namespace AgroContainerTracker.Infrastructure.Validators
 {
-    public class AddColdRoomValidator : AbstractValidator<CreateColdRoomCommand>
+    public class AddStorageValidator : AbstractValidator<CreateStorageCommand>
     {
         private const string NUMBER_EXISTS_MESSAGE = "Ya existe una cámara con este número.";
 
-        public AddColdRoomValidator(IMediator mediator)
+        public AddStorageValidator(IMediator mediator)
         {
             RuleFor(v => v.Number)
                 .GreaterThanOrEqualTo(0).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE)
                 .MustAsync(async (number, cancellation) =>
                 {
-                    return !await mediator.Send(new ExistsColdRoomNumberQuery(number), cancellation);
+                    return !await mediator.Send(new ExistsStorageNumberQuery(number), cancellation);
 
                 }).WithMessage(NUMBER_EXISTS_MESSAGE);
 

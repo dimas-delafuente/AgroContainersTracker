@@ -24,7 +24,7 @@ namespace AgroContainerTracker.Domain
 
         public bool IsActive { get; set; }
 
-        public int ColdRoomId { get; set; }
+        public int StorageId { get; set; }
 
         public Customer Seller { get; set; }
 

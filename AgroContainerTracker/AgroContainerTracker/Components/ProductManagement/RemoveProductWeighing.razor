@@ -1,5 +1,5 @@
 ﻿@using AgroContainerTracker.Core.Services
-@inject IProductWeighingService productWeighingService
+@inject IWeighingService WeighingService
 @inject NotificationService notificationService
 
 <div class="text-center" style="padding: 20px;">
@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-md-12 text-center">
             <RadzenButton Text="Cancelar" Click="() => OnRemoveCancel()" ButtonStyle="ButtonStyle.Secondary" />
-            <RadzenButton Text="Eliminar" Click="() => RemoveWeighing()" ButtonStyle="ButtonStyle.Danger" />
+            <RadzenButton Text="Eliminar" Click="() => RemoveWeighting()" ButtonStyle="ButtonStyle.Danger" />
         </div>
     </div>
 </div>
@@ -16,18 +16,18 @@
 @code {
 
     [Parameter]
-    public int ProductWeighingId { get; set; }
+    public int WeighingId { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
-    public EventCallback<int> OnProductWeighingRemoved { get; set; }
+    public EventCallback<int> OnWeighingRemoved { get; set; }
 
-    private async Task RemoveWeighing()
+    private async Task RemoveWeighting()
     {
         NotificationMessage message;
-        bool deleted = await productWeighingService.DeleteAsync(ProductWeighingId);
+        bool deleted = await WeighingService.DeleteAsync(WeighingId);
 
         if (deleted)
         {
@@ -38,7 +38,7 @@
                 Detail = "La pesada se ha eliminado correctamente",
                 Duration = 4000
             };
-            await OnProductWeighingRemoved.InvokeAsync(ProductWeighingId);
+            await OnWeighingRemoved.InvokeAsync(WeighingId);
         }
         else
         {

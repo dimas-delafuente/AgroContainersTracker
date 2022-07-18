@@ -1,4 +1,4 @@
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 
 namespace AgroContainerTracker.Domain.Reports
 {

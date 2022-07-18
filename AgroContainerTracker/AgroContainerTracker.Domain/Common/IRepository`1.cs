@@ -1,7 +1,7 @@
-﻿namespace AgroContainerTracker.Domain.Common
+﻿namespace AgroContainerTracker.Domain
 {
-    public interface IRepository<TEntity> where
-        TEntity : class, IAggregate
+    public interface IRepository<T>
+        where T : class, IAggregate
     {
     }
 }

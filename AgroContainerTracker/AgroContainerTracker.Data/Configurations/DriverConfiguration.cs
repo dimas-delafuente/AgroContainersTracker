@@ -1,35 +1,38 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class DriverConfiguration : IEntityTypeConfiguration<DriverEntity>
+    public class DriverConfiguration : IEntityTypeConfiguration<Driver>
     {
-        public void Configure(EntityTypeBuilder<DriverEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Driver> entityBuilder)
         {
             entityBuilder.ToTable("Drivers");
 
+            entityBuilder.HasKey(e => e.Id);
+            entityBuilder.HasAlternateKey("IdentificationNumber", "CompanyId");
 
-            entityBuilder.HasKey(e => e.DriverId)
-                    .HasName("Drivers_PK");
+            entityBuilder.Property(e => e.Id)
+                .HasColumnName("DriverId")
+                .HasColumnType("int")
+                .IsRequired();
 
-            entityBuilder.HasIndex(e => e.CarrierId);
-
-            entityBuilder.Property(e => e.DriverId).HasColumnType("int");
-
-            entityBuilder.Property(e => e.CarrierId).HasColumnType("int");
+            entityBuilder.Property<int>("CompanyId")
+                .IsRequired();
 
             entityBuilder.Property(e => e.IdentificationNumber)
-                .HasColumnType("varchar(15)");
+                .HasColumnType("nvarchar(12)")
+                .IsRequired();
 
             entityBuilder.Property(e => e.Name)
-                .HasColumnType("varchar(100)");
+                .HasColumnType("varchar(100)")
+                .IsRequired();
 
-            entityBuilder.HasOne(d => d.CarrierCompany)
-                .WithMany(p => p.Drivers)
-                .HasForeignKey(d => d.CarrierId)
-                .OnDelete(DeleteBehavior.Cascade);
+            entityBuilder.HasOne(d => d.Carrier)
+                .WithMany()
+                .HasForeignKey("CompanyId")
+                .IsRequired();
         }
     }
 }

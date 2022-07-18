@@ -19,7 +19,6 @@
     <ProjectReference Include="..\AgroContainerTracker.Domain\AgroContainerTracker.Domain.csproj" />
     <ProjectReference Include="..\AgroContainerTracker.Shared\AgroContainerTracker.Shared.csproj" />
   </ItemGroup>
-    
     <PropertyGroup>
         <OutputPath>..\AgroContainerTracker\bin\$(Configuration)\</OutputPath>
         <TargetFramework>net6.0</TargetFramework>

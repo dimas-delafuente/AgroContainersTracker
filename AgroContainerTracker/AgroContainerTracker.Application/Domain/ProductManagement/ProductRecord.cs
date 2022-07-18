@@ -1,6 +1,5 @@
 ﻿using AgroContainerTracker.Domain.Companies;
-using AgroContainerTracker.Domain.Fruits;
-using AgroContainerTracker.Domain.Packagings;
+using AgroContainerTracker.Domain;
 
 namespace AgroContainerTracker.Domain.ProductManagement
 {
@@ -9,15 +8,15 @@ namespace AgroContainerTracker.Domain.ProductManagement
         public int ProductRecordId { get; set; }
         public string ReferenceNumber { get; set; }
 
-        public ProductWeighing ProductWeighing { get; set; }
+        public Weighing Weighing { get; set; }
 
-        public Campaing Campaing { get; set; }
+        public Campaign Campaign { get; set; }
 
-        public ProductEntry ProductEntry { get; set; }
+        public Input Input { get; set; }
 
         public  Fruit Fruit { get; set; }
 
-        public  ColdRoom ColdRoom { get; set; }
+        public  Storage Storage { get; set; }
 
         public int Quantity { get; set; }
         public bool IsOwnPackaging { get; set; }
@@ -38,15 +37,15 @@ namespace AgroContainerTracker.Domain.ProductManagement
     public class AddProductRecordRequest
     {
 
-        public int ProductWeighingId { get; set; }
+        public int WeighingId { get; set; }
 
-        public int CampaingId { get; set; }
+        public int CampaignId { get; set; }
 
-        public int ProductEntryNumber { get; set; }
+        public int InputNumber { get; set; }
 
         public int FruitId { get; set; }
 
-        public int ColdRoomId { get; set; }
+        public int StorageId { get; set; }
         public int Quantity { get; set; }
         public int PackagingId { get; set; }
         public bool IsOwnPackaging { get; set; }

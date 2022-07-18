@@ -3,14 +3,14 @@ using MediatR;
 
 namespace AgroContainerTracker.Application.Features
 {
-    public class ExistsColdRoomNumberQuery : IRequest<bool>
+    public class ExistsStorageNumberQuery : IRequest<bool>
     {
-        public int ColdRoomNumber { get; set; }
+        public int StorageNumber { get; set; }
 
-        public ExistsColdRoomNumberQuery(int coldRoomNumber)
+        public ExistsStorageNumberQuery(int storageNumber)
         {
-            Ensure.Positive(coldRoomNumber, nameof(coldRoomNumber));
-            ColdRoomNumber = coldRoomNumber;
+            Ensure.Positive(storageNumber, nameof(storageNumber));
+            StorageNumber = storageNumber;
         }
     }
 }

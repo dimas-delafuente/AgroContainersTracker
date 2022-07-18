@@ -53,7 +53,7 @@ namespace AgroContainerTracker
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
 
-            services.AddMediatR(Assembly.GetAssembly(typeof(ICampaingService)));
+            services.AddMediatR(Assembly.GetAssembly(typeof(ICampaignService)));
         }
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)

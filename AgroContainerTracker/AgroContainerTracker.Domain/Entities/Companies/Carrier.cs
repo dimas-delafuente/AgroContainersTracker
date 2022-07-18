@@ -1,48 +1,11 @@
-﻿namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public class Carrier : CompanyBase
+    public class Carrier : IAggregate
     {
-        public Carrier()
-        {
-            Country = new Country();
-            Vehicles = new List<Vehicle>();
-            Carriages = new List<Carriage>();
-            Drivers = new List<Driver>();
-        }
-
-        public int CarrierId { get; set; }
-
-        public int CarrierNumber { get; set; }
-
-        public string SanitaryRegistrationNumber { get; set; }
-
-        public List<Vehicle> Vehicles { get; set; }
-        public List<Carriage> Carriages { get; set; }
-
-        public List<Driver> Drivers { get; set; }
-    }
-
-    public class Vehicle
-    {
-        public int CarrierId { get; set; }
-        public string RegistrationNumber { get; set; }
-
-    }
-
-    public class Carriage
-    {
-        public int CarrierId { get; set; }
-        public string CarriageRegistrationNumber { get; set; }
-    }
-
-    public class Driver
-    {
-
-        public int CarrierId { get; set; }
-
-        public string Name { get; set; }
-
-        public string IdentificationNumber { get; set; }
-
+        public Company Company { get; set; } = null!;
+        public SanitaryInfo SanitaryInfo { get; set; } = null!;
+        public IEnumerable<Vehicle> Vehicles { get; } = null!;
+        public IEnumerable<Carriage> Carriages { get; } = null!;
+        public IEnumerable<Driver> Drivers { get; } = null!;
     }
 }

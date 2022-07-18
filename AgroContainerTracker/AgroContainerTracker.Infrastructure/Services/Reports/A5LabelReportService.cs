@@ -48,20 +48,20 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
 
         private async Task ReportBody(Document document, LabelReport reportData)
         {
-            var products = reportData.ProductWeighing.ProductRecords.Where(x => !x.Packaging.Type.Equals(PackagingType.Caja));
+            var products = reportData.Weighing.ProductRecords.Where(x => !x.Packaging.Type.Equals(PackagingType.Caja));
 
             foreach(ProductRecord product in products)
             {
                 AddLogo(pdfWriter, size: 150, 25, 360);
-                AddEntryDetails(document, reportData.ProductWeighing);
-                AddCustomerDetails(document, reportData.ProductWeighing);
-                AddFruitDetails(document, reportData.ProductWeighing);
-                AddProductDetails(document, reportData.ProductWeighing);
+                AddEntryDetails(document, reportData.Weighing);
+                AddCustomerDetails(document, reportData.Weighing);
+                AddFruitDetails(document, reportData.Weighing);
+                AddProductDetails(document, reportData.Weighing);
                 await AddReference(document, product.ReferenceNumber);
             }
         }
 
-        private void AddEntryDetails(Document document, ProductWeighing productWeighing)
+        private void AddEntryDetails(Document document, Weighing Weighing)
         {
             PdfPTable table = new PdfPTable(new float[] { 20, 60, 20 });
             table.WidthPercentage = TABLE_WIDTH;
@@ -73,7 +73,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             entryCell.VerticalAlignment = Element.ALIGN_MIDDLE;
             table.AddCell(entryCell);
 
-            PdfPCell entryNumber = new PdfPCell(new Phrase(DEFAULT_LEADING, productWeighing.ProductEntryNumber.ToString("000"), FontFactory.GetFont(BASE_FONT, 24, Font.BOLD)));
+            PdfPCell entryNumber = new PdfPCell(new Phrase(DEFAULT_LEADING, Weighing.InputNumber.ToString("000"), FontFactory.GetFont(BASE_FONT, 24, Font.BOLD)));
             entryNumber.Padding = 5;
             entryNumber.EnableBorderSide(BOX_BORDER);
             entryNumber.BorderWidthRight = 0;
@@ -81,7 +81,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             entryNumber.VerticalAlignment = Element.ALIGN_MIDDLE;
             table.AddCell(entryNumber);
 
-            PdfPCell entryDate = new PdfPCell(new Phrase(DEFAULT_LEADING, productWeighing.ProductEntry.EntryDate.ToString("dd/MM"), FontFactory.GetFont(BASE_FONT, 24, Font.BOLD)));
+            PdfPCell entryDate = new PdfPCell(new Phrase(DEFAULT_LEADING, Weighing.Input.EntryDate.ToString("dd/MM"), FontFactory.GetFont(BASE_FONT, 24, Font.BOLD)));
             entryDate.Padding = 5;
             entryDate.EnableBorderSide(BOX_BORDER);
             entryDate.BorderWidthLeft = 0;
@@ -94,7 +94,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             document.Add(table);
         }
 
-        private void AddCustomerDetails(Document document, ProductWeighing productWeighing)
+        private void AddCustomerDetails(Document document, Weighing Weighing)
         {
             PdfPTable table = new PdfPTable(new float[] { 20, 80 });
             table.SpacingBefore = 10;
@@ -108,7 +108,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             buyerCell.VerticalAlignment = Element.ALIGN_MIDDLE;
             table.AddCell(buyerCell);
 
-            PdfPCell buyerNameCell = new PdfPCell(new Phrase(DEFAULT_LEADING, productWeighing.Buyer.Name.ToUpper(), FontFactory.GetFont(BASE_FONT, 20, Font.BOLD)));
+            PdfPCell buyerNameCell = new PdfPCell(new Phrase(DEFAULT_LEADING, Weighing.Buyer.Name.ToUpper(), FontFactory.GetFont(BASE_FONT, 20, Font.BOLD)));
             buyerNameCell.Padding = 5;
             buyerNameCell.EnableBorderSide(BOX_BORDER);
             buyerNameCell.BorderWidthLeft = 0;
@@ -126,7 +126,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             sellerCell.VerticalAlignment = Element.ALIGN_MIDDLE;
             table.AddCell(sellerCell);
 
-            PdfPCell sellerNameCell = new PdfPCell(new Phrase(DEFAULT_LEADING, productWeighing.Seller.Name.ToUpper(), FontFactory.GetFont(BASE_FONT, 20, Font.BOLD)));
+            PdfPCell sellerNameCell = new PdfPCell(new Phrase(DEFAULT_LEADING, Weighing.Seller.Name.ToUpper(), FontFactory.GetFont(BASE_FONT, 20, Font.BOLD)));
             sellerNameCell.Padding = 5;
             sellerNameCell.EnableBorderSide(BOX_BORDER);
             sellerNameCell.BorderWidthLeft = 0;
@@ -139,13 +139,13 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             document.Add(table);
         }
 
-        private void AddFruitDetails(Document document, ProductWeighing productWeighing)
+        private void AddFruitDetails(Document document, Weighing Weighing)
         {
             PdfPTable table = new PdfPTable(new float[] { 100 });
             table.SpacingBefore = 10;
             table.WidthPercentage = TABLE_WIDTH;
 
-            PdfPCell fruitCell = new PdfPCell(new Phrase(DEFAULT_LEADING, productWeighing.Fruit.Name.ToUpper(), FontFactory.GetFont(BASE_FONT, 24, Font.BOLD)));
+            PdfPCell fruitCell = new PdfPCell(new Phrase(DEFAULT_LEADING, Weighing.Fruit.Name.ToUpper(), FontFactory.GetFont(BASE_FONT, 24, Font.BOLD)));
             fruitCell.Padding = 5;
             fruitCell.EnableBorderSide(BOX_BORDER);
             fruitCell.HorizontalAlignment = Element.ALIGN_CENTER;
@@ -157,7 +157,7 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
             document.Add(table);
         }
 
-        private void AddProductDetails(Document document, ProductWeighing productWeighing)
+        private void AddProductDetails(Document document, Weighing Weighing)
         {
             float columnWidth = 100 / 6;
             PdfPTable table = new PdfPTable(new float[] { columnWidth, columnWidth, columnWidth, columnWidth, columnWidth, columnWidth });
@@ -169,10 +169,10 @@ namespace AgroContainerTracker.Infrastructure.Services.Reports
                 table.AddCell(cell);
             }
 
-            string palets = productWeighing.ProductRecords.Where(x => x.Packaging.Type.Equals(PackagingType.Palet)).Sum(x => x.Quantity).ToString();
-            string palots = productWeighing.ProductRecords.Where(x => x.Packaging.Type.Equals(PackagingType.Palot)).Sum(x => x.Quantity).ToString();
-            string boxes = productWeighing.ProductRecords.Where(x => x.Packaging.Type.Equals(PackagingType.Caja)).Sum(x => x.Quantity).ToString();
-            foreach (PdfPCell cell in NewCellRow(productWeighing.GrossWeight.ToString(), productWeighing.TareWeight.ToString(), productWeighing.NetWeight.ToString(),
+            string palets = Weighing.ProductRecords.Where(x => x.Packaging.Type.Equals(PackagingType.Palet)).Sum(x => x.Quantity).ToString();
+            string palots = Weighing.ProductRecords.Where(x => x.Packaging.Type.Equals(PackagingType.Palot)).Sum(x => x.Quantity).ToString();
+            string boxes = Weighing.ProductRecords.Where(x => x.Packaging.Type.Equals(PackagingType.Caja)).Sum(x => x.Quantity).ToString();
+            foreach (PdfPCell cell in NewCellRow(Weighing.GrossWeight.ToString(), Weighing.TareWeight.ToString(), Weighing.NetWeight.ToString(),
                 palots, palets, boxes))
             {
                 table.AddCell(cell);

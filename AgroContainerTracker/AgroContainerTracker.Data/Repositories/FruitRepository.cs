@@ -1,8 +1,7 @@
 ﻿using AgroContainerTracker.Data.Contexts;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +47,7 @@ namespace AgroContainerTracker.Data.Repositories
 
             try
             {
-                var fruit = await _context.Fruits.FindAsync(fruitId, cancellationToken).ConfigureAwait(false);
+                var fruit = await _context.Fruits.FindAsync(new object[] { fruitId }, cancellationToken).ConfigureAwait(false);
                 if (fruit != null)
                 {
                     var removedEntity = _context.Fruits.Remove(fruit);
@@ -82,7 +81,7 @@ namespace AgroContainerTracker.Data.Repositories
 
             return await _context.Fruits
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.FruitId.Equals(fruitId), cancellationToken)
+                .FirstOrDefaultAsync(x => x.Id.Equals(fruitId), cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -93,11 +92,8 @@ namespace AgroContainerTracker.Data.Repositories
 
             try
             {
-                if (fruit == null)
-                    throw new ArgumentNullException();
-
                 var entity = await _context.Fruits
-                    .FindAsync(fruit.FruitId, cancellationToken)
+                    .FindAsync(new object[] { fruit.Id }, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (entity != null)
@@ -106,10 +102,8 @@ namespace AgroContainerTracker.Data.Repositories
                     entity.Code = fruit.Code;
                     entity.Name = fruit.Name;
 
-                    await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                    return true;
+                    return await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false) > 0;
                 }
-
             }
             catch
             {

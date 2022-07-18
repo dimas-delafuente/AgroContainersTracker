@@ -3,22 +3,20 @@ using FluentValidation;
 
 namespace AgroContainerTracker.Infrastructure.Validators
 {
-    public class ProductEntryValidator : AbstractValidator<ProductEntry>
+    public class InputValidator : AbstractValidator<Input>
     {
-        private const string DATE_OUTSIDE_CAMPAING_MESSAGE = "La fecha introducida no corresponde a la campaña asignada.";
+        private const string DATE_OUTSIDE_Campaign_MESSAGE = "La fecha introducida no corresponde a la campaña asignada.";
 
-        public ProductEntryValidator()
+        public InputValidator()
         {
-            RuleFor(v => v.CampaingId)
+            RuleFor(v => v.CampaignId)
                 .NotEmpty().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE);
 
             RuleFor(v => v.EntryDate)
                 .NotEmpty().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE)
-                .Must((entry, value) => {
-                    return value.Year.Equals(entry.CampaingId);
-                }).WithMessage(DATE_OUTSIDE_CAMPAING_MESSAGE);
+                .Must((entry, value) => value.Year.Equals(entry.CampaignId)).WithMessage(DATE_OUTSIDE_Campaign_MESSAGE);
 
-            RuleFor(v => v.ProductEntryNumber)
+            RuleFor(v => v.InputNumber)
                 .GreaterThanOrEqualTo(1).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE);
 
             RuleFor(v => v.Sellers)

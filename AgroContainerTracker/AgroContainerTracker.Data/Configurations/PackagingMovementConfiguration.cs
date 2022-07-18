@@ -1,27 +1,27 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class PackagingMovementConfiguration : IEntityTypeConfiguration<PackagingMovementEntity>
+    public class PackagingMovementConfiguration : IEntityTypeConfiguration<PackagingMovement>
     {
-        public void Configure(EntityTypeBuilder<PackagingMovementEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<PackagingMovement> entityBuilder)
         {
             entityBuilder.ToTable("PackagingMovements");
 
-
-            entityBuilder.HasKey(e => e.PackagingMovementId)
+            entityBuilder.HasKey(e => e.Id)
                 .HasName("PackagingMovements_PK");
 
-
-            entityBuilder.Property(e => e.PackagingMovementId).HasColumnType("int");
+            entityBuilder.Property(e => e.Id)
+                .HasColumnName("PackagingMovementId")
+                .HasColumnType("int");
 
             entityBuilder.Property(e => e.Operation)
                 .IsRequired()
                 .HasColumnType("tinyint");
 
-            entityBuilder.Property(e => e.Amount)
+            entityBuilder.Property(e => e.Quantity)
                 .IsRequired()
                 .HasColumnType("int");
 
@@ -33,21 +33,14 @@ namespace AgroContainerTracker.Data.Configurations
                 .IsRequired()
                 .HasColumnType("datetime");
 
-
-            entityBuilder.Property(e => e.PackagingId).HasColumnType("int");
-
-            entityBuilder.HasOne(d => d.Packaging)
-                .WithMany(p => p.PackagingMovements)
-                .HasForeignKey(d => d.PackagingId)
+            entityBuilder.HasOne(e => e.Packaging)
+                .WithMany()
+                .HasForeignKey("PackagingId")
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entityBuilder.Property(e => e.CustomerId)
-                .HasColumnType("int")
-                .IsRequired(false);
-
-            entityBuilder.HasOne(d => d.Customer)
-                .WithMany(p => p.PackagingMovements)
-                .HasForeignKey(d => d.CustomerId)
+            entityBuilder.HasOne(e => e.Receiver)
+                .WithMany()
+                .HasForeignKey("CompanyId")
                 .OnDelete(DeleteBehavior.SetNull);
         }
     }

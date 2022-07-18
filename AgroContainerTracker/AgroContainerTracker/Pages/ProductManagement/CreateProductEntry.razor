@@ -1,12 +1,10 @@
 ﻿@page "/entradas/nueva-entrada"
 
-@using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Domain.Companies
 
 @using AgroContainerTracker.Core.Services
 
-@inject IProductEntryService productEntryService
-@inject ICampaingService campaingService
+@inject ICampaignService CampaignService
 @inject ICustomerService customerService
 
 @inject NavigationManager NavigationManager
@@ -30,38 +28,38 @@
 }
 
 
-<EditForm Model="@productEntry" OnValidSubmit="AddProductEntry">
+<EditForm Model="@Input" OnValidSubmit="AddInput">
     <FluentValidator />
 
     <div class="row">
         <RadzenFieldset Text="DATOS DE LA ENTRADA" class="mt-4 col-lg-7">
             <div class="row">
                 <div class="form-group col-lg-3">
-                    <label for="campaing">Campaña:</label>
+                    <label for="Campaign">Campaña:</label>
                     <RadzenDropDown AllowFiltering="false"
-                                    Data="campaings" @bind-Value="productEntry.CampaingId"
-                                    Style="display: block;" Required TextProperty="CampaingId" ValueProperty="CampaingId"
-                                    Change="@((value) => ChangeCampaing(value))" />
-                    <ValidationMessage For="@(() => productEntry.CampaingId)" />
+                                    Data="campaigns" @bind-Value="Input.CampaignId"
+                                    Style="display: block;" Required TextProperty="CampaignId" ValueProperty="CampaignId"
+                                    Change="@((value) => ChangeCampaign(value))" />
+                    <ValidationMessage For="@(() => Input.CampaignId)" />
                 </div>
                 <div class="form-group col-lg-3">
                     <label for="entryNumber">Nº de Entrada:</label>
-                    <InputNumber id="entryNumber" @bind-Value="productEntry.ProductEntryNumber" class="form-control" required />
-                    <ValidationMessage For="@(() => productEntry.ProductEntryNumber)" />
+                    <InputNumber id="entryNumber" @bind-Value="Input.InputNumber" class="form-control" required />
+                    <ValidationMessage For="@(() => Input.InputNumber)" />
                 </div>
                 <div class="form-group col-lg-4">
                     <label for="date">Fecha de Entrada:</label>
-                    <InputDate @bind-Value="productEntry.EntryDate" class="form-control" />
-                    <ValidationMessage For="() => productEntry.EntryDate" />
+                    <InputDate @bind-Value="Input.EntryDate" class="form-control" />
+                    <ValidationMessage For="() => Input.EntryDate" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-12">
                     <label for="sellers">Fruticultores/Vendedores:</label>
                     <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    @bind-Value="productEntry.Sellers" Multiple="true" Placeholder="Seleccione fruticultores..." Data="@customers" TextProperty="Name"
+                                    @bind-Value="Input.SellerIds" Multiple="true" Placeholder="Seleccione fruticultores..." Data="@customers" TextProperty="Name"
                                     Style="display: block;" Required />
-                    <ValidationMessage For="@(() => productEntry.Sellers)" />
+                    <ValidationMessage For="@(() => Input.SellerIds)" />
 
                 </div>
             </div>
@@ -69,37 +67,37 @@
                 <div class="form-group col-lg-12">
                     <label for="buyer">Comprador:</label>
                     <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    @bind-Value="productEntry.Buyer" Placeholder="Seleccione comprador..." Data="@customers" TextProperty="Name"
+                                    @bind-Value="Input.BuyerId" Placeholder="Seleccione comprador..." Data="@customers" TextProperty="Name"
                                     Style="display: block;" Required />
-                    <ValidationMessage For="@(() => productEntry.Buyer)" />
+                    <ValidationMessage For="@(() => Input.BuyerId)" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-12">
                     <label for="payer">Pagador:</label>
                     <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    @bind-Value="productEntry.Payer" Placeholder="Seleccione pagador..." Data="@customers" TextProperty="Name"
+                                    @bind-Value="Input.PayerId" Placeholder="Seleccione pagador..." Data="@customers" TextProperty="Name"
                                     Style="display: block;" Required />
-                    <ValidationMessage For="@(() => productEntry.Payer)" />
+                    <ValidationMessage For="@(() => Input.PayerId)" />
 
                 </div>
             </div>
         </RadzenFieldset>
         <RadzenFieldset Text="INFORMACIÓN ADICIONAL" class="mt-4 col-lg-5">
             <div class="row mt-1">
-                <RadzenCheckBox @bind-Value="productEntry.HasHail" TValue="bool" /><RadzenLabel Text="Granizo" class="ml-1" />
+                <RadzenCheckBox @bind-Value="Input.HasHail" TValue="bool" /><RadzenLabel Text="Granizo" class="ml-1" />
             </div>
             <div class="row mt-1">
-                <RadzenCheckBox @bind-Value="productEntry.HasPlague" TValue="bool" /><RadzenLabel Text="Plaga" class="ml-1"/>
+                <RadzenCheckBox @bind-Value="Input.HasPlague" TValue="bool" /><RadzenLabel Text="Plaga" class="ml-1"/>
             </div>
             <div class="row mt-1">
-                <RadzenCheckBox @bind-Value="productEntry.HasSecondPasses" TValue="bool" /><RadzenLabel Text="Segundos pases" class="ml-1"/>
+                <RadzenCheckBox @bind-Value="Input.HasSecondPasses" TValue="bool" /><RadzenLabel Text="Segundos pases" class="ml-1"/>
             </div>
             <div class="row mt-4">
                 <div class="form-group col-lg-12">
                     <label for="observations">Observaciones:</label>
-                    <InputTextArea id="observations" @bind-Value="productEntry.Observations" class="form-control" rows="5"/>
-                    <ValidationMessage For="@(() => productEntry.Observations)" />
+                    <InputTextArea id="observations" @bind-Value="Input.Observations" class="form-control" rows="5"/>
+                    <ValidationMessage For="@(() => Input.Observations)" />
                 </div>
             </div>
         </RadzenFieldset>
@@ -120,41 +118,41 @@
 
 
 @code {
-    private ProductEntry productEntry = new ProductEntry();
-    private IEnumerable<Campaing> campaings = new List<Campaing>();
+    private CreateInputCommand Input = new CreateInputCommand();
+    private IEnumerable<Campaign> campaigns = new List<Campaign>();
     private IEnumerable<Customer> customers = new List<Customer>();
-    private int currentCampaing = DateTime.Now.Year;
+    private int currentCampaign = DateTime.Now.Year;
 
     public string errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        int nextEntryNumber = await campaingService.GetCampaingNextEntryId(currentCampaing).ConfigureAwait(false);
-        productEntry = new ProductEntry
+        int nextEntryNumber = await CampaignService.GetCampaignNextEntryId(currentCampaign).ConfigureAwait(false);
+
+        Input = new CreateInputCommand
         {
-            CampaingId = currentCampaing,
-            ProductEntryNumber = nextEntryNumber,
+            CampaignId = currentCampaign,
             EntryDate = DateTime.Now,
-            Closed = false
+            InputNumber = nextEntryNumber
         };
 
         customers = await customerService.GetAllAsync().ConfigureAwait(false);
-        campaings = await campaingService.GetAllAsync().ConfigureAwait(false);
+        campaigns = (await Mediator.Send(new GetAllCampaignsQuery())).ToList();
     }
 
-    public async Task AddProductEntry()
+    public async Task AddInput()
     {
         errorMessage = "";
 
-        if (await productEntryService.ExistsAsync(productEntry.CampaingId, productEntry.ProductEntryNumber))
+        if (await Mediator.Send(new ExistsInputQuery(Input.CampaignId, Input.InputNumber)))
         {
             errorMessage = "Ya existe este número de entrada para la campaña asignada.";
             return;
         }
 
-        ProductEntry productEntryCreated = await productEntryService.AddAsync(productEntry).ConfigureAwait(false);
+        Input InputCreated = await Mediator.Send(Input).ConfigureAwait(false);
 
-        if (productEntryCreated != null)
+        if (InputCreated != null)
         {
             var message = new NotificationMessage()
             {
@@ -164,7 +162,7 @@
                 Duration = 4000
             };
             Notify(message);
-            NavigationManager.NavigateTo($"entradas/{productEntry.CampaingId}/detalles/{productEntry.ProductEntryNumber}");
+            NavigationManager.NavigateTo($"entradas/{Input.CampaignId}/detalles/{Input.InputNumber}");
 
         }
         else
@@ -181,9 +179,9 @@
         }
     }
 
-    public async Task ChangeCampaing(object campaingId)
+    public async Task ChangeCampaign(object CampaignId)
     {
-        productEntry.ProductEntryNumber = await campaingService.GetCampaingNextEntryId((int) currentCampaing).ConfigureAwait(false);
+        Input.InputNumber = await CampaignService.GetCampaignNextEntryId((int) currentCampaign).ConfigureAwait(false);
     }
 
     public void OnCancel()

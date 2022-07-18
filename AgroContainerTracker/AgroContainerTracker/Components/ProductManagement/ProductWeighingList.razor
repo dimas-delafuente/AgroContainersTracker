@@ -4,7 +4,7 @@
 @using AgroContainerTracker.Core.Services
 @using AgroContainerTracker.Core.Services.Reports
 
-@inject IProductWeighingService productWeighingService
+@inject IWeighingService WeighingService
 @inject ILabelReportFactory labelReportFactory
 @inject DialogService dialogService
 @inject NotificationService notificationService
@@ -20,64 +20,64 @@
     </HeaderTemplate>
     <ChildContent>
         <RadzenCard>
-            @if (!ProductEntry.HasProductExit)
+            @if (!Input.HasProductExit)
             {
                 <div class="row mt-5">
                     <div class="col-lg-4">
-                        <button @onclick="() => ShowNewWeighingDialog()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva pesada</button>
+                        <button @onclick="() => ShowNewWeightingDialog()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva pesada</button>
                     </div>
                 </div>
             }
             <div class="row mt-5">
                 <div class="col-lg-12">
                     <RadzenGrid FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                                AllowSorting="true" Data="@productWeighings" TItem="ProductWeighing" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
+                                AllowSorting="true" Data="@Weighings" TItem="Weighing" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
                         <Columns>
-                            <RadzenGridColumn TItem="ProductWeighing" Property="ProductWeighingId" Width="80px" Title="Nº" TextAlign="TextAlign.Right">
+                            <RadzenGridColumn TItem="Weighing" Property="WeighingId" Width="80px" Title="Nº" TextAlign="TextAlign.Right">
                                 <FooterTemplate>
-                                    Total: <b>@productWeighings.Count()</b>
+                                    Total: <b>@Weighings.Count()</b>
                                 </FooterTemplate>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="ProductWeighing" Property="ColdRoom.Number" Title="Cámara" />
-                            <RadzenGridColumn TItem="ProductWeighing" Property="Fruit.Name" Title="Fruta" />
-                            <RadzenGridColumn TItem="ProductWeighing" TextAlign="TextAlign.Right" Title="Palots">
+                            <RadzenGridColumn TItem="Weighing" Property="Storage.Number" Title="Cámara" />
+                            <RadzenGridColumn TItem="Weighing" Property="Fruit.Name" Title="Fruta" />
+                            <RadzenGridColumn TItem="Weighing" TextAlign="TextAlign.Right" Title="Palots">
                                 <Template Context="data">
                                     @GetProductQuantity(data, PackagingType.Palot)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="ProductWeighing" TextAlign="TextAlign.Right" Title="Palets">
+                            <RadzenGridColumn TItem="Weighing" TextAlign="TextAlign.Right" Title="Palets">
                                 <Template Context="data">
                                     @GetProductQuantity(data, PackagingType.Palet)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="ProductWeighing" TextAlign="TextAlign.Right" Title="Cajas">
+                            <RadzenGridColumn TItem="Weighing" TextAlign="TextAlign.Right" Title="Cajas">
                                 <Template Context="data">
                                     @GetProductQuantity(data, PackagingType.Caja)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="ProductWeighing" Property="GrossWeight" Title="Peso Bruto" TextAlign="TextAlign.Right" />
-                            <RadzenGridColumn TItem="ProductWeighing" Property="TareWeight" Title="Destare" TextAlign="TextAlign.Right" />
-                            <RadzenGridColumn TItem="ProductWeighing" Property="NetWeight" Title="Peso Neto" TextAlign="TextAlign.Right" />
-                            @if (!ProductEntry.HasProductExit)
+                            <RadzenGridColumn TItem="Weighing" Property="GrossWeight" Title="Peso Bruto" TextAlign="TextAlign.Right" />
+                            <RadzenGridColumn TItem="Weighing" Property="TareWeight" Title="Destare" TextAlign="TextAlign.Right" />
+                            <RadzenGridColumn TItem="Weighing" Property="NetWeight" Title="Peso Neto" TextAlign="TextAlign.Right" />
+                            @if (!Input.HasProductExit)
                             {
-                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                <RadzenGridColumn TItem="Weighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                                     <Template Context="data">
-                                        <span class="oi oi-print" @onclick="() => PrintProductWeighing(data)"></span>
+                                        <span class="oi oi-print" @onclick="() => PrintWeighing(data)"></span>
                                     </Template>
                                 </RadzenGridColumn>
-                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                <RadzenGridColumn TItem="Weighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                                     <Template Context="data">
-                                        <span class="oi oi-magnifying-glass" @onclick="() => OpenWeighingDetails(data.ProductWeighingId)"></span>
+                                        <span class="oi oi-magnifying-glass" @onclick="() => OpenWeightingDetails(data.WeighingId)"></span>
                                     </Template>
                                 </RadzenGridColumn>
-                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                <RadzenGridColumn TItem="Weighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                                     <Template Context="data">
-                                        <span class="oi oi-pencil" @onclick="() => OpenWeighingEdit(data.ProductWeighingId)"></span>
+                                        <span class="oi oi-pencil" @onclick="() => OpenWeightingEdit(data.WeighingId)"></span>
                                     </Template>
                                 </RadzenGridColumn>
-                                <RadzenGridColumn TItem="ProductWeighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                                <RadzenGridColumn TItem="Weighing" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                                     <Template Context="data">
-                                        <span class="oi oi-trash" @onclick="() => ShowRemoveWeighingDialog(data.ProductWeighingId)"></span>
+                                        <span class="oi oi-trash" @onclick="() => ShowRemoveWeightingDialog(data.WeighingId)"></span>
                                     </Template>
                                 </RadzenGridColumn>
                             }
@@ -93,107 +93,107 @@
 @code {
 
     [Parameter]
-    public ProductEntry ProductEntry { get; set; }
+    public Input Input { get; set; }
 
-    private List<ProductWeighing> productWeighings = new List<ProductWeighing>();
+    private List<Weighing> Weighings = new List<Weighing>();
     private bool isLoading = true;
-    private int currentCampaing = DateTime.Now.Year;
+    private int currentCampaign = DateTime.Now.Year;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await LoadProductWeighings().ConfigureAwait(false);
+            await LoadWeighings().ConfigureAwait(false);
         }
     }
 
-    private async Task LoadProductWeighings()
+    private async Task LoadWeighings()
     {
-        productWeighings = await productWeighingService.GetAllAsync(ProductEntry.CampaingId, ProductEntry.ProductEntryNumber);
+        Weighings = await WeighingService.GetAllAsync(Input.CampaignId, Input.InputNumber);
         isLoading = false;
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
-    private async Task ShowNewWeighingDialog()
+    private async Task ShowNewWeightingDialog()
     {
 
         await dialogService.OpenAsync("Nueva Pesada", ds =>
-            @<CreateProductWeighing OnProductWeighingCreated="AddProductWeighing"
-                                    ProductEntry="@ProductEntry"
+            @<CreateWeighing OnWeighingCreated="AddWeighing"
+                                    Input="@Input"
                                     OnCancel="CloseDialog">
-            </CreateProductWeighing>,
+            </CreateWeighing>,
         new DialogOptions { Width = "60%" });
     }
 
-    private async Task ShowRemoveWeighingDialog(int productWeighingId)
+    private async Task ShowRemoveWeightingDialog(int WeighingId)
     {
 
         await dialogService.OpenAsync("Eliminar pesada", ds =>
-            @<RemoveProductWeighing OnProductWeighingRemoved="RemoveProductWeighing"
-                                    ProductWeighingId="@productWeighingId"
+            @<RemoveWeighing OnWeighingRemoved="RemoveWeighing"
+                                    WeighingId="@WeighingId"
                                     OnCancel="CloseDialog">
-            </RemoveProductWeighing>
+            </RemoveWeighing>
         );
     }
 
-    private async Task OpenWeighingDetails(int productWeighingId)
+    private async Task OpenWeightingDetails(int WeighingId)
     {
 
         await dialogService.OpenAsync("Detalles Pesada", ds =>
-            @<DetailsProductWeighing ProductWeighingId="@productWeighingId"
+            @<DetailsWeighing WeighingId="@WeighingId"
                                      OnCancel="CloseDialog">
-            </DetailsProductWeighing>,
+            </DetailsWeighing>,
             new DialogOptions { Width = "60%" }
         );
     }
 
-    private async Task OpenWeighingEdit(int productWeighingId)
+    private async Task OpenWeightingEdit(int WeighingId)
     {
 
         await dialogService.OpenAsync("Nueva Pesada", ds =>
-            @<EditProductWeighing OnProductWeighingUpdated="UpdateProductWeighing"
-                                  ProductWeighingId="productWeighingId"
-                                  ProductEntry="@ProductEntry"
+            @<EditWeighing OnWeighingUpdated="UpdateWeighing"
+                                  WeighingId="WeighingId"
+                                  Input="@Input"
                                   OnCancel="CloseDialog">
-            </EditProductWeighing>,
+            </EditWeighing>,
         new DialogOptions { Width = "60%" });
         }
 
-        private async Task AddProductWeighing(ProductWeighing productWeighing)
+        private async Task AddWeighing(Weighing Weighing)
         {
             CloseDialog();
-            productWeighings.Add(productWeighing);
+            Weighings.Add(Weighing);
 
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
-        private async Task UpdateProductWeighing(ProductWeighing productWeighing)
+        private async Task UpdateWeighing(Weighing Weighing)
         {
             CloseDialog();
-            var currentProductWeighingIndex = productWeighings.FindIndex(x => x.ProductWeighingId.Equals(productWeighing.ProductWeighingId));
+            var currentWeighingIndex = Weighings.FindIndex(x => x.WeighingId.Equals(Weighing.WeighingId));
 
-            productWeighings[currentProductWeighingIndex] = productWeighing;
+            Weighings[currentWeighingIndex] = Weighing;
 
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
-        private async Task RemoveProductWeighing(int productWeighingId)
+        private async Task RemoveWeighing(int WeighingId)
         {
             CloseDialog();
-            productWeighings.Remove(productWeighings.FirstOrDefault(x => x.ProductWeighingId.Equals(productWeighingId)));
+            Weighings.Remove(Weighings.FirstOrDefault(x => x.WeighingId.Equals(WeighingId)));
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
-        private int GetProductQuantity(ProductWeighing productWeighing, PackagingType type)
+        private int GetProductQuantity(Weighing Weighing, PackagingType type)
         {
-            var productRecords = productWeighing.ProductRecords.Where(x => x.Packaging.Type.Equals(type));
+            var productRecords = Weighing.ProductRecords.Where(x => x.Packaging.Type.Equals(type));
             return productRecords?.Count() > 0 ? productRecords.Sum(x => x.Quantity) : 0;
         }
 
-        private async Task PrintProductWeighing(ProductWeighing productWeighing)
+        private async Task PrintWeighing(Weighing Weighing)
         {
             var report = new LabelReport { 
-                ProductWeighing = productWeighing
+                Weighing = Weighing
             };
             byte[] reportPDFData = await labelReportFactory.BuildReport(report, LabelType.CUSTOM);
 

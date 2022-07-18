@@ -1,94 +1,117 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class ProductRecordConfiguration : IEntityTypeConfiguration<ProductRecordEntity>
+    public class ProductRecordConfiguration : IEntityTypeConfiguration<ProductRecord>
     {
-        public void Configure(EntityTypeBuilder<ProductRecordEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<ProductRecord> entityBuilder)
         {
             entityBuilder.ToTable("ProductRecords");
 
-            entityBuilder.HasKey(e => e.ProductRecordId).HasName("ProductRecords_PK");
+            entityBuilder.HasKey("Id", "WeighingId", "CampaignId", "InputId");
+            entityBuilder.Property<int>("CampaignId").IsRequired();
+            entityBuilder.Property<int>("InputId").IsRequired();
+            entityBuilder.Property<int>("WeighingId").IsRequired();
 
-            entityBuilder.Property(e => e.CampaingId)
-                .HasColumnType("int");
-
-            entityBuilder.Property(e => e.ProductEntryNumber)
-                .IsRequired()
-                .HasColumnType("int");
-
-            entityBuilder.Property(e => e.ProductWeighingId)
-                .IsRequired()
-                .HasColumnType("int");
-            entityBuilder.HasOne(d => d.ProductWeighing)
-                .WithMany(p => p.ProductRecords)
-                .HasForeignKey(d => new { d.CampaingId, d.ProductEntryNumber, d.ProductWeighingId })
-                .OnDelete(DeleteBehavior.Cascade);
-            
-            entityBuilder.Property(e => e.ProductRecordId)
-                .IsRequired()
+            entityBuilder.Property(e => e.Id)
+                .HasColumnName("ProductRecordId")
                 .HasColumnType("int");
 
-            entityBuilder.Property(e => e.FruitId)
-                .IsRequired(false)
-                .HasColumnType("int");
+            entityBuilder.HasOne(e => e.Weighing)
+                .WithMany(d => d.ProductRecords)
+                .HasForeignKey("WeighingId", "CampaignId", "InputId");
+
             entityBuilder.HasOne(d => d.Fruit)
-                .WithMany(p => p.ProductRecords)
-                .HasForeignKey(d => d.FruitId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .WithMany()
+                .HasForeignKey("FruitId")
+                .OnDelete(DeleteBehavior.Restrict);
 
-            entityBuilder.Property(e => e.ColdRoomId)
-                .IsRequired(false)
-                .HasColumnType("int");
-            entityBuilder.HasOne(d => d.ColdRoom)
-               .WithMany(p => p.ProductRecords)
-               .HasForeignKey(d => d.ColdRoomId)
+            entityBuilder.HasOne(d => d.Storage)
+               .WithMany()
+               .HasForeignKey("StorageId")
                .OnDelete(DeleteBehavior.Restrict);
 
-            entityBuilder.Property(e => e.PackagingId)
-                .IsRequired(false)
-                .HasColumnType("int");
             entityBuilder.HasOne(d => d.Packaging)
-               .WithMany(p => p.ProductRecords)
-               .HasForeignKey(d => d.PackagingId)
+               .WithMany()
+               .HasForeignKey("PackagingId")
                .OnDelete(DeleteBehavior.Restrict);
+
             entityBuilder.Property(e => e.IsOwnPackaging)
                 .HasColumnType("bit");
 
             entityBuilder.Property(e => e.TotalDaysStored)
                 .HasColumnType("int");
-            entityBuilder.Property(e => e.ProductExitId)
-                .IsRequired(false)
-                .HasColumnType("int");
 
-            entityBuilder.Property(e => e.SellerId)
-                .IsRequired(false)
-                .HasColumnType("int");
+            entityBuilder.HasOne(e => e.Output)
+                .WithMany()
+                .HasForeignKey("OutputId");
+
             entityBuilder.HasOne(d => d.Seller)
-               .WithMany(p => p.SellerProductRecords)
-               .HasForeignKey(d => d.SellerId)
+               .WithMany()
+               .HasForeignKey("CompanyId")
+               .HasConstraintName("SellerId")
                .OnDelete(DeleteBehavior.Restrict);
 
-            entityBuilder.Property(e => e.BuyerId)
-                .IsRequired(false)
-                .HasColumnType("int");
             entityBuilder.HasOne(d => d.Buyer)
-               .WithMany(p => p.BuyerProductRecords)
-               .HasForeignKey(d => d.BuyerId)
+               .WithMany()
+               .HasForeignKey("CompanyId")
+               .HasConstraintName("BuyerId")
                .OnDelete(DeleteBehavior.Restrict);
 
-            entityBuilder.Property(e => e.GrossWeight)
-                .IsRequired()
-                .HasColumnType("float");
-            entityBuilder.Property(e => e.NetWeight)
-                .IsRequired()
-                .HasColumnType("float");
-            entityBuilder.Property(e => e.TareWeight)
-                .IsRequired()
-                .HasColumnType("float"); 
+            entityBuilder.OwnsOne(e => e.GrossWeight)
+                .Property(p => p.Amount)
+                    .HasConversion(
+                        v => v.Value,
+                        v => Amount.FromScalar(v)
+                    )
+                    .HasColumnType("decimal(7,5)");
 
+            entityBuilder.OwnsOne(e => e.GrossWeight)
+                .Property(p => p.Unit)
+                    .HasConversion(
+                        v => v.Name,
+                        v => Enumeration.FromDisplayName<WeightUnit>(v)
+                    )
+                    .HasColumnType("varchar(5)")
+                    .HasDefaultValueSql("kg");
+
+            entityBuilder.OwnsOne(e => e.NetWeight)
+                .Property(p => p.Amount)
+                    .HasConversion(
+                        v => v.Value,
+                        v => Amount.FromScalar(v)
+                    )
+                    .HasColumnType("decimal(7,5)")
+                    .HasDefaultValueSql("0");
+
+            entityBuilder.OwnsOne(e => e.NetWeight)
+                .Property(p => p.Unit)
+                    .HasConversion(
+                        v => v.Name,
+                        v => Enumeration.FromDisplayName<WeightUnit>(v)
+                    )
+                    .HasColumnType("varchar(5)")
+                    .HasDefaultValueSql("kg");
+
+            entityBuilder.OwnsOne(e => e.TareWeight)
+                .Property(p => p.Amount)
+                    .HasConversion(
+                        v => v.Value,
+                        v => Amount.FromScalar(v)
+                    )
+                    .HasColumnType("decimal(7,5)")
+                    .HasDefaultValueSql("0");
+
+            entityBuilder.OwnsOne(e => e.TareWeight)
+                .Property(p => p.Unit)
+                    .HasConversion(
+                        v => v.Name,
+                        v => Enumeration.FromDisplayName<WeightUnit>(v)
+                    )
+                    .HasColumnType("varchar(5)")
+                    .HasDefaultValueSql("kg");
         }
     }
 }

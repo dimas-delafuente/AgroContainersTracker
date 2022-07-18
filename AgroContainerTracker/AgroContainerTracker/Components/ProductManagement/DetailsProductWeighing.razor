@@ -1,11 +1,11 @@
 ﻿@using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Core.Services
 @using AgroContainerTracker.Domain.Packagings
-@inject IProductWeighingService productWeighingService
+@inject IWeighingService WeighingService
 
 <Loading ShowSpinner="@isLoading"></Loading>
 
-@if (productWeighing != null)
+@if (Weighing != null)
 {
     <section>
 
@@ -13,39 +13,39 @@
             <div class="row">
                 <div class="form-group col-lg-6">
                     <label for="type">Fruticultor/Vendedor:</label>
-                    <RadzenTextBox name="seller" Value="@productWeighing.Seller?.Name" Disabled="true" class="form-control block" />
+                    <RadzenTextBox name="seller" Value="@Weighing.Seller?.Name" Disabled="true" class="form-control block" />
                 </div>
                 <div class="form-group col-lg-6">
                     <label for="buyer">Comprador:</label>
-                    <RadzenTextBox name="buyer" Value="@productWeighing.Buyer?.Name" Disabled="true" class="form-control block" />
+                    <RadzenTextBox name="buyer" Value="@Weighing.Buyer?.Name" Disabled="true" class="form-control block" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-4">
                     <label for="fruit">Variedad de Fruta:</label>
-                    <RadzenTextBox name="fruit" Value="@productWeighing.Fruit?.Name" Disabled="true" class="form-control block" />
+                    <RadzenTextBox name="fruit" Value="@Weighing.Fruit?.Name" Disabled="true" class="form-control block" />
                 </div>
                 <div class="form-group col-lg-4">
-                    <label for="coldRoom">Cámara:</label>
-                    <RadzenTextBox name="coldRoom" Value="@productWeighing.ColdRoom?.Number.ToString()" Disabled="true" class="form-control block" />
+                    <label for="storage">Cámara:</label>
+                    <RadzenTextBox name="storage" Value="@Weighing.Storage?.Number.ToString()" Disabled="true" class="form-control block" />
                 </div>
                 <div class="form-group col-lg-4">
                     <label for="rate">Tarifa:</label>
-                    <RadzenTextBox name="rate" Value="@productWeighing.Rate?.Name" Disabled="true" class="form-control block" />
+                    <RadzenTextBox name="rate" Value="@Weighing.Rate?.Name" Disabled="true" class="form-control block" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-4">
                     <label for="grossweight">Peso Bruto:</label>
-                    <RadzenNumeric TValue="double" @bind-Value="productWeighing.GrossWeight" Disabled="true" class="form-control" />
+                    <RadzenNumeric TValue="double" @bind-Value="Weighing.GrossWeight" Disabled="true" class="form-control" />
                 </div>
                 <div class="form-group col-lg-4">
                     <label for="tareWeight">Destare:</label>
-                    <RadzenNumeric TValue="double" @bind-Value="productWeighing.TareWeight" Disabled="true" class="form-control" />
+                    <RadzenNumeric TValue="double" @bind-Value="Weighing.TareWeight" Disabled="true" class="form-control" />
                 </div>
                 <div class="form-group col-lg-4">
                     <label for="netWeight">Peso Neto:</label>
-                    <RadzenNumeric TValue="double" @bind-Value="productWeighing.NetWeight" Disabled="true" class="form-control" />
+                    <RadzenNumeric TValue="double" @bind-Value="Weighing.NetWeight" Disabled="true" class="form-control" />
                 </div>
             </div>
             <div class="row">
@@ -150,9 +150,9 @@
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
-    public int ProductWeighingId { get; set; }
+    public int WeighingId { get; set; }
 
-    private ProductWeighing productWeighing;
+    private Weighing Weighing;
     private ProductRecordPackaging palotPackaging = new ProductRecordPackaging();
     private ProductRecordPackaging paletPackaging = new ProductRecordPackaging();
     private ProductRecordPackaging boxPackaging = new ProductRecordPackaging();
@@ -163,7 +163,7 @@
     {
         if (firstRender)
         {
-            productWeighing = await productWeighingService.GetByIdAsync(ProductWeighingId).ConfigureAwait(false);
+            Weighing = await WeighingService.GetByIdAsync(WeighingId).ConfigureAwait(false);
             SetPackagings();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
@@ -180,11 +180,11 @@
 
     private ProductRecordPackaging CreateProductRecordPackaging(PackagingType type)
     {
-        ProductRecord product = productWeighing.ProductRecords.FirstOrDefault(x => x.Packaging.Type.Equals(type));
+        ProductRecord product = Weighing.ProductRecords.FirstOrDefault(x => x.Packaging.Type.Equals(type));
 
         if (product != null)
         {
-            int quantity = type.Equals(PackagingType.Caja) ? product.Quantity : productWeighing.ProductRecords.Count(x => x.Packaging.Type.Equals(type));
+            int quantity = type.Equals(PackagingType.Caja) ? product.Quantity : Weighing.ProductRecords.Count(x => x.Packaging.Type.Equals(type));
 
             return new ProductRecordPackaging
             {

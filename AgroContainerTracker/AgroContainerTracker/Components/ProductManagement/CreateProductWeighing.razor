@@ -3,12 +3,12 @@
 @using AgroContainerTracker.Domain
 @using AgroContainerTracker.Core.Services
 
-@inject IProductWeighingService productWeighingService
+@inject IWeighingService WeighingService
 @inject NotificationService notificationService
 
 <Loading ShowSpinner="@isLoading"></Loading>
 
-<EditForm Model="@productWeighing" OnValidSubmit="() => AddProductWeighing()">
+<EditForm Model="@Weighing" OnValidSubmit="() => AddWeighing()">
     <FluentValidator />
 
     <div class="col-lg-12">
@@ -16,38 +16,38 @@
             <div class="form-group col-lg-6">
                 <label for="seller">Fruticultor/Vendedor:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                Data="@ProductEntry.Sellers" @bind-Value="productWeighing.SellerId"
+                                Data="@Input.Sellers" @bind-Value="Weighing.SellerId"
                                 TextProperty="Name" ValueProperty="CustomerId" Style="display: block;" />
-                <ValidationMessage For="() => productWeighing.SellerId" />
+                <ValidationMessage For="() => Weighing.SellerId" />
 
             </div>
             <div class="form-group col-lg-6">
                 <label for="buyer">Comprador:</label>
-                <RadzenTextBox name="buyer" Value="@ProductEntry.Buyer?.Name" Disabled="true" class="form-control block" />
-                <ValidationMessage For="@(() => productWeighing.BuyerId)" />
+                <RadzenTextBox name="buyer" Value="@Input.Buyer?.Name" Disabled="true" class="form-control block" />
+                <ValidationMessage For="@(() => Weighing.BuyerId)" />
             </div>
         </div>
         <div class="row">
             <div class="form-group col-lg-4">
                 <label for="fruit">Variedad de Fruta:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                Data="@fruits" @bind-Value="productWeighing.FruitId" ValueProperty="FruitId"
+                                Data="@fruits" @bind-Value="Weighing.FruitId" ValueProperty="FruitId"
                                 TextProperty="Name" Style="display: block;" />
-                <ValidationMessage For="() => productWeighing.FruitId" />
+                <ValidationMessage For="() => Weighing.FruitId" />
             </div>
             <div class="form-group col-lg-4">
-                <label for="coldRoom">Cámara:</label>
+                <label for="storage">Cámara:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                Data="@coldRooms" @bind-Value="productWeighing.ColdRoomId" ValueProperty="ColdRoomId"
+                                Data="@storages" @bind-Value="Weighing.StorageId" ValueProperty="StorageId"
                                 TextProperty="Number" Style="display: block;" />
-                <ValidationMessage For="() => productWeighing.ColdRoomId" />
+                <ValidationMessage For="() => Weighing.StorageId" />
             </div>
             <div class="form-group col-lg-4">
                 <label for="rate">Tarifa:</label>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                Data="@rates" @bind-Value="productWeighing.RateId" ValueProperty="RateId"
+                                Data="@rates" @bind-Value="Weighing.RateId" ValueProperty="RateId"
                                 TextProperty="Name" Style="display: block;" />
-                <ValidationMessage For="() => productWeighing.RateId" />
+                <ValidationMessage For="() => Weighing.RateId" />
             </div>
         </div>
         <hr />
@@ -126,25 +126,25 @@
             </div>
 
         </div>
-        <ValidationMessage For="@(() => productWeighing.ProductRecords)" />
+        <ValidationMessage For="@(() => Weighing.ProductRecords)" />
         <hr />
         <div class="row">
             <div class="form-group col-lg-4">
                 <label for="grossweight">Peso Bruto:</label>
-                <RadzenNumeric TValue="double" @bind-Value="productWeighing.GrossWeight" Min="0" Change="@(_ => UpdateProductWeight())" class="form-control" />
-                <ValidationMessage For="@(() => productWeighing.GrossWeight)" />
+                <RadzenNumeric TValue="double" @bind-Value="Weighing.GrossWeight" Min="0" Change="@(_ => UpdateProductWeight())" class="form-control" />
+                <ValidationMessage For="@(() => Weighing.GrossWeight)" />
 
             </div>
             <div class="form-group col-lg-4">
                 <label for="tareWeight">Destare:</label>
-                <RadzenNumeric TValue="double" @bind-Value="productWeighing.TareWeight" Min="0" Disabled="true" class="form-control" />
-                <ValidationMessage For="@(() => productWeighing.TareWeight)" />
+                <RadzenNumeric TValue="double" @bind-Value="Weighing.TareWeight" Min="0" Disabled="true" class="form-control" />
+                <ValidationMessage For="@(() => Weighing.TareWeight)" />
 
             </div>
             <div class="form-group col-lg-4">
                 <label for="netWeight">Peso Neto:</label>
-                <RadzenNumeric TValue="double" @bind-Value="productWeighing.NetWeight" Min="0" Disabled="true" class="form-control" />
-                <ValidationMessage For="@(() => productWeighing.NetWeight)" />
+                <RadzenNumeric TValue="double" @bind-Value="Weighing.NetWeight" Min="0" Disabled="true" class="form-control" />
+                <ValidationMessage For="@(() => Weighing.NetWeight)" />
 
             </div>
         </div>
@@ -163,21 +163,21 @@
 @code {
 
     [Parameter]
-    public EventCallback<ProductWeighing> OnProductWeighingCreated { get; set; }
+    public EventCallback<Weighing> OnWeighingCreated { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
-    public ProductEntry ProductEntry { get; set; }
+    public Input Input { get; set; }
 
-    private AddProductWeighingRequest productWeighing = new AddProductWeighingRequest();
+    private AddWeighingRequest Weighing = new AddWeighingRequest();
     private ProductRecordPackaging palotRecordPackaging = new ProductRecordPackaging();
     private ProductRecordPackaging paletRecordPackaging = new ProductRecordPackaging();
     private ProductRecordPackaging boxRecordPackaging = new ProductRecordPackaging();
 
     private List<Fruit> fruits = new List<Fruit>();
-    private List<ColdRoom> coldRooms = new List<ColdRoom>();
+    private List<Storage> storages = new List<Storage>();
     private List<Rate> rates = new List<Rate>();
     private List<Packaging> palotPackagings = new List<Packaging>();
     private List<Packaging> paletPackagings = new List<Packaging>();
@@ -191,16 +191,16 @@
     protected override async Task OnInitializedAsync()
     {
 
-        productWeighing = new AddProductWeighingRequest
+        Weighing = new AddWeighingRequest
         {
-            CampaingId = ProductEntry.CampaingId,
-            ProductEntryNumber = ProductEntry.ProductEntryNumber,
-            BuyerId = ProductEntry.Buyer.CustomerId,
+            CampaignId = Input.CampaignId,
+            InputNumber = Input.InputNumber,
+            BuyerId = Input.Buyer.CustomerId,
             ProductRecords = new List<ProductRecordPackaging>()
         };
 
         fruits = (await Mediator.Send(new GetAllFruitsQuery()).ConfigureAwait(false))?.ToList();
-        coldRooms = (await Mediator.Send(new GetColdAllRoomsQuery()).ConfigureAwait(false)).ToList();
+        storages = (await Mediator.Send(new GetColdAllRoomsQuery()).ConfigureAwait(false)).ToList();
         rates = (await Mediator.Send(new GetAllRatesQuery()).ConfigureAwait(false)).ToList();
         await LoadPackagings();
 
@@ -209,12 +209,12 @@
 
     }
 
-    private async Task AddProductWeighing()
+    private async Task AddWeighing()
     {
         isLoading = true;
-        ProductWeighing productWeighingCreated = await productWeighingService.AddAsync(this.productWeighing);
+        Weighing WeighingCreated = await WeighingService.AddAsync(this.Weighing);
 
-        if (productWeighingCreated != null)
+        if (WeighingCreated != null)
         {
             var message = new NotificationMessage()
             {
@@ -223,7 +223,7 @@
                 Detail = "La entrada se ha añadido correctamente",
                 Duration = 4000
             };
-            await OnProductWeighingCreated.InvokeAsync(productWeighingCreated);
+            await OnWeighingCreated.InvokeAsync(WeighingCreated);
             Notify(message);
         }
         else
@@ -247,7 +247,7 @@
         {
             productPackaging.PackagingWeight = productPackaging.Packaging.Weight;
             productPackaging.TotalWeight = productPackaging.Quantity * productPackaging.PackagingWeight;
-            productWeighing.ProductRecords.Add(productPackaging);
+            Weighing.ProductRecords.Add(productPackaging);
         }
         else
         {
@@ -255,7 +255,7 @@
             productPackaging.TotalWeight = 0;
             productPackaging.Quantity = 0;
             productPackaging.IsOwnPackaging = false;
-            productWeighing.ProductRecords.Remove(productPackaging);
+            Weighing.ProductRecords.Remove(productPackaging);
         }
 
         disablePalets = palotRecordPackaging.Packaging != null;
@@ -267,7 +267,7 @@
             boxRecordPackaging.TotalWeight = 0;
             boxRecordPackaging.Quantity = 0;
             boxRecordPackaging.IsOwnPackaging = false;
-            productWeighing.ProductRecords.Remove(boxRecordPackaging);
+            Weighing.ProductRecords.Remove(boxRecordPackaging);
         }
         disablePalots = boxRecordPackaging.Packaging != null || paletRecordPackaging.Packaging != null;
 
@@ -282,8 +282,8 @@
 
     private void UpdateProductWeight()
     {
-        productWeighing.TareWeight = GetTareWeight();
-        productWeighing.NetWeight = productWeighing.GrossWeight - productWeighing.TareWeight;
+        Weighing.TareWeight = GetTareWeight();
+        Weighing.NetWeight = Weighing.GrossWeight - Weighing.TareWeight;
     }
 
     private double GetTareWeight()

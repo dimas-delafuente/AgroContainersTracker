@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 
 namespace AgroContainerTracker.Application.Features
@@ -17,21 +17,21 @@ namespace AgroContainerTracker.Application.Features
         public static Rate ToDomain(this UpdateRateCommand command) =>
             new Rate
             {
-                RateId = command.RateId,
+                Id = command.RateId,
                 Name = command.Name,
-                Value = command.Value,
-                SecondaryValue = command.SecondaryValue,
+                MainPrice = command.Value,
+                SecondaryPrice = command.SecondaryValue,
                 Description = command.Description
             };
 
         public static UpdateRateCommand ToCommand(this Rate rate) => rate == null ? null 
             : new UpdateRateCommand
             {
-                RateId = rate.RateId,
+                RateId = rate.Id,
                 Description = rate.Description,
                 Name = rate.Name,
-                SecondaryValue = rate.SecondaryValue,
-                Value = rate.Value
+                SecondaryValue = rate.SecondaryPrice,
+                Value = rate.MainPrice
             };
     }
 }

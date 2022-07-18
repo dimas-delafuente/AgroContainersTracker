@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,10 +10,12 @@ namespace AgroContainerTracker.Data.Configurations
         {
             entityBuilder.ToTable("Fruits");
 
-            entityBuilder.HasKey(e => e.FruitId)
+            entityBuilder.HasKey(e => e.Id)
                     .HasName("Fruits_PK");
 
-            entityBuilder.Property(e => e.FruitId).HasColumnType("int");
+            entityBuilder.Property(e => e.Id)
+                .HasColumnName("FruitId")
+                .HasColumnType("int");
 
             entityBuilder.Property(e => e.Name)
                 .HasColumnType("nvarchar(50)");

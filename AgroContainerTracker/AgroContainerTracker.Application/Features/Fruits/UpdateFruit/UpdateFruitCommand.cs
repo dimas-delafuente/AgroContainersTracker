@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 
 namespace AgroContainerTracker.Application.Features

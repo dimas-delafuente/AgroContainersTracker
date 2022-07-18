@@ -1,5 +1,5 @@
 ﻿using AgroContainerTracker.Application.Features;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using FluentValidation;
 using MediatR;
 using System;
@@ -17,15 +17,15 @@ namespace AgroContainerTracker.Infrastructure.Validators
                 .NotEmpty().WithMessage(ValidationMessages.REQUIRED_FIELD_MESSAGE)
                 .MustAsync(async (rate, name, cancellation) =>
                 {
-                    Rate currentRate = await mediator.Send(new GetRateByIdQuery(rate.RateId)).ConfigureAwait(false);
+                    Rate currentRate = await mediator.Send(new GetRateByIdQuery(rate.Id)).ConfigureAwait(false);
                     return NameHasChanged(currentRate.Name, name) ? !await mediator.Send(new ExistsRateNameQuery(name)).ConfigureAwait(false) : true;
                     
                 }).WithMessage(NAME_EXISTS_MESSAGE);
 
-            RuleFor(v => v.Value)
+            RuleFor(v => v.MainPrice)
                 .GreaterThanOrEqualTo(0.0).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE);
 
-            RuleFor(v => v.SecondaryValue)
+            RuleFor(v => v.SecondaryPrice)
                 .GreaterThanOrEqualTo(0.0).WithMessage(ValidationMessages.MIN_VALUE_MESSAGE);
 
             RuleFor(v => v.Description)

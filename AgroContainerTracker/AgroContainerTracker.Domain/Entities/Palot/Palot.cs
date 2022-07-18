@@ -1,17 +1,18 @@
-﻿namespace AgroContainerTracker.Domain.Entities
+﻿using AgroContainerTracker.Domain;
+
+namespace AgroContainerTracker.Domain
 {
-    public class Palot
+    public class Palot : Entity<int>, IAggregate
     {
         public enum PalotType
         {
             Box,
             Palot
         }
-        public int PalotId { get; set; }
 
-        public string PalotCode { get; set; }
+        public string PalotCode { get; set; } = null!;
 
-        public string ArrivalNumber { get; set; }
+        public string? ArrivalNumber { get; set; }
 
         public DateTime Arrival { get; set; }
 
@@ -21,13 +22,13 @@
 
         public bool IsActive { get; set; }
 
-        public int ColdRoomId { get; set; }
+        public int StorageId { get; set; }
 
-        public Customer Seller { get; set; }
+        public int SellerId { get; set; }
 
-        public Customer Buyer { get; set; }
+        public int BuyerId { get; set; }
 
-        public Fruit Fruit { get; set; }
+        public int FruitId { get; set; }
 
         public PalotType Type { get; set; }
     }

@@ -1,11 +1,11 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 
 namespace AgroContainerTracker.Application.Features
 {
-    public class UpdateColdRoomCommand : IRequest<bool>
+    public class UpdateStorageCommand : IRequest<bool>
     {
-        public int ColdRoomId { get; set; }
+        public int StorageId { get; set; }
         public int Number { get; set; }
         public string Description { get; set; }
         public double Surface { get; set; }
@@ -14,13 +14,13 @@ namespace AgroContainerTracker.Application.Features
         public double Humidity { get; set; }
     }
 
-    public static class UpdateColdRoomCommandExtensions
+    public static class UpdateStorageCommandExtensions
     {
-        public static ColdRoom ToDomain(this UpdateColdRoomCommand command)
+        public static Storage ToDomain(this UpdateStorageCommand command)
         {
-            return new ColdRoom
+            return new Storage
             {
-                ColdRoomId = command.ColdRoomId,
+                Id = command.StorageId,
                 Number = command.Number,
                 Description = command.Description,
                 Surface = command.Surface,

@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using MediatR;
 using System.Collections.Generic;

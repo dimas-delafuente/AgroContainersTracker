@@ -1,6 +1,4 @@
-﻿using AgroContainerTracker.Domain.Common;
-
-namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
     public interface IFruitRepository : IRepository<Fruit>
     {

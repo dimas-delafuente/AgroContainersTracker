@@ -1,21 +1,25 @@
-﻿using AgroContainerTracker.Data.Entities;
+﻿using AgroContainerTracker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AgroContainerTracker.Data.Configurations
 {
-    public class CampaingConfiguration : IEntityTypeConfiguration<CampaingEntity>
+    public class CampaignConfiguration : IEntityTypeConfiguration<Campaign>
     {
-        public void Configure(EntityTypeBuilder<CampaingEntity> entityBuilder)
+        public void Configure(EntityTypeBuilder<Campaign> entityBuilder)
         {
-            entityBuilder.ToTable("Campaings");
+            entityBuilder.ToTable("Campaigns");
 
-            entityBuilder.HasKey(e => e.CampaingId).HasName("Campaings_PK");
+            entityBuilder.HasKey("CampaignId");
 
-            entityBuilder.Property(e => e.CampaingId)
+            entityBuilder.Property(e => e.Id)
+                .HasColumnName("CampaignId")
                 .IsRequired()
                 .HasColumnType("int");
 
+            entityBuilder.HasMany(e => e.Inputs)
+                .WithOne(d => d.Campaign)
+                .HasForeignKey("InputId", "CampaignId");
         }
     }
 }

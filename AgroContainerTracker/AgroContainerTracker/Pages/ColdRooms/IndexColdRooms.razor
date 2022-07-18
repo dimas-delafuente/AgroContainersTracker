@@ -13,48 +13,48 @@
 
 <div class="row mt-4">
     <div class="col-lg-4">
-        <button @onclick="() => OpenAddColdRoom()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cámara</button>
+        <button @onclick="() => OpenAddStorage()" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Agregar cámara</button>
     </div>
 </div>
 
-@if (coldRooms == null)
+@if (storages == null)
 {
     <p><em>Cargando...</em></p>
 }
 else
 {
     <div class="row mt-4">
-        @foreach (var coldRoom in coldRooms)
+        @foreach (var storage in storages)
         {
             <div class="col-lg-3">
                 <div class="box">
                     <div>
                         <div class="row box-header">
-                            <h3 class="mb-xs ml-2"><strong>Cámara @coldRoom.Number</strong></h3>
+                            <h3 class="mb-xs ml-2"><strong>Cámara @storage.Number</strong></h3>
                             <div class="mr-2">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                     <span class="oi oi-ellipses"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user">
-                                    <li @onclick="() => OpenColdRoomEdit(coldRoom)">
+                                    <li @onclick="() => OpenStorageEdit(storage)">
                                         <a><span class="oi oi-pencil"></span> Editar </a>
 
                                     </li>
-                                    <li @onclick="() => ShowRemoveColdRoomDialog(coldRoom)">
+                                    <li @onclick="() => ShowRemoveStorageDialog(storage)">
                                         <a><span class="oi oi-trash"></span> Eliminar</a>
                                     </li>
                                 </ul>
-                                @* <span class="oi oi-pencil" @onclick="() => OpenColdRoomEdit(coldRoom)"></span>
-                                    <span class="oi oi-trash" @onclick="() => ShowRemoveColdRoomDialog(coldRoom)"></span> *@
+                                @* <span class="oi oi-pencil" @onclick="() => OpenStorageEdit(storage)"></span>
+                                    <span class="oi oi-trash" @onclick="() => ShowRemoveStorageDialog(storage)"></span> *@
                             </div>
 
                         </div>
-                        <div class="font-bold">@coldRoom.Description</div>
+                        <div class="font-bold">@storage.Description</div>
                         <hr>
                         <div class="cold-room-details">
-                            <span>Capacidad (kg): <p class="float-right">@coldRoom.Capacity.ToString("N1", CultureInfo.CreateSpecificCulture("es-ES"))</p></span>
-                            <span>Superficie (m2): <p class="float-right">@coldRoom.Surface.ToString("N1", CultureInfo.CreateSpecificCulture("es-ES"))</p></span>
-                            <span>Temperatura: <p class="float-right">@coldRoom.Temperature.ToString("G", CultureInfo.CreateSpecificCulture("es-ES")) ºC</p></span>
+                            <span>Capacidad (kg): <p class="float-right">@storage.Capacity.ToString("N1", CultureInfo.CreateSpecificCulture("es-ES"))</p></span>
+                            <span>Superficie (m2): <p class="float-right">@storage.Surface.ToString("N1", CultureInfo.CreateSpecificCulture("es-ES"))</p></span>
+                            <span>Temperatura: <p class="float-right">@storage.Temperature.ToString("G", CultureInfo.CreateSpecificCulture("es-ES")) ºC</p></span>
                         </div>
                     </div>
 
@@ -77,7 +77,7 @@ else
 
 @code {
 
-    private List<ColdRoom> coldRooms = new List<ColdRoom>();
+    private List<Storage> storages = new List<Storage>();
     private bool isLoading = true;
     private string errorMessage;
 
@@ -85,46 +85,46 @@ else
     {
         if (firstRender)
         {
-            coldRooms = (await Mediator.Send(new GetColdAllRoomsQuery()).ConfigureAwait(false))?.ToList();
+            storages = (await Mediator.Send(new GetColdAllRoomsQuery()).ConfigureAwait(false))?.ToList();
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
     }
 
-    private async Task OpenAddColdRoom()
+    private async Task OpenAddStorage()
     {
-        CreateColdRoomCommand coldRoom = new CreateColdRoomCommand();
+        CreateStorageCommand storage = new CreateStorageCommand();
         await dialogService.OpenAsync("Añadir cámara", ds =>
-            @<EditForm Model="@coldRoom" OnValidSubmit="() => AddColdRoom(coldRoom)">
+            @<EditForm Model="@storage" OnValidSubmit="() => AddStorage(storage)">
                 <FluentValidator></FluentValidator>
                 <div>
                     <div class="row">
                         <div class="form-group col-lg-3">
                             <label for="code">Nº Cámara:</label>
-                            <InputNumber id="code" @bind-Value="coldRoom.Number" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Number" />
+                            <InputNumber id="code" @bind-Value="storage.Number" class="form-control" />
+                            <ValidationMessage For="() => storage.Number" />
                         </div>
                         <div class="form-group col-lg-9">
                             <label for="name">Descripción:</label>
-                            <InputText id="name" @bind-Value="coldRoom.Description" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Description" />
+                            <InputText id="name" @bind-Value="storage.Description" class="form-control" />
+                            <ValidationMessage For="() => storage.Description" />
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-4">
                             <label for="surface">Superficie (m2):</label>
-                            <InputNumber id="surface" @bind-Value="coldRoom.Surface" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Surface" />
+                            <InputNumber id="surface" @bind-Value="storage.Surface" class="form-control" />
+                            <ValidationMessage For="() => storage.Surface" />
                         </div>
                         <div class="form-group col-lg-4">
                             <label for="capacity">Capacidad (kg):</label>
-                            <InputNumber id="capacity" @bind-Value="coldRoom.Capacity" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Capacity" />
+                            <InputNumber id="capacity" @bind-Value="storage.Capacity" class="form-control" />
+                            <ValidationMessage For="() => storage.Capacity" />
                         </div>
                         <div class="form-group col-lg-4">
                             <label for="temperature">Temperatura (ºC):</label>
-                            <InputNumber id="temperature" @bind-Value="coldRoom.Temperature" class="form-control" />
-                            <ValidationMessage For="() => coldRoom.Temperature" />
+                            <InputNumber id="temperature" @bind-Value="storage.Temperature" class="form-control" />
+                            <ValidationMessage For="() => storage.Temperature" />
                         </div>
                     </div>
 
@@ -144,15 +144,15 @@ else
         );
     }
 
-    private async Task AddColdRoom(CreateColdRoomCommand coldRoom)
+    private async Task AddStorage(CreateStorageCommand storage)
     {
         NotificationMessage message;
-        ColdRoom coldRoomCreated = await Mediator.Send(coldRoom).ConfigureAwait(false);
+        Storage storageCreated = await Mediator.Send(storage).ConfigureAwait(false);
 
-        if (coldRoomCreated != null)
+        if (storageCreated != null)
         {
             dialogService.Close(true);
-            coldRooms.Add(coldRoomCreated);
+            storages.Add(storageCreated);
             await InvokeAsync(() => { StateHasChanged(); });
 
             message = new NotificationMessage()
@@ -179,15 +179,15 @@ else
         Notify(message);
     }
 
-    private async Task EditColdRoom(UpdateColdRoomCommand coldRoom)
+    private async Task EditStorage(UpdateStorageCommand storage)
     {
         NotificationMessage message;
-        bool coldRoomCreated = await Mediator.Send(coldRoom).ConfigureAwait(false);
+        bool storageCreated = await Mediator.Send(storage).ConfigureAwait(false);
 
-        if (coldRoomCreated)
+        if (storageCreated)
         {
-            int coldRoomToUpdate = coldRooms.FindIndex(x => x.ColdRoomId.Equals(coldRoom.ColdRoomId));
-            coldRooms[coldRoomToUpdate] = coldRoom.ToDomain();
+            int storageToUpdate = storages.FindIndex(x => x.Id.Equals(storage.StorageId));
+            storages[storageToUpdate] = storage.ToDomain();
 
             dialogService.Close(true);
             await InvokeAsync(() => { StateHasChanged(); });
@@ -216,49 +216,49 @@ else
         Notify(message);
     }
 
-    private async Task OpenColdRoomEdit(ColdRoom oldColdRoom)
+    private async Task OpenStorageEdit(Storage oldStorage)
     {
-        UpdateColdRoomCommand coldRoom = new UpdateColdRoomCommand
+        UpdateStorageCommand storage = new UpdateStorageCommand
             {
-                ColdRoomId = oldColdRoom.ColdRoomId,
-                Number = oldColdRoom.Number,
-                Description = oldColdRoom.Description,
-                Surface = oldColdRoom.Surface,
-                Capacity = oldColdRoom.Capacity,
-                Temperature = oldColdRoom.Temperature
+                StorageId = oldStorage.Id,
+                Number = oldStorage.Number,
+                Description = oldStorage.Description,
+                Surface = oldStorage.Surface,
+                Capacity = oldStorage.Capacity,
+                Temperature = oldStorage.Temperature
             };
 
         await dialogService.OpenAsync("Editar cámara", ds =>
-    @<EditForm Model="@coldRoom" OnValidSubmit="() => EditColdRoom(coldRoom)">
+    @<EditForm Model="@storage" OnValidSubmit="() => EditStorage(storage)">
         <FluentValidator></FluentValidator>
         <div>
             <div class="row">
                 <div class="form-group col-lg-3">
                     <label for="code">Nº Cámara:</label>
-                    <InputNumber id="code" @bind-Value="coldRoom.Number" class="form-control" />
-                    <ValidationMessage For="() => coldRoom.Number" />
+                    <InputNumber id="code" @bind-Value="storage.Number" class="form-control" />
+                    <ValidationMessage For="() => storage.Number" />
                 </div>
                 <div class="form-group col-lg-9">
                     <label for="name">Descripción:</label>
-                    <InputText id="name" @bind-Value="coldRoom.Description" class="form-control" />
-                    <ValidationMessage For="() => coldRoom.Description" />
+                    <InputText id="name" @bind-Value="storage.Description" class="form-control" />
+                    <ValidationMessage For="() => storage.Description" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-4">
                     <label for="surface">Superficie (m2):</label>
-                    <InputNumber id="surface" @bind-Value="coldRoom.Surface" class="form-control" />
-                    <ValidationMessage For="() => coldRoom.Surface" />
+                    <InputNumber id="surface" @bind-Value="storage.Surface" class="form-control" />
+                    <ValidationMessage For="() => storage.Surface" />
                 </div>
                 <div class="form-group col-lg-4">
                     <label for="capacity">Capacidad (kg):</label>
-                    <InputNumber id="capacity" @bind-Value="coldRoom.Capacity" class="form-control" />
-                    <ValidationMessage For="() => coldRoom.Capacity" />
+                    <InputNumber id="capacity" @bind-Value="storage.Capacity" class="form-control" />
+                    <ValidationMessage For="() => storage.Capacity" />
                 </div>
                 <div class="form-group col-lg-4">
                     <label for="temperature">Temperatura (ºC):</label>
-                    <InputNumber id="temperature" @bind-Value="coldRoom.Temperature" class="form-control" />
-                    <ValidationMessage For="() => coldRoom.Temperature" />
+                    <InputNumber id="temperature" @bind-Value="storage.Temperature" class="form-control" />
+                    <ValidationMessage For="() => storage.Temperature" />
                 </div>
             </div>
 
@@ -277,7 +277,7 @@ else
         );
     }
 
-    private async Task ShowRemoveColdRoomDialog(ColdRoom coldRoom)
+    private async Task ShowRemoveStorageDialog(Storage storage)
     {
         await dialogService.OpenAsync("Eliminar cámara", ds =>
     @<div class="text-center" style="padding: 20px;">
@@ -285,22 +285,22 @@ else
         <div class="row">
             <div class="col-md-12 text-center">
                 <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                <RadzenButton Text="Eliminar" Click="() => RemoveColdRoom(coldRoom)" ButtonStyle="ButtonStyle.Danger" />
+                <RadzenButton Text="Eliminar" Click="() => RemoveStorage(storage)" ButtonStyle="ButtonStyle.Danger" />
             </div>
         </div>
     </div>
     );
     }
 
-    private async Task RemoveColdRoom(ColdRoom coldRoom)
+    private async Task RemoveStorage(Storage storage)
     {
-        bool deleted = await Mediator.Send(new DeleteColdRoomCommand(coldRoom.ColdRoomId)).ConfigureAwait(false);
+        bool deleted = await Mediator.Send(new DeleteStorageCommand(storage.Id)).ConfigureAwait(false);
         dialogService.Close(true);
         NotificationMessage message;
 
         if (deleted)
         {
-            coldRooms.Remove(coldRoom);
+            storages.Remove(storage);
             await InvokeAsync(() => { StateHasChanged(); });
 
             message = new NotificationMessage()
@@ -325,9 +325,9 @@ else
         Notify(message);
     }
 
-    private void OpenColdRoomDetails(int coldRoomId)
+    private void OpenStorageDetails(int storageId)
     {
-        navigationManager.NavigateTo($"/coldRooms/details/{coldRoomId}");
+        navigationManager.NavigateTo($"/storages/details/{storageId}");
     }
 
 

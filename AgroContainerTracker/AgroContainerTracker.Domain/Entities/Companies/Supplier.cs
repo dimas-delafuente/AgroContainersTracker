@@ -1,13 +1,7 @@
-﻿namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public class Supplier : CompanyBase
+    public class Supplier : IAggregate
     {
-        public Supplier()
-        {
-            Country = new Country();
-        }
-        public int SupplierId { get; set; }
-
-        public int SupplierNumber { get; set; }
+        public Company Company { get; set; } = null!;
     }
 }

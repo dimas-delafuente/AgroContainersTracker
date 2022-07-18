@@ -1,13 +1,12 @@
 ﻿@page "/entradas"
 
-@using AgroContainerTracker.Domain.ProductManagement
 @using AgroContainerTracker.Domain.Companies
 @using AgroContainerTracker.Core.Services
 
 @inject IJSRuntime jsRuntime
-@inject IProductEntryService productEntryService
+
 @inject ICustomerService customerService
-@inject ICampaingService campaingService
+@inject ICampaignService CampaignService
 
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
@@ -31,47 +30,46 @@
         <a href="/entradas/nueva-entrada" class="btn btn-outline-primary"><span class="oi oi-plus"></span> Nueva entrada</a>
     </div>
     <div class="col-3">
-        <label for="campaing">Campaña:</label>
-        <RadzenDropDown AllowFiltering="false" Data="campaings" @bind-Value="currentCampaing"
-                        Style="display: block;" Change="@((value) => ChangeCampaing((int)value))" />
+        <label for="Campaign">Campaña:</label>
+        <RadzenDropDown AllowFiltering="false" Data="campaignIds" @bind-Value="currentCampaign"
+                        Style="display: block;" Change="@((value) => ChangeCampaign((int)value))" />
     </div>
 </div>
 
-@if (productEntries == null)
+@if (inputs == null)
 {
     <p><em>Cargando...</em></p>
 }
 else
 {
-    
     <div class="row mt-3">
         <div class="col-lg-12">
             <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                        AllowSorting="true" Data="@productEntries" TItem="ProductEntry" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
+                        AllowSorting="true" Data="@inputs" TItem="Input" ColumnWidth="150px" EmptyText="No se han encontrado resultados.">
                 <Columns>
-                    <RadzenGridColumn TItem="ProductEntry" Property="ProductEntryNumber" Title="Entrada">
+                    <RadzenGridColumn TItem="Input" Property="InputNumber" Title="Entrada">
                         <Template Context="data">
-                            @data.CampaingId@data.ProductEntryNumber.ToString("000")
+                            @data.CampaignId@data.Id.ToString("000")
                         </Template>
                         <FooterTemplate>
-                            Total: <b>@productEntries.Count()</b>
+                            Total: <b>@inputs.Count()</b>
                         </FooterTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductEntry" Property="EntryDate" Title="Fecha">
+                    <RadzenGridColumn TItem="Input" Property="EntryDate" Title="Fecha">
                         <Template Context="data">
-                            @data.EntryDate.ToString("dd/MM/yyyy")
+                            @data.CreatedDate.ToString("dd/MM/yyyy")
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductEntry" Property="Closed" Title="Cerrada">
+                    <RadzenGridColumn TItem="Input" Property="Closed" Title="Cerrada">
                         <Template Context="data">
                             @if(data.Closed) { <p>Si</p> }
                             else { <p>No</p>}
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductEntry" Property="Buyer.Name" Title="Comprador" />
-                    <RadzenGridColumn TItem="ProductEntry" Property="Payer.Name" Title="Pagador" />
+                    <RadzenGridColumn TItem="Input" Property="Buyer.Name" Title="Comprador" />
+                    <RadzenGridColumn TItem="Input" Property="Payer.Name" Title="Pagador" />
 
-                    <RadzenGridColumn TItem="ProductEntry" Property="Sellers" Title="Fruticultores" Width="200px">
+                    <RadzenGridColumn TItem="Input" Property="Sellers" Title="Fruticultores" Width="200px">
                         <Template Context="data">
                             @foreach (var seller in data?.Sellers)
                             {
@@ -80,17 +78,17 @@ else
                         </Template>
                     </RadzenGridColumn>
 
-                    <RadzenGridColumn TItem="ProductEntry" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                    <RadzenGridColumn TItem="Input" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-magnifying-glass" @onclick="() => OpenEntryDetails(data.ProductEntryNumber)"></span>
+                            <span class="oi oi-magnifying-glass" @onclick="() => OpenEntryDetails(data.Id)"></span>
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductEntry" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                    <RadzenGridColumn TItem="Input" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
-                            <span class="oi oi-pencil" @onclick="() => OpenEntryEdit(data.ProductEntryNumber)"></span>
+                            <span class="oi oi-pencil" @onclick="() => OpenEntryEdit(data.Id)"></span>
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductEntry" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
+                    <RadzenGridColumn TItem="Input" Sortable="false" Filterable="false" TextAlign="TextAlign.Center" Width="50px">
                         <Template Context="data">
                             <span class="oi oi-trash" @onclick="() => ShowRemoveEntryDialog(data)"></span>
                         </Template>
@@ -102,94 +100,94 @@ else
 }
 
 @code {
-    private List<ProductEntry> productEntries = new List<ProductEntry>();
+    private List<Input> inputs = new List<Input>();
     private List<Customer> customers = new List<Customer>();
-    private IEnumerable<int> campaings = new List<int>();
+    private IEnumerable<int> campaignIds = new List<int>();
 
     private bool isLoading = true;
-    private int currentCampaing = DateTime.Now.Year;
+    private int currentCampaign = DateTime.Now.Year;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            productEntries = await productEntryService.GetByCampaingIdAsync(currentCampaing);
-            campaings = (await campaingService.GetAllAsync().ConfigureAwait(false)).Select(x => x.CampaingId);
+            inputs = (await Mediator.Send(new GetInputByCampaignIdQuery(currentCampaign))).ToList();
+            campaignIds = (await Mediator.Send(new GetAllCampaignsQuery()).ConfigureAwait(false))?.ToList().Select(x => x.CampaignId);
 
             isLoading = false;
             await InvokeAsync(() => { StateHasChanged(); });
         }
     }
 
-    protected async Task ChangeCampaing(int campaingIg)
+    protected async Task ChangeCampaign(int campaignId)
     {
         isLoading = true;
-        productEntries = await productEntryService.GetByCampaingIdAsync(currentCampaing);
+        inputs = (await Mediator.Send(new GetInputByCampaignIdQuery(campaignId))).ToList();
         await InvokeAsync(() => { StateHasChanged(); });
         isLoading = false;
     }
 
-    private void OpenEntryDetails(long productEntryNumber)
+    private void OpenEntryDetails(long InputNumber)
     {
-        navigationManager.NavigateTo($"/entradas/{currentCampaing}/detalles/{productEntryNumber}");
+        navigationManager.NavigateTo($"/entradas/{currentCampaign}/detalles/{InputNumber}");
     }
 
-    private void OpenEntryEdit(long productEntryNumber)
+    private void OpenEntryEdit(long InputNumber)
     {
-        navigationManager.NavigateTo($"/entradas/{currentCampaing}/editar/{productEntryNumber}");
+        navigationManager.NavigateTo($"/entradas/{currentCampaign}/editar/{InputNumber}");
     }
 
-    private async Task ShowRemoveEntryDialog(ProductEntry productEntry)
+    private async Task ShowRemoveEntryDialog(Input Input)
     {
         await dialogService.OpenAsync("Eliminar entrada", ds =>
-    @<div class="text-center" style="padding: 20px;">
-        <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este envase?</p>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-                <RadzenButton Text="Eliminar" Click="() => RemoveEntry(productEntry)" ButtonStyle="ButtonStyle.Danger" />
+            @<div class="text-center" style="padding: 20px;">
+                <p Style="margin-bottom: 10px;">¿Estás seguro de que quieres borrar este envase?</p>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <RadzenButton Text="Cancelar" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                        <RadzenButton Text="Eliminar" Click="() => RemoveEntry(Input)" ButtonStyle="ButtonStyle.Danger" />
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    );
-}
+            );
+    }
 
-private async Task RemoveEntry(ProductEntry productEntry)
-{
-NotificationMessage message;
-bool deleted = await productEntryService.DeleteAsync(productEntry.CampaingId, productEntry.ProductEntryNumber).ConfigureAwait(false);
-dialogService.Close(true);
-
-
-if (deleted)
-{
-    productEntries.Remove(productEntry);
-    await InvokeAsync(() => { StateHasChanged(); });
-
-    message = new NotificationMessage()
+    private async Task RemoveEntry(Input Input)
     {
-        Severity = NotificationSeverity.Success,
-        Summary = "Entrada eliminada",
-        Detail = "La entrada se ha eliminado correctamente",
-        Duration = 4000
-    };
-}
-else
-{
-    message = new NotificationMessage()
+        NotificationMessage message;
+        bool deleted = await Mediator.Send(new DeleteInputCommand(Input.CampaignId, Input.Id)).ConfigureAwait(false);
+        dialogService.Close(true);
+
+
+        if (deleted)
+        {
+            inputs.Remove(Input);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Entrada eliminada",
+                Detail = "La entrada se ha eliminado correctamente",
+                Duration = 4000
+            };
+        }
+        else
+        {
+            message = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Se ha producido un error al borrar la entrada.",
+                Duration = 4000
+            };
+        }
+
+        Notify(message);
+    }
+
+    private void Notify(NotificationMessage message)
     {
-        Severity = NotificationSeverity.Error,
-        Summary = "Error",
-        Detail = "Se ha producido un error al borrar la entrada.",
-        Duration = 4000
-    };
-}
-
-Notify(message);
-}
-
-private void Notify(NotificationMessage message)
-{
-notificationService.Notify(message);
-}
+        notificationService.Notify(message);
+    }
 }

@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Application.Features
 {
-    internal class GetColdAllRoomHandler : ColdRoomBaseHandler, IRequestHandler<GetColdAllRoomsQuery, IEnumerable<ColdRoom>>
+    internal class GetColdAllRoomHandler : StorageBaseHandler, IRequestHandler<GetColdAllRoomsQuery, IEnumerable<Storage>>
     {
-        public GetColdAllRoomHandler(IColdRoomRepository coldRoomRepository) : base(coldRoomRepository)
+        public GetColdAllRoomHandler(IStorageRepository storageRepository) : base(storageRepository)
         {
 
         }
 
-        public async Task<IEnumerable<ColdRoom>> Handle(GetColdAllRoomsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Storage>> Handle(GetColdAllRoomsQuery request, CancellationToken cancellationToken)
         {
-            return await _coldRoomRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+            return await _storageRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

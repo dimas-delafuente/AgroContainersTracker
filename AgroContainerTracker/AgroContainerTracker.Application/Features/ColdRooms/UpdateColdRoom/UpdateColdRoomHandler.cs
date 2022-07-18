@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using MediatR;
 using System.Threading;
@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace AgroContainerTracker.Application.Features
 {
-    internal class UpdateColdRoomHandler : ColdRoomBaseHandler, IRequestHandler<UpdateColdRoomCommand, bool>
+    internal class UpdateStorageHandler : StorageBaseHandler, IRequestHandler<UpdateStorageCommand, bool>
     {
-        public UpdateColdRoomHandler(IColdRoomRepository coldRoomRepository) : base(coldRoomRepository)
+        public UpdateStorageHandler(IStorageRepository storageRepository) : base(storageRepository)
         {
         }
 
-        public async Task<bool> Handle(UpdateColdRoomCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UpdateStorageCommand request, CancellationToken cancellationToken)
         {
             Ensure.NotNull(request, nameof(request));
-            Ensure.Positive(request.ColdRoomId, nameof(request.ColdRoomId));
+            Ensure.Positive(request.StorageId, nameof(request.StorageId));
 
-            return await _coldRoomRepository.UpdateAsync(request.ColdRoomId, request.ToDomain(), cancellationToken).ConfigureAwait(false);
+            return await _storageRepository.UpdateAsync(request.StorageId, request.ToDomain(), cancellationToken).ConfigureAwait(false);
         }
     }
 }

@@ -1,17 +1,17 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using MediatR;
 
 namespace AgroContainerTracker.Application.Features
 {
-    public class GetColdRoomQuery : IRequest<ColdRoom>
+    public class GetStorageQuery : IRequest<Storage>
     {
-        public int ColdRoomId { get; set; }
+        public int StorageId { get; set; }
 
-        public GetColdRoomQuery(int coldRoomId)
+        public GetStorageQuery(int storageId)
         {
-            Ensure.Positive(coldRoomId, nameof(coldRoomId));
-            ColdRoomId = coldRoomId;
+            Ensure.Positive(storageId, nameof(storageId));
+            StorageId = storageId;
         }
     }
 }

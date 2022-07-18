@@ -1,27 +1,13 @@
-﻿using AgroContainerTracker.Domain.Common;
-using System.ComponentModel.DataAnnotations;
-
-namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public class Rate : IAggregate
+    public class Rate : Entity<int>, IAggregate
     {
-        public int RateId { get; set; }
+        public string Name { get; set; } = null!;
 
-        [Required]
-        public string Name { get; set; }
+        public Price MainPrice { get; set; } = null!;
 
-        [Required]
-        [Range(0.0, Double.MaxValue)]
-        public double Value { get; set; }
+        public Price SecondaryPrice { get; set; } = null!;
 
-        [Required]
-        [Range(0.0, Double.MaxValue)]
-        public double SecondaryValue { get; set; }
-
-        [MaxLength(300)]
-        public string Description { get; set; }
-
-        public virtual IEnumerable<Customer> Customers { get; set; }
-
+        public string? Description { get; set; }
     }
 }

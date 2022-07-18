@@ -6,7 +6,6 @@ using AgroContainerTracker.Infrastructure.Services.Reports;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http.Headers;
-using System.Reflection;
 
 namespace AgroContainerTracker.Infrastructure
 {
@@ -17,16 +16,13 @@ namespace AgroContainerTracker.Infrastructure
 
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<ICreditorService, CreditorService>();
             services.AddTransient<ICarrierService, CarrierService>();
 
-            services.AddTransient<ICampaingService, CampaingService>();
-            services.AddTransient<IProductEntryService, ProductEntryService>();
-            services.AddTransient<IProductWeighingService, ProductWeighingService>();
+            services.AddTransient<ICampaignService, CampaignService>();
+            services.AddTransient<IWeighingService, WeighingService>();
 
 
             //services.AddSingleton<IReportService<PackagingReport>, PackagingReportService>();

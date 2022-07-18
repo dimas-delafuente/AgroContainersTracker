@@ -4,7 +4,7 @@ namespace AgroContainerTracker.Domain.Reports
 {
     public class LabelReport : ReportData
     {
-        public ProductWeighing ProductWeighing { get; set; }
+        public Weighing Weighing { get; set; }
     }
 
     public enum LabelType

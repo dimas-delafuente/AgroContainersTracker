@@ -8,7 +8,7 @@ namespace AgroContainerTracker.Application.Features
         public string RateName { get; set; }
         public ExistsRateNameQuery(string rateName)
         {
-            Ensure.NotEmpty(rateName, nameof(rateName));
+            Ensure.NotNullOrEmpty(rateName, nameof(rateName));
             RateName = rateName;
         }
     }

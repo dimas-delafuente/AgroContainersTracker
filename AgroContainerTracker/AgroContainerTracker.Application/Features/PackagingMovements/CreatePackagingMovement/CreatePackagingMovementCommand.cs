@@ -1,4 +1,4 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using MediatR;
 using System;
 
@@ -8,7 +8,7 @@ namespace AgroContainerTracker.Application.Features
     {
         public int? PackagingId { get; set; }
 
-        public PackagMovementOperation Operation { get; set; }
+        public PackagingMovementOperation Operation { get; set; }
 
         public int Amount { get; set; }
 
@@ -24,11 +24,11 @@ namespace AgroContainerTracker.Application.Features
             {
                 PackagingId = command.PackagingId.Value,
                 Operation = command.Operation,
-                Amount = command.Amount,
+                Quantity = command.Amount,
                 Created = command.Created,
                 Customer = new Customer
                 {
-                    CustomerId = command.CustomerId.Value
+                    Id = command.CustomerId.Value
                 }
             };
     }

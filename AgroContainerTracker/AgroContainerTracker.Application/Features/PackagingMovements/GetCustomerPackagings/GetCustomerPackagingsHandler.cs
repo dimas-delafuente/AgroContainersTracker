@@ -1,11 +1,11 @@
-﻿using AgroContainerTracker.Domain.Entities;
+﻿using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AgroContainerTracker.Application.Features.Packagings.GetPackagingById
+namespace AgroContainerTracker.Application.Features
 {
     internal class GetCustomerPackagingsHandler : PackagingMovementsBaseHandler, IRequestHandler<GetCustomerPackagingsQuery, IEnumerable<PackagingMovement>>
     {

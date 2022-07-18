@@ -1,6 +1,5 @@
 ﻿using AgroContainerTracker.Data.Contexts;
-using AgroContainerTracker.Data.Entities;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using AgroContainerTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -27,22 +26,23 @@ namespace AgroContainerTracker.Data.Repositories
 
             try
             {
+                // TODO: Convert to domain event
                 var packaging = await _context.Packagings
-                    .FindAsync(packagingMovement.PackagingId, cancellationToken)
+                    .FindAsync(new object[] { packagingMovement.Packaging.Id }, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
                 if (packaging != null)
                 {
-                    packaging.Total = packagingMovement.Operation.Equals(Operation.Add) ?
-                        packaging.Total + packagingMovement.Amount :
-                        packaging.Total - packagingMovement.Amount;
+                    packaging.Total = packagingMovement.Operation.Equals(PackagingMovementOperation.Add) ?
+                        packaging.Total + packagingMovement.Quantity :
+                        packaging.Total - packagingMovement.Quantity;
 
                     packagingMovement.Total = packaging.Total;
 
                     var added = await _context.PackagingMovements.AddAsync(packagingMovement, cancellationToken).ConfigureAwait(false);
                     if (added.State.Equals(EntityState.Added))
                     {
-                        await _context.SaveChangesAsync().ConfigureAwait(false);
+                        await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                         return packagingMovement;
                     }
                 }
@@ -63,32 +63,21 @@ namespace AgroContainerTracker.Data.Repositories
         {
             try
             {
-                return await _context.Packagings
+                return await _context.PackagingMovements
                     .AsNoTracking()
-                    .Where(x => x.CustomerId.Equals(customerId))
-                    .SelectMany(x => x.PackagingMovements.Where(pm => pm.Created >= initDate && pm.Created <= endDate)
-                        .Select(pm => new PackagingMovement
-                        {
-                            PackagingMovementId = pm.PackagingMovementId,
-                            Customer = pm.Customer,
-                            Packaging = pm.Packaging,
-                            Created = pm.Created,
-                            Operation = pm.Operation,
-                            Amount = pm.Amount,
-                            Total = pm.Total
-                        }))
+                    .Include(x => x.Packaging)
+                        .ThenInclude(x => x.Owner)
+                    .Include(x => x.Receiver)
+                    .Where(x => x.Packaging.Owner.Company.Id == customerId)
                     .OrderBy(x => x.Created)
-                    .ToListAsync()
+                    .ToListAsync(cancellationToken)
                     .ConfigureAwait(false);
-
             }
             catch
             {
                 _context.DetachAll();
                 throw;
             }
-
-            return Enumerable.Empty<PackagingMovement>();
         }
     }
 }

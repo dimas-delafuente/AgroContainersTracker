@@ -1,5 +1,5 @@
 ﻿using AgroContainerTracker.Application.Features;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using FluentValidation;
 using MediatR;
 
@@ -40,7 +40,7 @@ namespace AgroContainerTracker.Infrastructure.Validators.Packagings
 
         private bool IsValidAmount(int currentTotal, CreatePackagingMovementCommand packagingMovement)
         {
-            return packagingMovement.Operation.Equals(PackagMovementOperation.Substract) ?
+            return packagingMovement.Operation.Equals(PackagingMovementOperation.Subtract) ?
                 (currentTotal - packagingMovement.Amount) >= 0 :
                 packagingMovement.Amount >= 0;
         }

@@ -6,18 +6,18 @@ using AgroContainerTracker.Domain.Rates;
 
 namespace AgroContainerTracker.Domain.ProductManagement
 {
-    public class ProductWeighing
+    public class Weighing
     {
-        public int ProductWeighingId { get; set; }
+        public int WeighingId { get; set; }
 
-        public int CampaingId { get; set; }
+        public int CampaignId { get; set; }
 
-        public int ProductEntryNumber { get; set; }
-        public ProductEntry ProductEntry { get; set; }
+        public int InputNumber { get; set; }
+        public Input Input { get; set; }
 
         public Fruit Fruit { get; set; }
 
-        public ColdRoom ColdRoom { get; set; }
+        public Storage Storage { get; set; }
 
         public Rate Rate { get; set; }
 
@@ -35,17 +35,17 @@ namespace AgroContainerTracker.Domain.ProductManagement
         public List<ProductRecord> ProductRecords { get; set; }
     }
 
-    public class AddProductWeighingRequest
+    public class AddWeighingRequest
     {
-        public int ProductWeighingId { get; set; }
+        public int WeighingId { get; set; }
 
-        public int CampaingId { get; set; }
+        public int CampaignId { get; set; }
 
-        public int ProductEntryNumber { get; set; }
+        public int InputNumber { get; set; }
 
         public int FruitId { get; set; }
 
-        public int ColdRoomId { get; set; }
+        public int StorageId { get; set; }
 
         public int RateId { get; set; }
 

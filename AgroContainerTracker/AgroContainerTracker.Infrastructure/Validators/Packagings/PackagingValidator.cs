@@ -1,5 +1,5 @@
 ﻿using AgroContainerTracker.Application.Features;
-using AgroContainerTracker.Domain.Entities;
+using AgroContainerTracker.Domain;
 using FluentValidation;
 using MediatR;
 using System;

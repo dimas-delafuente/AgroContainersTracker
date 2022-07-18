@@ -1,48 +1,21 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace AgroContainerTracker.Domain.Entities
+﻿namespace AgroContainerTracker.Domain
 {
-    public class CompanyBase
+    public class Company : Entity<int>, IAggregate
     {
+        public string CompanyCode { get; set; } = null!;
 
-        [Required]
-        [MaxLength(9)]
-        public string CompanyCode { get; set; }
+        public string Name { get; set; } = null!;
 
-        [Required]
-        public string Name { get; set; }
+        public string ContactName { get; set; } = null!;
 
-        [Required]
-        public string ContactName { get; set; }
+        public string Email { get; set; } = null!;
 
-        [EmailAddress]
-        [Required]
-        public string Email { get; set; }
+        public string Phone { get; set; } = null!;
 
-        [MaxLength(9)]
-        public string Phone { get; set; }
+        public string? Mobile { get; set; }
 
-        [MaxLength(9)]
-        public string Mobile { get; set; }
+        public Address Address { get; set; } = null!;
 
-        [Required]
-        public string Address { get; set; }
-
-        [Required]
-        public string Locality { get; set; }
-
-        [Required]
-        public string State { get; set; }
-
-        [MaxLength(5)]
-        [Required]
-        public string PostalCode { get; set; }
-
-        [Required]
-        public Country Country { get; set; }
-
-        [MaxLength(300)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }
