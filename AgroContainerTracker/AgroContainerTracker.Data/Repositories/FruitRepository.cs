@@ -85,9 +85,8 @@ namespace AgroContainerTracker.Data.Repositories
                 .ConfigureAwait(false);
         }
 
-        public async Task<bool> UpdateAsync(int fruitId, Fruit fruit, CancellationToken cancellationToken)
+        public async Task<bool> UpdateAsync(Fruit fruit, CancellationToken cancellationToken)
         {
-            Ensure.Positive(fruitId, nameof(fruitId));
             Ensure.NotNull(fruit, nameof(fruit));
 
             try
